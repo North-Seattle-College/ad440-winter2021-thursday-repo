@@ -37,7 +37,6 @@ if($doesntExist.NameAvailable){
     }
 } else {
     #If the storage account already exists
-    #TODO: Code below exists for testing purposes, replace with error logging instead for actual deployment
     Write-Host "Storage Account $storageAccountName already exists"
 }
 
