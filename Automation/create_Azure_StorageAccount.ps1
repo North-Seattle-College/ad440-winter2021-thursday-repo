@@ -39,11 +39,6 @@ if($doesntExist.NameAvailable){
     #If the storage account already exists
     #TODO: Code below exists for testing purposes, replace with error logging instead for actual deployment
     Write-Host "Storage Account $storageAccountName already exists"
-    $prompt = Read-Host -Prompt "Would you like to delete for script testing? y/n"
-    if($prompt = "y"){
-        Write-Host "Deleting Storage Account $storageAccountName"
-        Remove-AzStorageAccount -Name $storageAccountName -ResourceGroupName $resourceGroup
-    }
 }
 
 Read-Host -Prompt "Press enter to continue"
