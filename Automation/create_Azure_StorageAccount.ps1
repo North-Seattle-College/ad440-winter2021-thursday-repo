@@ -1,3 +1,5 @@
+Start-Transcript -Path "$PSScriptRoot\create_Azure_StorageAccountlog.log"
+Write-Host "Logging to $PSScriptRoot\create_Azure_StorageAccountlog.log"
 Write-Host "Create Azure Storage Account"
 
 # Name of resource group
@@ -31,12 +33,11 @@ if($doesntExist.NameAvailable){
     if(Get-AzStorageAccount -ResourceGroupName $resourceGroup -Name $storageAccountName){
         Write-Host "Successfully created storage account $storageAccountName"
     } else {
-        #Exists for testing purposes, replace with error logging instead for actual deployment
         throw "Failed to create storage account. Failure in create_Azure_StorageAccount.ps1"
     }
 } else {
     #If the storage account already exists
-    #Code below exists for testing purposes, replace with error logging instead for actual deployment
+    #TODO: Code below exists for testing purposes, replace with error logging instead for actual deployment
     Write-Host "Storage Account $storageAccountName already exists"
     $prompt = Read-Host -Prompt "Would you like to delete for script testing? y/n"
     if($prompt = "y"){
@@ -46,3 +47,4 @@ if($doesntExist.NameAvailable){
 }
 
 Read-Host -Prompt "Press enter to continue"
+Stop-Transcript
