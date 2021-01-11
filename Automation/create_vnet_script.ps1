@@ -1,0 +1,1 @@
+# https://github.com/Azure-Samples/resource-manager-python-template-deployment

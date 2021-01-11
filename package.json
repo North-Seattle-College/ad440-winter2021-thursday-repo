@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "azure-mgmt-resource": "^2.0.0-pre.17"
+  }
+}
