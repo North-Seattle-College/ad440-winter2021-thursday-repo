@@ -1,0 +1,23 @@
+{
+  "name": "ad440-winter2021-thursday-repo",
+  "version": "1.0.0",
+  "description": "none",
+  "main": "index.js",
+  "directories": {
+    "example": "example",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "none"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theKunte/ad440-winter2021-thursday-repo.git"
+  },
+  "author": "davidp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theKunte/ad440-winter2021-thursday-repo/issues"
+  },
+  "homepage": "https://github.com/theKunte/ad440-winter2021-thursday-repo#readme"
+}
