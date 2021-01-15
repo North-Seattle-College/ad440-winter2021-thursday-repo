@@ -13,7 +13,7 @@ jobs:
       matrix:
         node-version: [12.x]
     env:
-      AWS_PROFILE: ${{ secrets.AWS_CREDENTIALS }}
+      AWS_CREDS: ${{ secrets.AWS_CREDENTIALS }}
       NPM_CONFIG_PREFIX: "~/.npm-global"
     steps:
       - name: Checkout code
@@ -23,6 +23,7 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm install -g serverless@1.38.0
       - run: npm install -g serverless-artillery
+      - run: export AWS_PROFILE=$AWS_CREDS
       - run: ~/.npm-global/bin/slsart deploy
       - run: ~/.npm-global/bin/slsart invoke
       - run: ~/.npm-global/bin/slsart remove
