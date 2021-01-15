@@ -1,7 +1,7 @@
 name: Deploy Azure functions on pull request from development branch
 
 on:
-  push:
+  pull_request:
     branches:
       - feature/task14-AutoDeployAzureFunctions
 
