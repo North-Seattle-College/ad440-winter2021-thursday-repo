@@ -1,10 +1,14 @@
 import logging
+import os
 
 import azure.functions as func
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
+
+    db_username = os.environ["ENV_DATABASE_USERNAME"]
+    db_password = os.environ["ENV_DATABASE_PASSWORD"]
 
     name = req.params.get('name')
     if not name:
@@ -13,7 +17,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         except ValueError:
             pass
         else:
-            name = req_body.get('name')
+            name = req_body.get('test_string')
 
     if name:
         return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
