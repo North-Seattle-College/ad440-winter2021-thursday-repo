@@ -26,9 +26,7 @@ jobs:
       - run: touch ~/.aws/credentials
       - run: echo "$AWS_CREDS" > ~/.aws/credentials
       - run: export AWS_PROFILE=slsart-profile
-      - run: cd ~/.aws
-      - run: ls -la
-      - run: more config
+      - run: more ~/.aws/config
       - run: ~/.npm-global/bin/slsart deploy
       - run: ~/.npm-global/bin/slsart invoke
       - run: ~/.npm-global/bin/slsart remove
