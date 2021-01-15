@@ -14,14 +14,15 @@ jobs:
         node-version: [12.x]
     env:
       AWS_PROFILE: ${{ secrets.AWS_CREDENTIALS }}
+      NPM_CONFIG_PREFIX: "~/.npm-global"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install serverless@1.38.0
-      - run: npm install serverless-artillery
+      - run: npm install -g serverless@1.38.0
+      - run: npm install -g serverless-artillery
       - run: slsart deploy
       - run: slsart invoke
       - run: slsart remove
