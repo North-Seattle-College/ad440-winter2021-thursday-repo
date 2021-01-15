@@ -23,7 +23,6 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm install -g serverless@1.38.0
       - run: npm install -g serverless-artillery
-      - run: mkdir ~/.aws
       - run: touch ~/.aws/credentials
       - run: echo "$AWS_CREDS" > ~/.aws/credentials
       - run: export AWS_PROFILE=slsart-profile
