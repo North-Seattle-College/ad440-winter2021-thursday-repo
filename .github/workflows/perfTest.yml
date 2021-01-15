@@ -1,0 +1,27 @@
+name: Performance-Test
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  slsart-perf:
+    name: slsart Performance Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    env:
+      AWS_PROFILE: ${{ secrets.AWS_CREDENTIALS }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-versions: ${{ matrix.node }}
+      - run: npm install -g serverless
+      - run: npm install -g serverless-artillery
+      - run: slsart deploy
+      - run: slsart invoke
+      - run: slsart remove
