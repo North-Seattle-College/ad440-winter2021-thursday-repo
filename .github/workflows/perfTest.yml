@@ -20,9 +20,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install -g serverless@1.38.0
-      - run: npm install -g serverless-artillery
+      - run: npm install serverless@1.38.0
+      - run: npm install serverless-artillery
       - run: slsart deploy
       - run: slsart invoke
       - run: slsart remove
-      
