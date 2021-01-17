@@ -1,17 +1,20 @@
-param ($rgname, $vmname)
-#Following code to create a VM from:
+#Script to create a Virtual Machine on Azure.
 #https://docs.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-powershell
 
-'''
-Currently, script will ask for 2 params: desired ResourceGroupName and desired VirtualMachineName.
-Script will then create Resource Group with said name using the New-AzResourceGroup command.
-Then, using New-AzVm command, the script will create a virtual machine with desired VirtualMachineName.
-'''
-
-
+#Create a VM on Azure.
+param (
+    [Parameter(Mandatory)] $rgname, #Resource Group Name required.
+    [Parameter(Mandatory)] $vmname, #VM Name required
+    $location='West US2', #Default value
+    $vnetname='myVnet',  #Default value
+    $subnetname='mySubnet', #Default value
+    $nsgname='myNetworkSecurityGroup', #Default value
+    $publicipname='myPublicIpAddress' #Default value
+    )
 
 #Check to see if resource group name exists. If not it will create one by that name.
 Get-AzResourceGroup -Name $rgname -ErrorVariable norg -ErrorAction SilentlyContinue
+Write-Output $test
 if ($norg)
 {
     # ResourceGroup doesn't exist
@@ -24,18 +27,16 @@ else
     Write-Output "Resource group already exists, proceeding to create VM."
 }
 
+#Create VM. Will add the same error handling as resource groups in next push.
 New-AzVm `
     -ResourceGroupName $rgname `
     -Name $vmname `
-    -Location "West US2" `
+    -Location $location `
+    -VirtualNetworkName $vnetname `
+    -SubnetName $subnetname `
+    -SecurityGroupName $nsgname `
+    -PublicIpAddressName $publicipname `
     -OpenPorts 80,3389
 
-    # New-AzVm `
-    # -ResourceGroupName $rgname `
-    # -Name $vmname `
-    # -Location "West US2" `
-    # -VirtualNetworkName "myVnet" `
-    # -SubnetName "mySubnet" `
-    # -SecurityGroupName "myNetworkSecurityGroup" `
-    # -PublicIpAddressName "myPublicIpAddress" `
-    # -OpenPorts 80,3389
+
+
