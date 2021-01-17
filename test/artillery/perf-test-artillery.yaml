@@ -1,0 +1,18 @@
+config:
+  target: "https://nsc-fun-dev-usw2-tsmtestfunction.azurewebsites.net"
+  phases:
+    - duration: 10
+      arrivalRate: 1
+      name: Warm up
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 120
+      arrivalRate: 10
+      name: Sustained load
+scenarios:
+  - name: "Load test"
+    flow:
+      - get:
+          url: "/api/HttpTriggerLoadTest"
