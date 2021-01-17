@@ -2,15 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "sites_nsc_fun_dev_usw2_tsmtestfunction_name": {
-            "defaultValue": "nsc-fun-dev-usw2-tsmtestfunction",
+        "function_name": {
             "type": "String"
         },
-        "storageAccounts_nscstrdevusw2tsmtestfun_name": {
+        "storage_account_name": {
             "defaultValue": "nscstrdevusw2tsmtestfun",
             "type": "String"
         },
-        "serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name": {
+        "app_service_plan_name": {
             "defaultValue": "ASP-nscrgdevusw2tsmtestfunction-8ab1",
             "type": "String"
         }
@@ -20,7 +19,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2020-08-01-preview",
-            "name": "[parameters('storageAccounts_nscstrdevusw2tsmtestfun_name')]",
+            "name": "[parameters('storage_account_name')]",
             "location": "westus2",
             "tags": {
                 "Application": "Tasks App",
@@ -59,7 +58,7 @@
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2018-02-01",
-            "name": "[parameters('serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name')]",
+            "name": "[parameters('app_service_plan_name')]",
             "location": "West US 2",
             "tags": {
                 "Application": "Tasks App",
@@ -228,9 +227,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -248,9 +247,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
             "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -268,9 +267,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
             "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
             ],
             "properties": {
                 "cors": {
@@ -281,9 +280,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/tableServices",
             "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
             ],
             "properties": {
                 "cors": {
@@ -294,10 +293,10 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
-            "name": "[parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name')]",
+            "name": "[parameters('function_name')]",
             "location": "West US 2",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('app_service_plan_name'))]"
             ],
             "tags": {
                 "Application": "Tasks App",
@@ -314,17 +313,17 @@
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '.azurewebsites.net')]",
+                        "name": "[concat(parameters('function_name'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('function_name'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('app_service_plan_name'))]",
                 "reserved": true,
                 "isXenon": false,
                 "hyperV": false,
@@ -342,10 +341,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '/web')]",
+            "name": "[concat(parameters('function_name'), '/web')]",
             "location": "West US 2",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('function_name'))]"
             ],
             "tags": {
                 "Application": "Tasks App",
@@ -429,10 +428,10 @@
         {
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '/HttpTriggerLoadTest')]",
+            "name": "[concat(parameters('function_name'), '/HttpTriggerLoadTest')]",
             "location": "West US 2",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('function_name'))]"
             ],
             "properties": {
                 "script_root_path_href": "https://nsc-fun-dev-usw2-tsmtestfunction.azurewebsites.net/admin/vfs/home/site/wwwroot/HttpTriggerLoadTest/",
@@ -445,10 +444,10 @@
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '/', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '.azurewebsites.net')]",
+            "name": "[concat(parameters('function_name'), '/', parameters('function_name'), '.azurewebsites.net')]",
             "location": "West US 2",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('function_name'))]"
             ],
             "properties": {
                 "siteName": "nsc-fun-dev-usw2-tsmtestfunction",
@@ -458,10 +457,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default/azure-webjobs-hosts')]",
+            "name": "[concat(parameters('storage_account_name'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storage_account_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
             ],
             "properties": {
                 "defaultEncryptionScope": "$account-encryption-key",
@@ -472,10 +471,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default/azure-webjobs-secrets')]",
+            "name": "[concat(parameters('storage_account_name'), '/default/azure-webjobs-secrets')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storage_account_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
             ],
             "properties": {
                 "defaultEncryptionScope": "$account-encryption-key",
@@ -486,10 +485,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default/scm-releases')]",
+            "name": "[concat(parameters('storage_account_name'), '/default/scm-releases')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storage_account_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
             ],
             "properties": {
                 "defaultEncryptionScope": "$account-encryption-key",
