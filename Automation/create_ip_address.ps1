@@ -9,5 +9,5 @@ param(
         [string] [Parameter(Mandatory=$true)] $allocation # AllocationMethod, Static or Dynamic
       )
 
-
+# Creates a new Public IP Address based on the params.
 New-AzPublicIpAddress -ResourceGroupName $rgname -Name $publicIp -Location $location -AllocationMethod $allocation -SKU $sku
