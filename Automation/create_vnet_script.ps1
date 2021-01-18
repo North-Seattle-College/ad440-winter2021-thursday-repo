@@ -8,12 +8,30 @@
 # also go to Azure to see if you can get the script from there
 
 param(
-        [string] [Parameter(Mandatory=$true)] $parameter1,
-        [string] [Parameter(Mandatory=$true)] $parameter2,
-        [string] [Parameter(Mandatory=$true)] $parameter3
+        [string] [Parameter(Mandatory=$true)] $tenantId,
+        [string] [Parameter(Mandatory=$true)] $applicationId,
+        [SecureString] [Parameter(Mandatory=$true)] $secret,
+        [string] [Parameter(Mandatory=$true)] $subscriptionId,
+        [string] [Parameter(Mandatory=$true)] $resourceGroupName,
+        [string] [Parameter(Mandatory=$true)] $location,
+        [string] [Parameter(Mandatory=$true)] $vNetName,
+        [string] [Parameter(Mandatory=$false)] $vNetAddressPrefix
       )
 
-$output = 'Hello {0}. The username is {1}, the password is {2}.' -f $name,${Env:UserName},${Env:Password}
-Write-Output $output
-$DeploymentScriptOutputs = @{}
-$DeploymentScriptOutputs['text'] = $output
+$pathToVNetTemplate = "./vnet_parameters.json"      
+
+# Logs in and sets subscription      
+& "$PSScriptRoot\login.ps1" $tenantId $applicationId $secret $subscriptionId
+
+if (!Test-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName) {
+   # create the resource group.
+   New-AzResourceGroup -Name $resourceGroupName -Location $location
+   Write-Output "Created Resource Group $resourceGroupName"
+}
+
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate
+
+# $output = 'Hello {0}. The username is {1}, the password is {2}.' -f $name,${Env:UserName},${Env:Password}
+# Write-Output $output
+# $DeploymentScriptOutputs = @{}
+# $DeploymentScriptOutputs['text'] = $output
