@@ -8,21 +8,13 @@ CREATE TABLE users (
 
 CREATE TABLE tasks(
   taskId INT PRIMARY KEY IDENTITY(1,1),
+  userId INT NOT NULL,
   title VARCHAR(50),
   description VARCHAR(400),
   createdTime DATETIME NOT NULL,
-  deleted INT NOT NULL DEFAULT 0
-);
+  deleted INT NOT NULL DEFAULT 0,
+  completed INT NOT NULL DEFAULT 0
 
-CREATE TABLE userTasks(
-  taskId INT NOT NULL,
-  userId INT NOT NULL,
-  assignedDate DATETIME NOT NULL,
-  completed INT NOT NULL DEFAULT 0,
-  
-  CONSTRAINT FK_Task_User FOREIGN KEY (taskId)
-    REFERENCES  tasks(taskId)
-    ON DELETE CASCADE,
   CONSTRAINT FK_User_Task FOREIGN KEY (userId)
     REFERENCES  users(userId)
     ON DELETE CASCADE
@@ -30,4 +22,5 @@ CREATE TABLE userTasks(
 
 -- useful statements =>
 -- rename a column: EXEC sp_RENAME 'tableName.columnOldName' , 'columnNewName', 'COLUMN'
--- add a column: ALTER TABLE tableName ADD columnName columnType null/not null;
+-- add a column: ALTER TABLE tableName ADD columnName columnType NULL/NOT NULL;
+-- drop table: DROP TABLE tableName;
