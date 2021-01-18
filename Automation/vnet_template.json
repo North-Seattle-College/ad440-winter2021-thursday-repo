@@ -28,19 +28,18 @@
       "defaultValue": "[utcNow()]"
     }
   },
-  "resources": 
+  "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2020-07-01",
+      "apiVersion": "2017-06-01",
       "name": "[parameters('vNetName')]",
       "location": "[parameters('location')]",
-      "kind": "AzurePowerShell",
       "properties": {
-        "azPowerShellVersion": "7.0",
-        "arguments": "[concat('-vNetName', ' ', parameters('vNetName'))]",
-        "timeout": "PT1H",
-        "cleanupPreference": "OnSuccess",
-        "retentionInterval": "P1D"
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vNetAddressPrefix')]"
+          ]
+        }
       }
-    }
+    }]
 }

@@ -29,9 +29,9 @@ New-AzResourceGroup -Name $resourceGroupName -Location $location
 Write-Output "Created Resource Group $resourceGroupName"
 
 
-New-AzResourceGroupDeployment -Name $vNetName -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
 
-New-AzResourceGroupDeployment -Name $vNetName -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate
 
 # $output = 'Hello {0}. The username is {1}, the password is {2}.' -f $name,${Env:UserName},${Env:Password}
 # Write-Output $output
