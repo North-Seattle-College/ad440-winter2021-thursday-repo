@@ -1,24 +1,35 @@
 import logging
-
+import pyodbc
+import os
 import azure.functions as func
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
-    name = req.params.get('name')
-    if not name:
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            pass
-        else:
-            name = req_body.get('name')
+    db_server = os.environ["ENV_DATABASE_SERVER"]
+    db_name = os.environ["ENV_DATABASE_NAME"]
+    db_username = os.environ["ENV_DATABASE_USERNAME"]
+    db_password = os.environ["ENV_DATABASE_PASSWORD"]
+    driver = '{ODBC Driver 17 for SQL Server}'
 
-    if name:
-        return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
-    else:
+    id = req.params.get('id')
+    if not id:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
+            "not found.",
+            status_code=404
+        )
+    else:
+        # query database
+        with pyodbc.connect('DRIVER='+driver+';SERVER='+db_server+';PORT=1433;DATABASE='+db_name+';UID=' + db_username+';PWD=' + db_password) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(
+                    "SELECT TOP 3 name, collation_name FROM sys.databases")
+                row = cursor.fetchone()
+                while row:
+                    print(str(row[0]) + " " + str(row[1]))
+                    row = cursor.fetchone()
+        return func.HttpResponse(
+            "Data goes here",
+            status_code=200
         )
