@@ -13,7 +13,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest # tells GH actions what we'll be running everything on
     steps:
-    - name: 'Checkout GitHub Action' # lets us use GitHub actions
+    - name: 'Checkout Repository GitHub Action' # checks out the repository
       uses: actions/checkout@main 
 
     - name: Setup Python ${{ env.PYTHON_VERSION }} Environment # this is the script that sets up python
