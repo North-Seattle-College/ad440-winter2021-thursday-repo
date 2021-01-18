@@ -1,9 +1,9 @@
 name: Deploy Azure functions on pull request from development branch
 
 on:
-  pull_request:
+  push:
     branches:
-      - feature/task14-AutoDeployAzureFunctions
+      - development
 
 env:
   AZURE_FUNCTIONAPP_NAME: nsc-fun-dev-usw2-deployfunc-lenny # the name of the function (on Azure)
