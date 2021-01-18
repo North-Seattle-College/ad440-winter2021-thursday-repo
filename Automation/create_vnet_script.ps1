@@ -1,5 +1,5 @@
 # to run this, navigate to the repo and run ./Automation/create_vnet_script.ps1 
-# with the 1st 7 parameters inline
+# with the 1st 7 parameters inline -location westus2
 
 param(
         [string] [Parameter(Mandatory=$true)] $tenantId,
@@ -24,8 +24,3 @@ Write-Output "Created Resource Group $resourceGroupName"
 
 # create vNet with given name (can also add address prefix and location if not same as rg)
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
-
-# $output = 'Hello {0}. The username is {1}, the password is {2}.' -f $name,${Env:UserName},${Env:Password}
-# Write-Output $output
-# $DeploymentScriptOutputs = @{}
-# $DeploymentScriptOutputs['text'] = $output
