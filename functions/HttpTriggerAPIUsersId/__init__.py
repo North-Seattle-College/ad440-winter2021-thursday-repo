@@ -12,6 +12,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     db_username = os.environ["ENV_DATABASE_USERNAME"]
     db_password = os.environ["ENV_DATABASE_PASSWORD"]
     driver = '{ODBC Driver 17 for SQL Server}'
+    connectionString = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
+        driver, db_server, db_name, db_username, db_password)
 
     id = req.params.get('id')
     if not id:
@@ -21,10 +23,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
     else:
         # query database
-        with pyodbc.connect('DRIVER='+driver+';SERVER='+db_server+';PORT=1433;DATABASE='+db_name+';UID=' + db_username+';PWD=' + db_password) as conn:
+
+        with pyodbc.connect(connectionString) as conn:
+
             with conn.cursor() as cursor:
                 cursor.execute(
-                    "SELECT TOP 3 name, collation_name FROM sys.databases")
+                    "SELECT * FROM users WHERE userId={}".format(id))
                 row = cursor.fetchone()
                 while row:
                     print(str(row[0]) + " " + str(row[1]))
