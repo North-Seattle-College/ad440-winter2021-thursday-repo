@@ -19,7 +19,7 @@ $pathToVNetTemplate = "./Automation/vnet_template.json"
 & "$PSScriptRoot\login.ps1" $tenantId $applicationId $secret $subscriptionId
 
 # create/update the resource group
-New-AzResourceGroup -Name $resourceGroupName -Location $location
+New-AzResourceGroup -Name $resourceGroupName -Location $location -Force
 Write-Output "Created Resource Group $resourceGroupName"
 
 # create vNet with given name (can also add address prefix and location if not same as rg)
