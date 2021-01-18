@@ -2,14 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "vnetName": {
+    "vNetName": {
       "type": "string",
       "defaultValue": "VNet1",
       "metadata": {
         "description": "VNet name"
       }
     },
-    "vnetAddressPrefix": {
+    "vNetAddressPrefix": {
       "type": "string",
       "defaultValue": "10.0.0.0/16",
       "metadata": {
@@ -22,21 +22,25 @@
       "metadata": {
         "description": "Location for all resources."
       }
+    },
+    "utcValue": {
+      "type": "string",
+      "defaultValue": "[utcNow()]"
     }
   },
-  "variables": {},
   "resources": 
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2020-05-01",
+      "apiVersion": "2020-07-01",
       "name": "[parameters('vNetName')]",
       "location": "[parameters('location')]",
+      "kind": "AzurePowerShell",
       "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('vNetAddressPrefix')]"
-          ]
-        }
+        "azPowerShellVersion": "7.0",
+        "arguments": "[concat('-vNetName', ' ', parameters('vNetName'))]",
+        "timeout": "PT1H",
+        "cleanupPreference": "OnSuccess",
+        "retentionInterval": "P1D"
       }
     }
 }

@@ -18,18 +18,20 @@ param(
         [string] [Parameter(Mandatory=$false)] $vNetAddressPrefix
       )
 
-$pathToVNetTemplate = "./vnet_parameters.json"      
+$pathToVNetTemplate = "./vnet_template.json"    
+# $pathToVNetTemplate = "D:\VSCode\ad440-winter2021-thursday-repo\Automation\vnet_template.json"  
 
 # Logs in and sets subscription      
 & "$PSScriptRoot\login.ps1" $tenantId $applicationId $secret $subscriptionId
 
-if (!Test-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName) {
-   # create the resource group.
-   New-AzResourceGroup -Name $resourceGroupName -Location $location
-   Write-Output "Created Resource Group $resourceGroupName"
-}
+# create/update the resource group
+New-AzResourceGroup -Name $resourceGroupName -Location $location
+Write-Output "Created Resource Group $resourceGroupName"
 
-New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate
+
+New-AzResourceGroupDeployment -Name $vNetName -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
+
+New-AzResourceGroupDeployment -Name $vNetName -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate
 
 # $output = 'Hello {0}. The username is {1}, the password is {2}.' -f $name,${Env:UserName},${Env:Password}
 # Write-Output $output
