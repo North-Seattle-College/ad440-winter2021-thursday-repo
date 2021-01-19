@@ -18,11 +18,22 @@ param(
 
     [Parameter(Mandatory=$True)]
     [string]
-    $ResourceGroupName
+    $function_name,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $storage_account_name,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $app_service_plan_name,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $location
 
 )
-$Credential = Get-Credential
-$Credential
+#$Credential = Get-Credential
 #logging in
 #Select-AzContext
 # $user = Read-Host "Please enter the user name"
@@ -53,5 +64,5 @@ $location = Read-Host "Please enter a location for your resource group"
 
 New-AzResourceGroup -Name $name -Location $location
 
-New-AzResourceGroupDeployment -ResourceGroupName $name -TemplateFile "./template.json" -TemplateParameterFile "./parameters.json" -function_name Read-Host -storage_account_name Read-Host -app_service_plan_name Read-Host -location Read-Host -tenant_id Read-Host -service_plan_id Read-Host
+New-AzResourceGroupDeployment -ResourceGroupName $name -TemplateFile "./template.json" -TemplateParameterFile "./parameters.json" -function_name $function_name -storage_account_name $storage_account_name -app_service_plan_name $app_service_plan_name -location $location -tenant_id $TenantId -service_plan_id $ServicePrincipalId
 
