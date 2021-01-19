@@ -1,11 +1,13 @@
 param(
-    # Change if you want a different region limit notification
+    # Change value if you want a different region limit notification
     $ResourceLimit = 15,
+    $TemplateFilePath = "./template.json",
+    $ParameterFilePath = "./parameters.json",
 
     # Found in Azure secrets
     [Parameter(Mandatory=$True)]
     [string]
-    $ServicePrincipleUsername,
+    $ServicePrincipalUsername,
 
     # Your tenant Id in Azure
     [Parameter(Mandatory=$True)]
@@ -24,21 +26,12 @@ param(
 
     [Parameter(Mandatory=$True)]
     [string]
-    $DeploymentName,
-
-    # File path to the NSG deployment template
-    [Parameter(Mandatory=$True)]
-    [string]
-    $TemplateFilePath,
-
-    # File path to the NSG parameter template
-    [Parameter(Mandatory=$True)]
-    [string]
-    $ParameterFilePath
+    $DeploymentName
 )
 
 # Service principal login, will prompt user for password
-$credential = Get-Credential -Username $servicePrincipleUsername
+Write-Host "`n"
+$credential = Get-Credential -Username $ServicePrincipalUsername
 
 Connect-AzAccount `
     -ServicePrincipal `
