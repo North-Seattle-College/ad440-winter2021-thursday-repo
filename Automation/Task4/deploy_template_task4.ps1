@@ -21,9 +21,16 @@ param(
     $ResourceGroupName
 
 )
-#$Credential = Get-Credential
+$Credential = Get-Credential
+$Credential
 #logging in
 #Select-AzContext
+# $user = Read-Host "Please enter the user name"
+# $password = Read-Host "Please enter the password" -AsSecureString
+
+#$credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
+
+
 #Connect-AzAccount -Credential $Credential -Tenant $TenantId -ServicePrincipal
 #Connect-AzAccount   -Credential $Credential -Tenant $TenantId -ServicePrincipal
 # #creating a new resource group
@@ -44,7 +51,7 @@ Write-Host "The name used will be" $name;
 
 $location = Read-Host "Please enter a location for your resource group"
 
-New-AzResource -Name $name -Location $location
+New-AzResourceGroup -Name $name -Location $location
 
-New-AzResourceGroupDeployment 
+New-AzResourceGroupDeployment -ResourceGroupName $name -TemplateFile "./template.json" -TemplateParameterFile "./parameters.json" -function_name Read-Host -storage_account_name Read-Host -app_service_plan_name Read-Host -location Read-Host -tenant_id Read-Host -service_plan_id Read-Host
 
