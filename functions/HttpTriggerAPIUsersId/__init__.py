@@ -1,12 +1,11 @@
 import logging
-import pyodbc
+import pypyodbc
 import os
 import azure.functions as func
 import json
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    data = ''
     db_server = os.environ["ENV_DATABASE_SERVER"]
     db_name = os.environ["ENV_DATABASE_NAME"]
     db_username = os.environ["ENV_DATABASE_USERNAME"]
@@ -18,33 +17,37 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     id = req.params.get('id')
     if not id:
         return func.HttpResponse(
-            "issue",
+            "Bad Request",
             status_code=400
         )
     else:
-        # query database
-        with pyodbc.connect(connectionString) as conn:
+        try:
+            with pypyodbc.connect(connectionString) as conn:
+                return execute_query(conn, id)
+        except pypyodbc.DatabaseError as e:
+            if e.args[0] == '28000':
+                return func.HttpResponse(
+                    "Unauthorized",
+                    status_code=403
+                )
 
-            with conn.cursor() as cursor:
-                cursor.execute(
-                    "SELECT * FROM users WHERE userId={}".format(id))
 
-                columns = [column[0] for column in cursor.description]
-                data = dict(zip(columns, cursor.fetchone()))
+def execute_query(conn, id):
+    with conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT * FROM users WHERE userId={}".format(id))
+        row = cursor.fetchone()
+        if not row:
+            return func.HttpResponse(
+                "User not found",
+                status_code=404
+            )
+        else:
+            columns = [column[0] for column in cursor.description]
+            data = dict(zip(columns, row))
 
-                if not data:
-                    return func.HttpResponse(
-                        "not found.",
-                        status_code=404
-                    )
-                else:
-                    return func.HttpResponse(
-                        json.dumps(data),
-                        status_code=201,
-                        mimetype="application/json"
-                    )
-                    # return func.HttpResponse(
-                    #     json.dumps({"userId": row.userId, "firstName": row.firstName,
-                    #                 "lastName": row.lastName, "email": row.email, "deleted": row.deleted}),
-                    #     status_code=201
-                    # )
+            return func.HttpResponse(
+                json.dumps(data),
+                status_code=200,
+                mimetype="application/json"
+            )
