@@ -13,12 +13,6 @@
         },
          "location": {
             "type": "String" 
-        },
-         "tenant_id": {
-            "type":"String"
-        },
-        "service_plan_id": {
-            "type": "String"
         }
     },
     "variables": {},
