@@ -14,8 +14,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     connectionString = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
         driver, db_server, db_name, db_username, db_password)
 
-    id = req.params.get('id')
+    # This gets the userId from the query string
+    id = req.params.get('userId')
     if not id:
+        # If no userId is supplied http response -> Bad Request
         return func.HttpResponse(
             "Bad Request",
             status_code=400
@@ -23,8 +25,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     else:
         try:
             with pypyodbc.connect(connectionString) as conn:
-                return execute_query(conn, id)
+                return get_user_by_id(conn, id)
         except pypyodbc.DatabaseError as e:
+            # This code is returned by pypyodbc meaning Unautroized when a bad password is supplied etc
+            # Adddtional error handeling will need to be implemented, maybe in srpint 2
             if e.args[0] == '28000':
                 return func.HttpResponse(
                     "Unauthorized",
@@ -32,7 +36,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 )
 
 
-def execute_query(conn, id):
+def get_user_by_id(conn, id):
     with conn.cursor() as cursor:
         cursor.execute(
             "SELECT * FROM users WHERE userId={}".format(id))
@@ -43,6 +47,9 @@ def execute_query(conn, id):
                 status_code=404
             )
         else:
+            # This will convert the results from the query into json properties.
+            # More information can be found:
+            # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
             columns = [column[0] for column in cursor.description]
             data = dict(zip(columns, row))
 
