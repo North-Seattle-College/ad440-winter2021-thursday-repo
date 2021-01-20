@@ -48,7 +48,7 @@ def get_user_by_id(conn, id):
             )
         else:
             # This will convert the results from the query into json properties.
-            # More information can be found:
+            # More information can be found on the link below:
             # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
             columns = [column[0] for column in cursor.description]
             data = dict(zip(columns, row))
