@@ -1,3 +1,8 @@
+Start-Transcript -Path "$PSScriptRoot\create_Azure_StorageAccountlog.log"
+Write-Host "Logging to $PSScriptRoot\create_Azure_StorageAccountlog.log"
+Write-Host "Create Azure Storage Account"
+
+
 $resourceGroupName = Read-Host -Prompt "Enter the Resource Group name"
 $location = Read-Host -Prompt "Enter the location (i.e. centralus)"
 $storageAccountName = Read-Host -Prompt "Enter the storage account name"
