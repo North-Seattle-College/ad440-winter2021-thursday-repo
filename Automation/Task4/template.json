@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "function_name": {
@@ -11,23 +11,21 @@
         "app_service_plan_name": {
             "type": "String"
         },
-
-        "location": {
-            "type": "String"
+         "location": {
+            "type": "String" 
         },
-        "tenant_id": {
+         "tenant_id": {
             "type":"String"
         },
         "service_plan_id": {
             "type": "String"
         }
-
     },
     "variables": {},
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[parameters('storage_account_name')]",
             "location": "[parameters('location')]",
             "tags": {
@@ -93,10 +91,9 @@
                 "targetWorkerSizeId": 0
             }
         },
-        
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
@@ -116,7 +113,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
@@ -136,7 +133,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
@@ -149,7 +146,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/tableServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storage_account_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storage_account_name'))]"
@@ -175,8 +172,8 @@
             },
             "kind": "functionapp,linux",
             "identity": {
-                "principalId": "[parameters('service_plan_id')]",
-                "tenantId": "[parameters('tenant_id')]",
+                "principalId": null,
+                "tenantId": null,
                 "type": "SystemAssigned"
             },
             "properties": {
@@ -241,7 +238,7 @@
                 "httpLoggingEnabled": false,
                 "logsDirectorySizeLimit": 35,
                 "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "[parameters('function_name')]",
+                "publishingUsername": "$nsc-fun-dev-usw2-tsmtestfunction",
                 "azureStorageAccounts": {},
                 "scmType": "None",
                 "use32BitWorkerProcess": false,
@@ -298,7 +295,7 @@
         {
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('function_name'), '/load1')]",
+            "name": "[concat(parameters('function_name'), '/HttpTriggerLoadTest')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('function_name'))]"
@@ -308,7 +305,6 @@
                 "script_href": "https://nsc-fun-dev-usw2-tsmtestfunction.azurewebsites.net/admin/vfs/home/site/wwwroot/HttpTriggerLoadTest/__init__.py",
                 "config_href": "https://nsc-fun-dev-usw2-tsmtestfunction.azurewebsites.net/admin/vfs/home/site/wwwroot/HttpTriggerLoadTest/function.json",
                 "href": "https://nsc-fun-dev-usw2-tsmtestfunction.azurewebsites.net/admin/functions/HttpTriggerLoadTest",
-                
                 "config": {}
             }
         },
@@ -321,13 +317,13 @@
                 "[resourceId('Microsoft.Web/sites', parameters('function_name'))]"
             ],
             "properties": {
-                "siteName": "[parameters('function_name')]",
+                "siteName": "nsc-fun-dev-usw2-tsmtestfunction",
                 "hostNameType": "Verified"
             }
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storage_account_name'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storage_account_name'), 'default')]",
@@ -341,7 +337,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storage_account_name'), '/default/azure-webjobs-secrets')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storage_account_name'), 'default')]",
@@ -355,7 +351,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storage_account_name'), '/default/scm-releases')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storage_account_name'), 'default')]",

@@ -3,23 +3,23 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "function_name": {
-            "value": ""
+            "value": null
         },
         "storage_account_name": {
-            "value": ""
+            "value": null
         },
         "app_service_plan_name": {
-            "value": ""
+            "value": null
         }
         ,
         "location": {
-            "value": ""
+            "value": null
         },
         "tenant_id": {
-            "value":""
+            "value":null
         },
         "service_plan_id": {
-            "value": ""
+            "value": null
         }
     }
 }

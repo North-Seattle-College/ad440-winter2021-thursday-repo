@@ -31,25 +31,16 @@ param(
     [Parameter(Mandatory=$True)]
     [string]
     $location
-
 )
-#$Credential = Get-Credential
-#logging in
-#Select-AzContext
-# $user = Read-Host "Please enter the user name"
-# $password = Read-Host "Please enter the password" -AsSecureString
-
-#$credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
 
-#Connect-AzAccount -Credential $Credential -Tenant $TenantId -ServicePrincipal
-#Connect-AzAccount   -Credential $Credential -Tenant $TenantId -ServicePrincipal
-# #creating a new resource group
-# #New-AzResourceGroup
-# #creating a new resource group deployment
-# #New-AzResourceGroupDeployment
+Clear-AzContext -Force;
+#$securePassword = ConvertTo-SecureString -String $ServicePrincipalPassword -AsPlainText -Force;
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword);
 
-Connect-AzAccount -Tenant $TenantId -SubscriptionId $SubscriptionId;
+
+Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -SubscriptionId $SubscriptionId;
+
 
 Write-Host "The Resource group will have the name in this format : [project]-[resource-type]-[environment]-[location]-[other-stuff]"
 $project = Read-Host "Please enter the project name"
