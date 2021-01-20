@@ -16,6 +16,7 @@ param(
     $ServicePrincipalPassword
 )
 
-Connect-AzAccount
-New-AzResourceGroup
-New-AzResourceGroupDeployment
+# Changing something here
+#Connect-AzAccount
+#New-AzResourceGroup
+#New-AzResourceGroupDeployment
