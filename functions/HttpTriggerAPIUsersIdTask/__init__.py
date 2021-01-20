@@ -4,18 +4,16 @@ import os
 import azure.functions as func
 import datetime
 import json
-from json import JSONEncoder
+import time
 
 
-# date1 = 'June 8, 2011'
-# date2 = '08/31/79'
-#  date3 = '09-04-1954 02:15:05'
-
-# date1_obj = datetime.strptime(date1, '%B %d, %Y')
-# date2_obj = datetime.strptime(date2, '%m/%d/%y')
-#  date3_obj = datetime.strptime(date3, '%m-%d-%Y %H:%M:%S')
 
 
+
+
+def default(o):
+    if isinstance(o, (datetime.datetime, datetime.date)):
+        return o.isoformat()
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
@@ -28,26 +26,28 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     
     # define the connection string
     driver = '{ODBC Driver 17 for SQL Server}'
-    connectionString = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
+    cnxn = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
         driver, server, database, username, password)
-    # create the connection cursor
-    # cursor = conn.cursor()
+    
    
-    id = 1
+    id = req.params.get('id')
 
     if not id:
         return func.HTTPResponse('Bad Request', status_code=400 )
     else:
         try:
-            with pyodbc.connect(connectionString) as conn:
-                return execute_query(conn, id)
-        except pyodbc.DatabaseError as e:
-            if e.args[0] == '28000':
+            with pyodbc.connect(cnxn) as conn:
+                return tasks_query(conn, id)
+        except pyodbc.DatabaseError as err:
+            if err.args[0] == '28000':
                 return func.HttpResponse(
-                    "Unauthorized",
-                    status_code=403
+                    "Unauthorized User",
+                    status_code=403 
                 )
-def execute_query(conn, id):
+
+# create the connection cursor
+def tasks_query(conn, id):
+    # create the query
     with conn.cursor() as cursor:
         cursor.execute(
             "SELECT * FROM tasks WHERE userId={}".format(id))
@@ -60,10 +60,8 @@ def execute_query(conn, id):
         else:
             columns = [column[0] for column in cursor.description]
             data = dict(zip(columns, row))
-            datetime = {'09-04-1954 02:15:05'}
             return func.HttpResponse(
-                json.dumps(data),
-                json.dumps(datetime, default=str)
+                json.dumps(data, default=default),
                 status_code=200,
                 mimetype="application/json"
             )       
