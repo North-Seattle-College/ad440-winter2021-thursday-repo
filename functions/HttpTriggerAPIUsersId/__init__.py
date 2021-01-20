@@ -4,6 +4,11 @@ import os
 import azure.functions as func
 import json
 
+# This is the Http Trigger for Users/userId
+# It connects to the db and retrives the users added to the db by userId
+# Additional work to be done:
+# Add Http Response for UPDATE, DELETE, POST
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     db_server = os.environ["ENV_DATABASE_SERVER"]
@@ -15,7 +20,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         driver, db_server, db_name, db_username, db_password)
 
     # This gets the userId from the query string
-    id = req.params.get('userId')
+    id = req.route_params.get('userId')
     if not id:
         # If no userId is supplied http response -> Bad Request
         return func.HttpResponse(
