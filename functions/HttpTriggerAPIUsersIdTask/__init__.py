@@ -8,9 +8,7 @@ import time
 
 
 
-
-
-
+# to handle datetime with JSON object
 def default(o):
     if isinstance(o, (datetime.datetime, datetime.date)):
         return o.isoformat()
@@ -30,7 +28,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         driver, server, database, username, password)
     
    
-    id = req.params.get('id')
+    id = 1
 
     if not id:
         return func.HTTPResponse('Bad Request', status_code=400 )
