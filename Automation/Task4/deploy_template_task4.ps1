@@ -13,7 +13,7 @@ param(
     $ServicePrincipalId,
 
     [Parameter(Mandatory=$True)]
-    [SecureString]
+    [String]
     $ServicePrincipalPassword,
 
     [Parameter(Mandatory=$True)]
@@ -34,13 +34,20 @@ param(
 
     [Parameter(Mandatory=$True)]
     [string]
-    $location
+    $location,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $template_file_path
+
+
+
 )
 
 
 Clear-AzContext -Force;
-#$securePassword = ConvertTo-SecureString -String $ServicePrincipalPassword -AsPlainText -Force;
-$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword);
+$securePassword = ConvertTo-SecureString -String $ServicePrincipalPassword -AsPlainText -Force;
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $securePassword);
 
 
 Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -SubscriptionId $SubscriptionId;
