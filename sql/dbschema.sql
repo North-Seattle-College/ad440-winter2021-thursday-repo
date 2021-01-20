@@ -15,6 +15,7 @@ CREATE TABLE tasks(
   completed INT NOT NULL DEFAULT 0,
   completedDate DATETIME NULL,
 
+  -- delete the task if parent user gets deleted
   CONSTRAINT FK_User_Task FOREIGN KEY (userId)
     REFERENCES  users(userId)
     ON DELETE CASCADE
