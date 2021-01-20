@@ -1,5 +1,5 @@
-Start-Transcript -Path "$PSScriptRoot\create_Azure_StorageAccountlog.log"
-Write-Host "Logging to $PSScriptRoot\create_Azure_StorageAccountlog.log"
+Start-Transcript -Path "$PSScriptRoot\create_Azure_Storage.log"
+Write-Host "Logging to $PSScriptRoot\create_Azure_Storage.log"
 Write-Host "Create Azure Storage Account"
 
 
