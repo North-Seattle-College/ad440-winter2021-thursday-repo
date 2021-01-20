@@ -22,10 +22,6 @@
       "metadata": {
         "description": "Location for all resources."
       }
-    },
-    "utcValue": {
-      "type": "string",
-      "defaultValue": "[utcNow()]"
     }
   },
   "resources": [

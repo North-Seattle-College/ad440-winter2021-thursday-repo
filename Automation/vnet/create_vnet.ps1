@@ -12,15 +12,14 @@ param(
         [string] [Parameter(Mandatory=$false)] $vNetAddressPrefix
       )
 
-$pathToVNetTemplate = "./Automation/vnet_template.json"    
+$pathToVNetTemplate = "./vnet_template.json"    
 # $pathToVNetTemplate = "D:\VSCode\ad440-winter2021-thursday-repo\Automation\vnet_template.json"  
 
 # Logs in and sets subscription      
-& "$PSScriptRoot\login.ps1" $tenantId $applicationId $secret $subscriptionId
+& "../login.ps1" $tenantId $applicationId $secret $subscriptionId
 
 # create/update the resource group
 New-AzResourceGroup -Name $resourceGroupName -Location $location -Force
-Write-Output "Created Resource Group $resourceGroupName"
 
 # create vNet with given name (can also add address prefix and location if not same as rg)
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
