@@ -1,0 +1,20 @@
+param(
+    [Parameter(Mandatory=$True)]
+    [string]
+    $SubscriptionId,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $TenantId,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $ServicePrincipalId,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $ServicePrincipalPassword
+)
+Connect-AzureRmAccount
+New-AzureRmResource
+New-AzureRmResourceGroupDeployment
