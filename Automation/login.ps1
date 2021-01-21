@@ -21,7 +21,8 @@ if ($loggedIn) {
     $loggedIn = False
   }
 
-} elseif (!$loggedIn) {
+} 
+if (!$loggedIn) {
   # Log In
   Write-Output("Logging in...")
   [securestring]$secureSecret = ConvertTo-SecureString $secret -AsPlainText -Force      
