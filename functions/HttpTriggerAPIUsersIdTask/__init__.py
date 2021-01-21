@@ -4,7 +4,7 @@ import os
 import azure.functions as func
 import datetime
 import json
-import time
+
 
 
 # to handle datetime with JSON
@@ -17,15 +17,15 @@ def default(dateHandle):
 def main(req: func.HttpRequest) -> func.HttpResponse:
 
     # define the server and database names
-    server = os.environ["ENV_DATABASE_SERVER"]
-    database = os.environ["ENV_DATABASE_NAME"]
-    username = os.environ["ENV_DATABASE_USERNAME"]
-    password = os.environ["ENV_DATABASE_PASSWORD"]
+    db_server = os.environ["ENV_DATABASE_SERVER"]
+    db_name = os.environ["ENV_DATABASE_NAME"]
+    db_username = os.environ["ENV_DATABASE_USERNAME"]
+    db_password = os.environ["ENV_DATABASE_PASSWORD"]
 
     # define the connection string
     driver = '{ODBC Driver 17 for SQL Server}'
     cnxn = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
-        driver, server, database, username, password)
+        driver, db_server, db_name, db_username, db_password)
 
     user_id = req.route_params.get('userId')
 
@@ -50,8 +50,7 @@ def tasks_query(conn, user_id):
     with conn.cursor() as cursor:
         cursor.execute(
             "SELECT * FROM tasks WHERE userId={}".format(user_id))
-        row = list(cursor.fetchall())
-        logging.info(row)
+        row = cursor.fetchall()
         if not row:
             return func.HttpResponse(
                 "User not found",
