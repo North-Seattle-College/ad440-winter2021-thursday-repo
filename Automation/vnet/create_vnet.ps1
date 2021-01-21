@@ -2,9 +2,9 @@
 # with the 1st 7 parameters inline -location westus2
 
 param(
-        [string] [Parameter(Mandatory=$true)] $tenantId,
-        [string] [Parameter(Mandatory=$true)] $applicationId,
-        [string] [Parameter(Mandatory=$true)] $secret,
+        [string] [Parameter(Mandatory=$true)] $tenantId,          
+        [string] [Parameter(Mandatory=$true)] $applicationId,     #username for SP
+        [string] [Parameter(Mandatory=$true)] $secret,            #password for SP
         [string] [Parameter(Mandatory=$true)] $subscriptionId,
         [string] [Parameter(Mandatory=$true)] $resourceGroupName,
         [string] [Parameter(Mandatory=$true)] $location,
