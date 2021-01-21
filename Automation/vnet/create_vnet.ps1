@@ -12,14 +12,20 @@ param(
         [string] [Parameter(Mandatory=$false)] $vNetAddressPrefix
       )
 
-$pathToVNetTemplate = "./vnet_template.json"    
-# $pathToVNetTemplate = "D:\VSCode\ad440-winter2021-thursday-repo\Automation\vnet_template.json"  
+$pathToVNetTemplate = "./vnet_template.json"   
 
 # Logs in and sets subscription      
 & "../login.ps1" $tenantId $applicationId $secret $subscriptionId
 
-# create/update the resource group
+# Creates/Updates resource group
 New-AzResourceGroup -Name $resourceGroupName -Location $location -Force
 
-# create vNet with given name (can also add address prefix and location if not same as rg)
-New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
+# Creates VNet if one of the same name does not already exist in the Resource Group
+$vNetExists = (Get-AzVirtualNetwork -Name $vNetName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue).Name -eq $vNetName
+if (!$vNetExists) { 
+    Write-Output "Virtual Network did not exist. Creating now."
+    # create vNet with given name (can also add address prefix and location if not same as rg)
+    New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
+} else {
+    Write-Output "Virtual Network already exists."
+}
