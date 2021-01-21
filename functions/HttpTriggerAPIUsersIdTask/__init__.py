@@ -14,7 +14,7 @@ def default(o):
         return o.isoformat()
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
+    
 
     # define the server and database names
     server = os.environ["ENV_DATABASE_SERVER"]
