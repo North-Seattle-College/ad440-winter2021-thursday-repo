@@ -102,4 +102,12 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Vscode
 .vscode
+vscode
+.DS_Store
+DS_Store
+
+# ignore .vscode
+.vscode/

@@ -25,6 +25,8 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.venv
+.vscode
 MANIFEST
 
 # PyInstaller
@@ -128,4 +130,13 @@ obj
 appsettings.json
 local.settings.json
 .python_packages
+<<<<<<< HEAD
 .vscode
+=======
+
+# Vscode
+.vscode
+vscode
+.DS_Store
+DS_Store
+>>>>>>> development
