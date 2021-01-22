@@ -2,18 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        
-        "sites_nsc_fun_dev_usw2_tsmtestfunction_name": {
-        
-            "type": "String"
+        "functionName": {
+            "type": "tring"
         },
-        "Storagename": {
-           
-            "type": "String"
+        "storageAccountName": {
+            "type": "string"
         },
-        "serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name": {
-          
-            "type": "String"
+        "AppServicePlanName": {
+            "type": "string"
+        },
+         "location": {
+            "type": "string" 
         }
     },
     "variables": {},
@@ -21,8 +20,8 @@
         
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[parameters('storageAccounts_nscstrdevusw2tsmtestfun_name')]",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('storageAccountName')]",
             "location": "westus2",
             "tags": {
                 "Application": "Tasks App",
@@ -61,8 +60,8 @@
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2018-02-01",
-            "name": "[parameters('serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name')]",
-            "location": "West US 2",
+            "name": "[parameters('AppServicePlanName')]",
+            "location": "[parameters('location')]",
             "tags": {
                 "Application": "Tasks App",
                 "Owner": "Toddy Mladenov",
@@ -87,152 +86,13 @@
                 "targetWorkerSizeId": 0
             }
         },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/automation-sp-appid')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/automation-sp-appsecret')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/gha-aws-access-key-id')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/gha-aws-access-secret')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/subscriptionId')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/tenantId')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/thursday-sql-db-password')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/thursday-sql-db-user')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/tuesday-sql-db-password')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "apiVersion": "2016-10-01",
-            "name": "[concat(parameters('vaults_nsc_kv_usw2_commonpsswds_name'), '/tuesday-sql-db-user')]",
-            "location": "westus2",
-            "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_nsc_kv_usw2_commonpsswds_name'))]"
-            ],
-            "properties": {
-                "attributes": {
-                    "enabled": true
-                }
-            }
-        },
+      
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -249,10 +109,10 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "apiVersion": "2018-02-01",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -269,10 +129,10 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "properties": {
                 "cors": {
@@ -282,10 +142,10 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/tableServices",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default')]",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "properties": {
                 "cors": {
@@ -296,10 +156,10 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
-            "name": "[parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name')]",
-            "location": "West US 2",
+            "name": "[parameters('functionName')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]"
             ],
             "tags": {
                 "Application": "Tasks App",
@@ -308,25 +168,25 @@
             },
             "kind": "functionapp,linux",
             "identity": {
-                "principalId": "76026e25-2d01-4ad4-95fe-6179bb64d4dd",
-                "tenantId": "39edf504-8b38-44d6-bc9d-992fc9bb30ed",
+                "principalId": " ",
+                "tenantId": "",
                 "type": "SystemAssigned"
             },
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '.azurewebsites.net')]",
+                        "name": "[concat(parameters('functionName'), '.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '.scm.azurewebsites.net')]",
+                        "name": "[concat(parameters('functionName'), '.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_nscrgdevusw2tsmtestfunction_8ab1_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
                 "reserved": true,
                 "isXenon": false,
                 "hyperV": false,
@@ -344,10 +204,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '/web')]",
-            "location": "West US 2",
+            "name": "[concat(parameters('functionName'), '/web')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
             "tags": {
                 "Application": "Tasks App",
@@ -431,10 +291,10 @@
         {
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '/HttpTriggerLoadTest')]",
+            "name": "[concat(parameters('functionName'), '/HttpTriggerLoadTest')]",
             "location": "West US 2",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
             "properties": {
                 "script_root_path_href": "https://nsc-fun-dev-usw2-tsmtestfunction.azurewebsites.net/admin/vfs/home/site/wwwroot/HttpTriggerLoadTest/",
@@ -447,10 +307,10 @@
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '/', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'), '.azurewebsites.net')]",
+            "name": "[concat(parameters('functionName'), '/', parameters('functionName'), '.azurewebsites.net')]",
             "location": "West US 2",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('sites_nsc_fun_dev_usw2_tsmtestfunction_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
             "properties": {
                 "siteName": "nsc-fun-dev-usw2-tsmtestfunction",
@@ -459,39 +319,39 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default/azure-webjobs-hosts')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionName'), '/', parameters('functionName'), '.azurewebsites.net')]",
+            "location": "[parameters('location')]",
+               "dependsOn": [
+
+                "[resourceId('Microsoft.Web/sites, parameters('functionName'))]"
             ],
             "properties": {
-                "defaultEncryptionScope": "$account-encryption-key",
-                "denyEncryptionScopeOverride": false,
-                "publicAccess": "None"
+                "siteName": "nsc-fun-dev-usw2-tsmtestfunction",
+                "hostNameType": "Verified"
             }
         },
         {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default/azure-webjobs-secrets')]",
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionName'), '/', parameters('functionName'), '.azurewebsites.net')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
             "properties": {
-                "defaultEncryptionScope": "$account-encryption-key",
-                "denyEncryptionScopeOverride": false,
-                "publicAccess": "None"
+                "siteName": "nsc-fun-dev-usw2-tsmtestfunction",
+                "hostNameType": "Verified"
             }
         },
         {
+        
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), '/default/scm-releases')]",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_nscstrdevusw2tsmtestfun_name'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ],
             "properties": {
                 "defaultEncryptionScope": "$account-encryption-key",

@@ -12,9 +12,40 @@ param(
     $ServicePrincipalId,
 
     [Parameter(Mandatory=$True)]
+    [SecureString]
+    $ServicePrincipalPassword,
+    [Parameter(Mandatory=$True)]
     [string]
-    $ServicePrincipalPassword
+    $ResourceGroupName,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $functionName,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $storageAccountName,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $AppServicePlanName,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $location,
+
+    [Parameter(Mandatory=$True)]
+    [string]
+    $TemplatePath
 )
-Connect-AzureRmAccount
-New-AzureRmResource
-New-AzureRmResourceGroupDeployment
+Clear-AzContext -Force;
+$securePassword = ConvertTo-SecureString -String $ServicePrincipalPassword -AsPlainText -Force;
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $securePassword);
+
+
+Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -SubscriptionId $SubscriptionId;
+
+New-AzResourceGroup -Name $ResourceGroupName -Location $location
+
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile "./template.json" -function_name $functionName -storageAccountName $storageAccountName -app_service_plan_name $AppServicePlanName -location $location
+
