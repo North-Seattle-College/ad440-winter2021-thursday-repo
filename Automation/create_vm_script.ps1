@@ -1,7 +1,8 @@
 #Script to create a Virtual Machine on Azure.
 #https://docs.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-powershell
 
-#Create a VM on Azure.
+#Note: This creates a Windows VM, but the end goal is a Linux VM. This will be the next sprint.
+#Note: There are extra parameters that are not being used yet. These will be used when creating Linux machine.
 param (
     [string] [Parameter(Mandatory=$true)] $tenantId, #Tenant ID used to login to Azure with Service Provider
     [string] [Parameter(Mandatory=$true)] $applicationId, #App ID used to login to Azure with Service Provider
@@ -18,6 +19,8 @@ param (
     )
 
 $templatefile = "$PSScriptRoot\vm_parameters.json" #template file for Virtual Machine Resource
+
+#Authentication for VM. This will be replaced with ssh key soon.
 $adminUsername = Read-Host -Prompt "Enter the admin username for new VM"
 $adminPassword = Read-Host -Prompt "Enter the admin password for new VM" -AsSecureString
     
