@@ -9,14 +9,14 @@ param(
 $loggedIn = ((Get-AzContext).Tenant.Id -eq $tenantId)
 
 if ($loggedIn) {
-  Write-Output("Already logged in")
+  Write-Host("Already logged in")
 
   # Check we're on the correct Subscription
   $correctSub = (Get-AzContext).Subscription.Id -eq $subscriptionId
   if ($correctSub) {
-    Write-Output("Correct subscription")
+    Write-Host("Correct subscription")
   } else {
-    Write-Output("Wrong subscription")
+    Write-Host("Wrong subscription. Logging out...")
     Disconnect-AzAccount
     $loggedIn = False
   }
@@ -24,13 +24,13 @@ if ($loggedIn) {
 } 
 if (!$loggedIn) {
   # Log In
-  Write-Output("Logging in...")
+  Write-Host("Logging in...")
   [securestring]$secureSecret = ConvertTo-SecureString $secret -AsPlainText -Force      
   [pscredential]$credObject = New-Object System.Management.Automation.PSCredential ($applicationId, $secureSecret)
   Connect-AzAccount -ServicePrincipal -Credential $credObject -Tenant $tenantId      
-  Write-Output "Logged into the account $applicationId"
+  Write-Host "Logged into the account $applicationId"
 
   # Set Subscription
   Set-AzContext -Subscription $subscriptionId
-  Write-Output "Set to subscription $subscriptionId"
+  Write-Host "Set to subscription $subscriptionId"
 } 

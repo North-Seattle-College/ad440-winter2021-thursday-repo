@@ -23,9 +23,9 @@ New-AzResourceGroup -Name $resourceGroupName -Location $location -Force
 # Creates VNet if one of the same name does not already exist in the Resource Group
 $vNetExists = (Get-AzVirtualNetwork -Name $vNetName -ResourceGroupName $resourceGroupName -ErrorAction SilentlyContinue).Name -eq $vNetName
 if (!$vNetExists) { 
-    Write-Output "Virtual Network did not exist. Creating now."
+    Write-Host "Virtual Network did not exist. Creating now."
     # create vNet with given name (can also add address prefix and location if not same as rg)
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $pathToVNetTemplate -vNetName $vNetName
 } else {
-    Write-Output "Virtual Network already exists."
+    Write-Host "Virtual Network already exists."
 }
