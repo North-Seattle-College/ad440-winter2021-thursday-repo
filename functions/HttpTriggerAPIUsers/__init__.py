@@ -1,5 +1,5 @@
 import json
-import pypyodbc
+import pyodbc
 import logging
 import os
 import azure.functions as func
@@ -21,13 +21,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         driver, server, database, username, password)
     
     # Create a new connection
-    logging.deug("Attempting DB connection!")
+    logging.debug("Attempting DB connection!")
     try:
-        with pypyodbc.connect(connection_string) as conn:
+        with pyodbc.connect(connection_string) as conn:
             logging.debug("Connection successful! Attempting to retrieve users.")
             return get_users(conn)
-    except pypyodbc.DatabaseError as e:
-        logging.error("Failed to connect to DB")
+    except pyodbc.DatabaseError as e:
+        logging.error("Failed to connect to DB: " + e.args[0])
         logging.debug("Error: " + e.args[1])
         if e.args[0] == '28000':
           return func.HttpResponse(
