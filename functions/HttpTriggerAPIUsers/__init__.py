@@ -14,16 +14,21 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     password = os.environ["ENV_DATABASE_PASSWORD"]
     
     # Define driver
-    driver = '{ODBC Driver 17 for SQL Server}'
+    driver = '{SQL Server}'
     
     # Define the connection string
-    connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(driver, server, database, username, password)
+    connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(
+        driver, server, database, username, password)
     
     # Create a new connection
+    logging.deug("Attempting DB connection!")
     try:
         with pypyodbc.connect(connection_string) as conn:
-            return select_users_query(conn)
+            logging.debug("Connection successful! Attempting to retrieve users.")
+            return get_users(conn)
     except pypyodbc.DatabaseError as e:
+        logging.error("Failed to connect to DB")
+        logging.debug("Error: " + e.args[1])
         if e.args[0] == '28000':
           return func.HttpResponse(
               "Unauthorized",
@@ -31,11 +36,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
           )
 
 # Define query    
-def select_users_query(conn):
+def get_users(conn):
     with conn.cursor() as cursor:
+        logging.debug("Using connection cursor to execute query (select all from users)")
         cursor.execute("SELECT * FROM users")
 
         # Get users
+        logging.debug("Fetching all queried information")
         users = list(cursor.fetchall())
             
         # Clean up to put them in JSON.
@@ -49,4 +56,5 @@ def select_users_query(conn):
             data.append(dict(zip(columns, user)))
             
         # users = dict(zip(columns, rows))
+        logging.debug("User data retrieved and processed, returning information from get_users function")
         return func.HttpResponse(json.dumps(data), status_code=200, mimetype="application/json")
