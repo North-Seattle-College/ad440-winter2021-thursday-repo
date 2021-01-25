@@ -1,10 +1,9 @@
 name: Blob storage website CI
 
 on:
-  pull_request:
+  push:
     branches:
       - development
-      - TestBranch
 
 jobs:
   build:
