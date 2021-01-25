@@ -24,20 +24,29 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.debug("Error: " + e.args[1])
         if e.args[0] == '28000':
             return func.HttpResponse(
-                "Unauthorized",
-                status_code=403
+                "Internal Server Error",
+                status_code=500
             )
     logging.debug("Connection to DB successful!")
 
     try:
         # Return results according to the method
         if method == "GET":
-            logging.debug("Attempting to retrieve users...")            
-            return get_users(conn)
+            logging.debug("Attempting to retrieve users...")
+            all_users_http_response = get_users(conn)
+            logging.debug("Users retrieved successfully!")
+            return all_users_http_response
 
-        elif method == "PUT":
-            logging.warn("Request with method put has been recieved, but that is not valid for this endpoint")
-            func.HttpResponse("Method is not allowed", status_code=405)
+        elif method == "POST":
+            logging.debug("Attempting to add user...")
+            user_req_body = req.get_json()
+            new_user_id_http_response = add_user(conn, user_req_body)
+            logging.debug("User added successfully!")
+            return new_user_id_http_response
+
+        else:
+            logging.warn(f"Request with method {method} has been recieved, but that is not allowed for this endpoint")
+            return func.HttpResponse(status_code=405)
 
     #displays erros encountered when API methods were called
     except Exception as e:
@@ -63,8 +72,6 @@ def get_db_connection():
 
     return pyodbc.connect(connection_string)
 
-
-# Define query
 def get_users(conn):
     with conn.cursor() as cursor:
         logging.debug(
@@ -73,19 +80,50 @@ def get_users(conn):
 
         # Get users
         logging.debug("Fetching all queried information")
-        users = list(cursor.fetchall())
+        users_table = list(cursor.fetchall())
 
         # Clean up to put them in JSON.
-        users = [tuple(user) for user in users]
+        users_data = [tuple(user) for user in users_table]
 
         # Empty data list
-        data = []
+        users = []
 
-        columns = [column[0] for column in cursor.description]
-        for user in users:
-            data.append(dict(zip(columns, user)))
+        users_columns = [column[0] for column in cursor.description]
+        for user in users_data:
+            users.append(dict(zip(users_columns, user)))
 
         # users = dict(zip(columns, rows))
         logging.debug(
             "User data retrieved and processed, returning information from get_users function")
-        return func.HttpResponse(json.dumps(data), status_code=200, mimetype="application/json")
+        return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
+
+def add_user(conn, user_req_body):
+    with conn.cursor() as cursor:
+        # Unpack user data
+        firstName = user_req_body["firstName"]
+        lastName = user_req_body["lastName"]
+        email = user_req_body["email"]
+
+        # Create the query
+        add_user_query = """
+                         SET NOCOUNT ON;
+                         DECLARE @NEWID TABLE(ID INT);
+
+                         INSERT INTO dbo.users (firstName, lastName, email)
+                         OUTPUT inserted.userId INTO @NEWID(ID)
+                         VALUES('{}', '{}', '{}');
+
+                         SELECT ID FROM @NEWID
+                         """.format(firstName, lastName, email)
+
+
+        logging.debug(
+            "Using connection cursor to execute query (add a new user and get id)")
+        count = cursor.execute(add_user_query)
+
+        # Get the user id from cursor
+        user_id = cursor.fetchval()
+        
+        logging.debug(
+            "User added and new user id retrieved, returning information from add_user function")
+        return func.HttpResponse(json.dumps({"userId": user_id}), status_code=200, mimetype="application/json")
