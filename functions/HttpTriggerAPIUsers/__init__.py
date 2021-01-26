@@ -60,7 +60,7 @@ def get_db_connection():
     password = os.environ["ENV_DATABASE_PASSWORD"]
 
     # Define driver
-    driver = '{SQL Server}'
+    driver = '{ODBC Driver 17 for SQL Server}'
 
     # Define the connection string
     connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(
