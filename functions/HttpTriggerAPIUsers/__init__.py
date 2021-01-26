@@ -22,11 +22,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except pyodbc.DatabaseError as e:
         logging.error("Failed to connect to DB: " + e.args[0])
         logging.debug("Error: " + e.args[1])
-        if e.args[0] == '28000':
-            return func.HttpResponse(
-                "Internal Server Error",
-                status_code=500
-            )
+        return func.HttpResponse(
+            f'Internal Server Error: {e.args[1]}',
+            status_code=500
+        )
     logging.debug("Connection to DB successful!")
 
     try:
@@ -98,6 +97,17 @@ def get_users(conn):
         return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
 
 def add_user(conn, user_req_body):
+    # First we want to ensure that the request has all the necessary fields
+    logging.debug("Testing the add new user request body for necessary fields...")
+    try:
+        assert "firstName" in user_req_body, "New user request body did not contain field: 'firstName'"
+        assert "lastName" in user_req_body, "New user request body did not contain field: 'lastName'"
+        assert "email" in user_req_body, "New user request body did not contain field: 'email'"
+    except AssertionError as user_req_body_content_error:
+        logging.error("New user request body did not contain the necessary fields!")
+        return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
+    
+    logging.debug("New user request body contains all the necessary fields!")
     with conn.cursor() as cursor:
         # Unpack user data
         firstName = user_req_body["firstName"]
