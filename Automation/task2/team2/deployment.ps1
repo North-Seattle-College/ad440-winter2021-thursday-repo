@@ -30,8 +30,24 @@ param (
 
     [Parameter(Mandatory=$true)]
     [string]
+    $FunctionName,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $StorageAccountName,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $AppServiceplaneName,
+
+    [Parameter(Mandatory=$true)]
+    [string]
     $DeployName
 )
+#open log
+$prefix = "jin-templa-deployment"
+$stamp = (Get-Date).toString().Replace("/","-").Replace(":","-")
+Start-Transcript "./$prefix-$stamp.log"
 
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword );
 
@@ -44,6 +60,14 @@ New-AzResourceGroup `
   -Location $location
 
 New-AzResourceGroupDeployment `
-  -Name blanktemplate `
+  -Name $DeployName `
   -ResourceGroupName $rgName `
-  -TemplateFile $TemplatefilePath
+  -TemplateFile $TemplatefilePath `
+  -Location $location `
+  -StorageAccountName $StorageAccountName  `
+  -AppServiceplaneName $AppServiceplaneName `
+  -FunctionName $FunctionName
+
+
+
+  Stop-Transcript
