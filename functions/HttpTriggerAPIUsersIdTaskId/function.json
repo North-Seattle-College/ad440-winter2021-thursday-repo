@@ -8,10 +8,10 @@
       "name": "req",
       "methods": [
         "get",
-        "post",
         "delete",
         "update"
-      ]
+      ],
+      "route": "users/{userId:int?}/task/{taskId:int?}"
     },
     {
       "type": "http",

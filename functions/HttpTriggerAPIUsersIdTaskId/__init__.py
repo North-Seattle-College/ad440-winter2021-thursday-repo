@@ -1,3 +1,5 @@
+"""This sript runs the userId/taskId API endpoint functionality and consists of
+    the main function, ODBC conenct function and 4 CRUD methods functions"""
 import logging
 import os
 import pyodbc
@@ -27,16 +29,7 @@ def get(param1, param2):
         cnxn.close()
         logging.info('Closed the connection')
 
-#POST API method function       
-def post(param):
-    return ('You selected POST method with {param} values. Functionality under construction')
-            # STARTER CODE FOR NEXT SPRINT, SQL QUERY TESTED
-            #     #insert row into tasks table / create a new task
-            #     #createdDate #'20120618 10:34:09 AM' and title/description are hardcoded for sprint1, update with automated date stamp and url params later
-            #     sql_query = ("""INSERT INTO dbo.tasks (userId, title, description, createdDate)
-            #     VALUES (?, ?, ?, '20120618 10:34:09 AM')""")
-            #     cursor.execute(sql_query, userId, 'Do It', 'Almost like Nike motto')   
-            #     logging.info('Executed the query')
+#POST API method function not implemented     
 
 #UPDATE API method function
 def update(param1, param2):
@@ -99,8 +92,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
 #collects parameters passed in url        
-    userId = req.params.get('userId')
-    taskId = req.params.get('taskId')
+    userId = req.route_params.get('userId')
+    taskId = req.route_params.get('taskId')
     logging.info('Trying to get userId and taskId')
     if (not userId) and (not taskId):
         logging.info("Got neither userId nor taskId")
@@ -125,11 +118,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         if method == "GET":        
             getResult = get(userId, taskId)
             return func.HttpResponse(f"This {method} method was called. You entered {userId} as userId and {taskId} as taskId. Result: {getResult}")
-
-    #if POST method is selected, it executes here
-        if method == "POST":
-            postResult = post(method)
-            return func.HttpResponse(f"Temp results: {postResult}")
 
     #if UPDATE method is selected, it executes here
         if method == "UPDATE":
