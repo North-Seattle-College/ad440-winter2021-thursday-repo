@@ -14,10 +14,28 @@ param (
 
     [Parameter(Mandatory=$true)]
     [string]
-    $TemplatefilePath
+    $TenantId,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $ServicePrincipalId,
+
+    [Parameter(Mandatory=$true)]
+    [securestring]
+    $ServicePrincipalPassword,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $TemplatefilePath,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    $DeployName
 )
 
-Connect-AzAccount
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword );
+
+Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -Subscription $SubscriptionId;
 
 Set-AzContext $SubscriptionId
 
