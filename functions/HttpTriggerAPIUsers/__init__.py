@@ -19,7 +19,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         conn = get_db_connection()
     except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
-        logging.error("Failed to connect to DB: " + e.args[0])
+        logging.critical("Failed to connect to DB: " + e.args[0])
         logging.debug("Error: " + e.args[1])
         return func.HttpResponse(status_code=500)
         
