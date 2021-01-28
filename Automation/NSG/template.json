@@ -3,15 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "networkSecurityGroups_name": {
-            "type": "string"
+            "type": "object"
         },
         "tags": {
-            "type": "object",
-            "defaultValue": {
-                "owner": "",
-                "OwnerEmail": "",
-                "use": ""
-            }
+            "type": "object"
         },
         "securityRules": {
             "type": "object",
@@ -31,20 +26,16 @@
                 "destinationAddressPrefixes": []                
             }
         }
-        
-
     },
     "variables": {},
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-05-01",
-            "name": "[parameters('networkSecurityGroups_name')]",
+            "name": "[parameters('networkSecurityGroups_name').securityGroupName]",
             "location": "[resourceGroup().location]",
             "tags": {
-                "owner": "[parameters('tags').owner]",
-                "OwnerEmail": "[parameters('tags').OwnerEmail]",
-                "use": "[parameters('tags').use]"
+                "ownerEmail": "[parameters('tags').ownerEmail]"
             },
             "properties": {               
                  "securityRules": [

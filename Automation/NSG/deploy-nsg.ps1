@@ -35,7 +35,17 @@ param(
     [string]
     $DeploymentName,
 
-    # Security rule params, see example below in $securityParams if unsure of inputs
+    # For tags, please include your email
+    [Parameter(Mandatory=$True)]
+    [string]
+    $OwnerEmail,
+
+    # Security group name ex. automation-nsg-<initials>
+    [Parameter(Mandatory=$True)]
+    [string]
+    $SecurityGroupName,
+
+    # Security rule params, see example below in $params line 125 if unsure of inputs
     [Parameter(Mandatory=$True)]
     [string]
     $SecurityRuleName,
@@ -72,7 +82,7 @@ param(
     [string]
     $Direction,
 
-    # Note, below are not mandatory params
+    # Note, below are not mandatory params and are here if further nsg specs are needed
     [Parameter(Mandatory=$False)]
     [string]
     $SourcePortRanges,
@@ -90,7 +100,13 @@ param(
     $DestinationAddressPrefies
 )
 
-$securityParams = @{
+$params = @{
+    tags = @{
+        "ownerEmail" = $OwnerEmail
+    }
+    networkSecurityGroups_name = @{
+        "securityGroupName" = $SecurityGroupName
+    }
     securityRules = @{
         "name" = $SecurityRuleName
         "protocol" = $Protocol    
@@ -134,4 +150,4 @@ New-AzResourceGroupDeployment `
     -Name $DeploymentName `
     -ResourceGroupName $ResourceGroupName `
     -TemplateFile $TemplateFilePath `
-    -TemplateParameterObject $securityParams -Verbose
+    -TemplateParameterObject $params -Verbose
