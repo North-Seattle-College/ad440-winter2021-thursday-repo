@@ -15,12 +15,13 @@ def get(param1, param2):
     cursor = cnxn.cursor() 
     try:
         logging.debug('opened connection')        
-        logging.debug('Attempting to execute the select task query')
+        logging.debug('Attempting to execute GET task query')
         #Get task title, description and user name by userId and taskId
-        sql_query = ("""SELECT tasks.title, tasks.description, tasks.dueDate, CONCAT (users.firstName, ' ', users.lastName) AS "user" 
-        FROM [dbo].[tasks] JOIN [dbo].[users] 
-        on [dbo].[tasks].userId = [dbo].[users].userId
-        WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
+        sql_query = ("""SELECT tasks.title, tasks.description, tasks.createdDate, tasks.dueDate, 
+                    tasks.completed, tasks.completedDate, CONCAT (users.firstName, ' ', users.lastName) AS "user" 
+                    FROM [dbo].[tasks] JOIN [dbo].[users] 
+                    on [dbo].[tasks].userId = [dbo].[users].userId
+                    WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
         cursor.execute(sql_query, param1, param2)
         logging.debug('Executed the query')          
         row = cursor.fetchone()
@@ -44,7 +45,7 @@ def update(param1, param2, task_req_body):
     cursor = cnxn.cursor()
     try:
         logging.info('opened connection')        
-        logging.info('Going to execute update query')
+        logging.info('Going to execute UPDATE task query')
         # task_req_body input check
         logging.debug("Checking the request body for necessary fields to update a task")
         try:
@@ -63,9 +64,17 @@ def update(param1, param2, task_req_body):
         sql_query = """UPDATE [dbo].[tasks]
         SET title = '{}', description = '{}', dueDate = '{}'
         WHERE userId = ? AND taskId = ?""".format(title, description, dueDate)
-        rowcount = cursor.execute(sql_query, param1, param2).rowcount
-        logging.debug(f"Executed the query: {rowcount} rows affected for taskId {param2}")
-        return func.HttpResponse(status_code=200)
+        try:
+            rowcount = cursor.execute(sql_query, param1, param2).rowcount
+            if not rowcount:
+                logging.error('No record with the requested parameters exists in db')
+                return func.HttpResponse('No record to update', status_code=500)                
+            logging.debug('UPDATE query executed')
+            logging.info(f"Executed the query: {rowcount} rows affected for taskId {param2}")
+            return func.HttpResponse(status_code=200)
+        except Exception as e:
+            logging.critical('Unable to execute the query')
+            return func.HttpResponse("Error: %s" % str(e), status_code=400)
     finally:
         #commits changes to db
         cnxn.commit()
@@ -75,26 +84,50 @@ def update(param1, param2, task_req_body):
         logging.info('Closed the db connection')    
 
 #DELETE API method function
-def delete(param):
+def delete(param1, param2):
     #connects to db
     cnxn = connect()
     cursor = cnxn.cursor()
     try:
-        return ('You selected POST method with {param} values. Functionality under construction')
-            # STARTER CODE FOR NEXT SPRINT, SQL QUERY TESTED
-            #     # #delete row, client passes in userId and taskId
-            #     sql_query = ("""DELETE FROM [dbo].[tasks] WHERE userId = ? AND taskId = ?""")
-            #     cursor.execute(sql_query, userId, taskId)
-            #     logging.info('Executed the query')
-            #     cnxn.commit()
+        logging.info('opened connection')        
+        logging.info('Going to execute DELETE task query')
+        # # task_req_body input check
+        # logging.debug("Checking the request body for necessary fields to update a task")
+        # try:
+        #     assert 'title' in task_req_body, "New task request body did not contain field: 'title'"
+        #     assert 'description' in task_req_body, "New task request body did not contain field: 'description'"
+        #     assert 'dueDate' in task_req_body, "New user request body did not contain field: 'dueDate'"
+        # except AssertionError as task_req_body_content_error:
+        #     logging.critical('New user request body did not contain fields to update a task')
+        #     return func.HttpResponse(task_req_body_content_error.args[0], status_code=400)
+        # logging.info('New user request body contained necessary fields to update a task')  
+        # # Unpack task data
+        # title = task_req_body.get('title')
+        # description = task_req_body.get('description')
+        # dueDate = datetime.strptime(task_req_body.get('dueDate'), '%d/%m/%y %H:%M:%S')     
+
+        # #delete row, client passes in userId and taskId
+        sql_query = ("""DELETE FROM [dbo].[tasks] WHERE userId = ? AND taskId = ?""")
+        try:
+            rowcount = cursor.execute(sql_query, param1, param2).rowcount
+            if not rowcount:
+                logging.error('No record with the requested parameters exists in db')
+                return func.HttpResponse('No record to delete', status_code=500)                
+            logging.debug('Executed the DELETE task query')
+            logging.info(f"Executed the query: {rowcount} rows affected for taskId {param2}")
+            return func.HttpResponse(status_code=200)
+        except Exception as e:
+            logging.critical('Unable to execute the query')
+            return func.HttpResponse("Error: %s" % str(e), status_code=400)
     finally:
         #commits changes to db
         cnxn.commit()
+        #properly closes the connection
         cursor.close()
         cnxn.close()
         logging.info('Closed the db connection')   
 
-#POST API method function not implemented  
+### POST API method function not implemented for this endpoint, use userId/tasks instead ### 
 
 #connect to db function
 def connect():
@@ -160,13 +193,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     #if PUT method is selected, it executes here
         if method == "PUT":
             logging.debug('Passed PUT method')   
-            logging.debug('Obtained req json')
             return (update(userId, taskId, req_body))
 
     #if DELETE method is selected, it executes here
         if method == "DELETE":
-            deleteResult = delete(method)
-            return func.HttpResponse(f"Temp results: {deleteResult}") 
-    #displays erros encountered when API methods were called
+            logging.debug('Passed DELETE method')   
+            return (delete(userId, taskId))
+
+    #displays erros, if any, encountered when API methods were called
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500) 
