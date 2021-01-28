@@ -8,7 +8,9 @@
       "name": "req",
       "methods": [
         "get",
-        "post"
+        "post",
+        "put",
+        "delete"
       ],
       "route":"users/{userId:int?}"
     },
