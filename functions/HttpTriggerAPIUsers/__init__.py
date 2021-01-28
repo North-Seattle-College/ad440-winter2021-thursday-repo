@@ -110,6 +110,7 @@ def add_user(conn, user_req_body):
         firstName = user_req_body["firstName"]
         lastName = user_req_body["lastName"]
         email = user_req_body["email"]
+        user_params = (firstName, lastName, email)
 
         # Create the query
         add_user_query = """
@@ -118,15 +119,15 @@ def add_user(conn, user_req_body):
 
                          INSERT INTO dbo.users (firstName, lastName, email)
                          OUTPUT inserted.userId INTO @NEWID(ID)
-                         VALUES('{}', '{}', '{}');
+                         VALUES(?, ?, ?);
 
                          SELECT ID FROM @NEWID
-                         """.format(firstName, lastName, email)
-
+                         """
 
         logging.debug(
             "Using connection cursor to execute query (add a new user and get id)")
-        count = cursor.execute(add_user_query)
+        
+        count = cursor.execute(add_user_query, user_params)
 
         # Get the user id from cursor
         user_id = cursor.fetchval()
