@@ -13,7 +13,10 @@ param(
 
     [Parameter(Mandatory=$True)]
     [SecureString]
-    $ServicePrincipalPassword,
+    [ValidateNotNullOrEmpty()]
+    [String]$ServicePrincipalPassword=$(Throw "Password required."),
+   
+    
     [Parameter(Mandatory=$True)]
     [string]
     $ResourceGroupName,
@@ -47,5 +50,5 @@ Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -
 
 New-AzResourceGroup -Name $ResourceGroupName -Location $location
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile "./template.json" -function_name $functionName -storageAccountName $storageAccountName -app_service_plan_name $AppServicePlanName -location $location
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplatePath "./template.json" -functionName $functionName -storageAccountName $storageAccountName -app_service_plan_name $AppServicePlanName -location $location
 
