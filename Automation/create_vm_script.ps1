@@ -18,7 +18,7 @@ param (
     [string] $dnsLabelPrefix=$rgname #Default value
     )
 
-$templatefile = "$PSScriptRoot\vm_parameters.json" #template file for Virtual Machine Resource
+$templatefile = "$PSScriptRoot\ubuntu_vm_parameters.json" #template file for Virtual Machine Resource
 
 #Authentication for VM. This will be replaced with ssh key soon.
 $adminUsername = Read-Host -Prompt "Enter the admin username for new VM"
@@ -50,16 +50,23 @@ Write-Output "Checking to see if Virtual Machine by this name exists in resource
 Get-AzVM -Name "$vmname" -ResourceGroupName $rgname -ErrorVariable notPresent -ErrorAction SilentlyContinue
 
 if ($notPresent) {
-    Write-Output "Virtual Machine did not exist in resource group $rgname. Creating Now."
-
     #Create VM using provided template file
+    #https://azure.microsoft.com/en-us/resources/templates/101-vm-simple-linux/
+
+    # New-AzResourceGroupDeployment `
+    # -ResourceGroupName $rgname `
+    # -TemplateFile $templatefile `
+    # -vmName $vmname `
+    # -adminUsername $adminUsername `
+    # -adminPassword $adminPassword `
+    # -dnsLabelPrefix $dnsLabelPrefix
+
+    Write-Output "Virtual Machine did not exist in resource group $rgname. Creating Now."  
     New-AzResourceGroupDeployment `
-    -ResourceGroupName $rgname `
+    -ResourceGroupName "$rgname" `
     -TemplateFile $templatefile `
-    -vmName $vmname `
     -adminUsername $adminUsername `
-    -adminPassword $adminPassword `
-    -dnsLabelPrefix $dnsLabelPrefix
+    -adminPassword $adminPassword
 }
 else {
     Write-Output "Error: A Virtual Machine by this name already exists in Resource Group $rgname."  
