@@ -10,6 +10,7 @@
         "get",
         "post",
         "put",
+        "patch",
         "delete"
       ],
       "route":"users/{userId:int?}"
