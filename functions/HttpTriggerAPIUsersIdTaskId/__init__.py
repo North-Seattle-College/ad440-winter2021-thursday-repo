@@ -40,46 +40,8 @@ def get(userId, taskId):
         cnxn.close()
         logging.debug('Closed the db connection')   
 
-# #Parses JSON body received by the API
-# def parse(task_req_body):
-#        try:
-#             #assert for the presense of appropriate fields in JSON
-#             assert 'title' in task_req_body, "New task request body did not contain field: 'title'"
-#             assert 'description' in task_req_body, "New task request body did not contain field: 'description'"
-#             assert 'dueDate' in task_req_body, "New user request body did not contain field: 'dueDate'"
-#             assert 'completed' in task_req_body, "New user request body did not contain field: 'completed'
-#             assert 'completedDate' in task_req_body, "New user request body did not contain field: 'completedDate'"
-#         except AssertionError as task_req_body_content_error:
-#             logging.error('New user request body did not contain fields to update a task')
-#             return func.HttpResponse(task_req_body_content_error.args[0], status_code=400)
-#         logging.debug('New user request body contained necessary fields to update a task')  
-#         # Unpack task data
-#         title = task_req_body.get('title')
-#         description = task_req_body.get('description')
-#         dueDate = None
-#         if task_req_body.get('dueDate') != None:
-#             dueDate = datetime.strptime(task_req_body.get('dueDate'), '%d/%m/%y %H:%M:%S')  
-#         completed = task_req_body.get('completed')
-#         completedDate = datetime.strptime(task_req_body.get('completedDate'), '%d/%m/%y %H:%M:%S')      
-#         # update task: title and description
-#         sql_query = """UPDATE [dbo].[tasks]
-#             SET title = ?, description = ?, dueDate = ?, completed = ?, completedDate = ?
-#             WHERE userId = ? AND taskId = ?"""
-#         try:
-#             rowcount = cursor.execute(sql_query, title, description, dueDate, completed, completedDate, userId, taskId).rowcount
-#             if not rowcount:
-#                 logging.error('No record with the requested parameters exists in db')
-#                 return func.HttpResponse('No record to update', status_code=404)                
-#             logging.debug('UPDATE query executed')
-#             logging.debug(f"Executed the query: {rowcount} rows affected for taskId {taskId}")
-#             return func.HttpResponse(status_code=200)
-#         except Exception as e:
-#             logging.critical('Unable to execute the query')
-#             return func.HttpResponse("Error: %s" % str(e), status_code=400)
-#     finally:  
-
 #PUT API method function
-def update(userId, taskId, task_req_body):
+def update(userId, taskId, task_fields):
     #connects to db
     cnxn = connect()
     cursor = cnxn.cursor()
@@ -87,39 +49,18 @@ def update(userId, taskId, task_req_body):
         logging.debug('opened connection')        
         logging.debug(f'Going to execute UPDATE task {taskId} for user {userId} query')
         # task_req_body input check
-        logging.debug("Checking the request body for necessary fields to update a task")
-###HOW to ENSURE NOTHING IS WRONG WITH JSON (see code in main and move if reasonable)
-###parse JSON in a separate file and validate there, pass the dictionary to this function
-        try:
-            #assert for the presense of appropriate fields in JSON
-            assert 'title' in task_req_body, "New task request body did not contain field: 'title'"
-            assert 'description' in task_req_body, "New task request body did not contain field: 'description'"
-            assert 'dueDate' in task_req_body, "New user request body did not contain field: 'dueDate'"
-            assert 'completed' in task_req_body, "New user request body did not contain field: 'completed'"
-            assert 'completedDate' in task_req_body, "New user request body did not contain field: 'completedDate'"
-        except AssertionError as task_req_body_content_error:
-            logging.error('New user request body did not contain fields to update a task')
-            return func.HttpResponse(task_req_body_content_error.args[0], status_code=400)
-        logging.debug('New user request body contained necessary fields to update a task')  
-        # Unpack task data
-        title = task_req_body.get('title')
-        description = task_req_body.get('description')
-        dueDate = None
-        if task_req_body.get('dueDate') != None:
-            dueDate = datetime.strptime(task_req_body.get('dueDate'), '%d/%m/%y %H:%M:%S')  
-        completed = task_req_body.get('completed')
-        completedDate = None
-        if task_req_body.get('completedDate') != None:
-            completedDate = datetime.strptime(task_req_body.get('completedDate'), '%d/%m/%y %H:%M:%S')      
-        # update task: title and description
+        logging.debug("Checking the request body for necessary fields to update a task")    
+        # update task: with all passed JSON fields
         sql_query = """UPDATE [dbo].[tasks]
             SET title = ?, description = ?, dueDate = ?, completed = ?, completedDate = ?
             WHERE userId = ? AND taskId = ?"""
         try:
-            rowcount = cursor.execute(sql_query, title, description, dueDate, completed, completedDate, userId, taskId).rowcount
+            rowcount = cursor.execute(sql_query, task_fields.get('title'), task_fields.get('description'), 
+            task_fields.get('dueDate'), task_fields.get('completed'), task_fields.get('completedDate'), 
+            userId, taskId).rowcount
             if not rowcount:
-                logging.error('No record with the requested parameters exists in db')
-                return func.HttpResponse('No record to update', status_code=404)                
+                logging.error('Invalid input and/or no record with the requested parameters exists in db')
+                return func.HttpResponse('Invalid input', status_code=404)                
             logging.debug('UPDATE query executed')
             logging.debug(f"Executed the query: {rowcount} rows affected for taskId {taskId}")
             return func.HttpResponse(status_code=200)
@@ -191,6 +132,38 @@ def connect():
     except Exception as e:
         logging.error('Failure: ' + str(e))
         return func.HttpResponse(status_code=500)
+#parse the request body
+def parse(req_body):
+###parse JSON in a separate file and validate there, pass the dictionary to this function
+    try:
+        #assert for the presense of appropriate fields in JSON
+        assert 'title' in req_body, "New task request body did not contain field: 'title'"
+        assert 'description' in req_body, "New task request body did not contain field: 'description'"
+        assert 'dueDate' in req_body, "New user request body did not contain field: 'dueDate'"
+        assert 'completed' in req_body, "New user request body did not contain field: 'completed'"
+        assert 'completedDate' in req_body, "New user request body did not contain field: 'completedDate'"
+    except AssertionError as req_body_content_error:
+        logging.error('New user request body did not contain fields to update a task')
+        return func.HttpResponse(req_body_content_error.args[0], status_code=400)
+    logging.debug('New user request body contained necessary fields to update a task')  
+    # Unpack task data
+    title = req_body.get('title')
+    description = req_body.get('description')
+    dueDate = None
+    if req_body.get('dueDate') != None:
+        dueDate = datetime.strptime(req_body.get('dueDate'), '%d/%m/%y %H:%M:%S')  
+    completed = req_body.get('completed')
+    completedDate = None
+    if req_body.get('completedDate') != None:
+        completedDate = datetime.strptime(req_body.get('completedDate'), '%d/%m/%y %H:%M:%S')  
+    task_fields = {
+        "title": title,
+        "description": description,
+        "dueDate": dueDate,
+        "completed": completed,
+        "completedDate": completedDate
+    }
+    return task_fields
 
 #MAIN FUNCTION
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -204,17 +177,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         req_body = req.get_json()
     except ValueError:
+        logging.error('Empty req body or non-JSON file passed')
         pass
-    if (not userId) and (not taskId):
-        logging.debug("Got neither userId nor taskId")
-        userId = req_body.get('userId')
-        taskId = req_body.get('taskId')
     if userId and taskId: 
         logging.debug(f"Got userId:{userId} and taskId: {taskId}")
+    task_fields = parse(req_body)
 
 #determines which API method was requested, and calls the API method
     method = req.method
-
     try:
     #if GET method is selected, it executes here
         if method == "GET":  
@@ -224,13 +194,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     #if PUT method is selected, it executes here
         elif method == "PUT":
             logging.debug('Passed PUT method')   
-            return (update(userId, taskId, req_body))
+            return (update(userId, taskId, task_fields))
 
     #if PATCH method is selected, it executes here
         elif method == "PATCH":
             logging.debug('Passed PATCH method')   
             return 
 
+    #if DELETE method is selected, it executes here
         elif method == "DELETE":
             logging.debug('Passed DELETE method')   
             return (delete(userId, taskId))
