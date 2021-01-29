@@ -31,17 +31,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             if req.method == 'GET':
                 return get(conn, user_id)
-            elif req.method == 'POST':
-                return post()
             elif req.method == 'PUT':
                 return put(req, conn, user_id)
-            elif req.method == 'PATCH':
-                return patch()
             elif req.method == 'DELETE':
                 return delete(conn, user_id)
-
-            conn.close()
-            logging.debug('Connection to DB closed')
+            else:
+                return methodNotAllowed()
 
     except Exception as e:
         logging.critical("Error: %s" % str(e))
@@ -79,8 +74,8 @@ def get(conn, user_id):
             )
 
 
-def post():
-    logging.debug("POST is not implemented")
+def methodNotAllowed():
+    logging.debug("This method is not Implemented")
     return func.HttpResponse(
         "Method not allowed!",
         status_code=405
@@ -134,14 +129,6 @@ def put(req, conn, user_id):
                 "Internal Server Error",
                 status_code=500
             )
-
-
-def patch():
-    logging.debug("PATCH is not implemented")
-    return func.HttpResponse(
-        "Method not allowed!",
-        status_code=405
-    )
 
 
 def delete(conn, user_id):
