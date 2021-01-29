@@ -34,7 +34,8 @@ jobs:
       # - currently this just runs the defaults
       # examples for future:
       # - run: cp ./slsart/script.yml ./
-      # - run: cp ./slsart/serverless.yml ./
+      - name: Moving slsart yml files
+        run: cp ./serverless/serverless.yml ./
       - name: Deploy, invoke, remove functions
         run: |
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
