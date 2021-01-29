@@ -11,8 +11,15 @@ import json
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    # TODO  error handleing like lenny
+    logging.info(
+        'Python HTTP trigger for users/userId is processing a request ')
 
+    # Check request method
+    if not req.method:
+        logging.critical('No method available')
+        raise Exception('No method passed')
+
+    # Database credentials.
     db_server = os.environ["ENV_DATABASE_SERVER"]
     db_name = os.environ["ENV_DATABASE_NAME"]
     db_username = os.environ["ENV_DATABASE_USERNAME"]
@@ -21,58 +28,52 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     connectionString = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
         driver, db_server, db_name, db_username, db_password)
 
-   # This gets the userId from the query string
+    # This gets the userId from the query string
     id = req.route_params.get('userId')
-
     if not id:
         # If no userId is supplied http response -> Bad Request
+        logging.debug("User Id was not found")
         return func.HttpResponse(
             "Bad Request",
             status_code=400
         )
     else:
         try:
+            # Create a new connection
+            logging.debug("Attempting DB connection!")
             with pypyodbc.connect(connectionString) as conn:
+                logging.debug("Connection to DB successful!")
 
                 if req.method == 'GET':
-                    return get(req, conn, id)
+                    return get(conn, id)
                 elif req.method == 'POST':
-                    return post(req, conn, id)
+                    return post()
                 elif req.method == 'PUT':
                     return put(req, conn, id)
                 elif req.method == 'PATCH':
-                    return patch(req, conn, id)
+                    return patch()
                 elif req.method == 'DELETE':
                     return delete(req, conn, id)
 
-                # Close connection after method call
                 conn.close()
-                logging.info('Closed the connection')
+                logging.debug('Connection to DB closed')
 
-        except pypyodbc.DatabaseError as e:
-            # 28000 - This code is returned by pypyodbc meaning Unautroized when a bad password is supplied etc
-            # 42000 - Azure firewall blocks ip
-            # Adddtional error handeling will need to be implemented, maybe in srpint 2
-
-            # TODO ADD LOGGING with error detail
-            if e.args[0] == '28000' or e.args[0] == '42000':
-                return func.HttpResponse(
-                    "Unauthorized",
-                    status_code=403
-                )
-        else:
+        except Exception as e:
+            logging.critical("Error: " + e.args[1])
             return func.HttpResponse(
-                "Error",
-                status_code=400
+                "Internal Server Error",
+                status_code=500
             )
 
 
-def get(req, conn, id):
+def get(conn, id):
+    logging.debug("Attempting to retrieve user by ID...")
     with conn.cursor() as cursor:
         cursor.execute(
             "SELECT * FROM users WHERE userId={}".format(id))
         row = cursor.fetchone()
         if not row:
+            logging.debug("User Id not found")
             return func.HttpResponse(
                 "User not found",
                 status_code=404
@@ -83,8 +84,8 @@ def get(req, conn, id):
             # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
             columns = [column[0] for column in cursor.description]
             data = dict(zip(columns, row))
-            cursor.close()
 
+            logging.debug("Users retrieved successfully!")
             return func.HttpResponse(
                 json.dumps(data),
                 status_code=200,
@@ -92,7 +93,8 @@ def get(req, conn, id):
             )
 
 
-def post(req, conn, id):
+def post():
+    logging.debug("POST is not implemented")
     return func.HttpResponse(
         "Method not allowed!",
         status_code=405
@@ -101,15 +103,17 @@ def post(req, conn, id):
 
 def put(req, conn, id):
     user_req_body = req.get_json()
+    logging.debug("Verifying fields in request body to update a user by ID")
     try:
-        assert "firstName" in user_req_body, "New user request body did not contain field: 'firstName'"
-        assert "lastName" in user_req_body, "New user request body did not contain field: 'lastName'"
-        assert "email" in user_req_body, "New user request body did not contain field: 'email'"
+        assert "firstName" in user_req_body, "User request body did not contain field: 'firstName'"
+        assert "lastName" in user_req_body, "User request body did not contain field: 'lastName'"
+        assert "email" in user_req_body, "User request body did not contain field: 'email'"
     except AssertionError as user_req_body_content_error:
         logging.error(
-            "New user request body did not contain the necessary fields!")
+            "User request body did not contain the necessary fields!")
         return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
 
+    logging.debug("New user request body contains all the necessary fields!")
     with conn.cursor() as cursor:
         # Unpack user data
         firstName = user_req_body["firstName"]
@@ -118,13 +122,36 @@ def put(req, conn, id):
         user_params = (firstName, lastName, email)
 
         # Update user  query
-        update_user_query = "UPDATE users SET firstName = {}, lastName = {}, email = {} WHERE userId={}".format(
-            firstName, lastName, email, id)
+        update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId={}".format(
+            id)
 
-        cursor.execute(update_user_query)
+        try:
+            logging.debug("Check if userId exists: " + id)
+            cursor.execute(
+                "SELECT * FROM users WHERE userId={}".format(id))
+            row = cursor.fetchone()
+            if not row:
+                return func.HttpResponse(
+                    "User not found",
+                    status_code=404
+                )
+            logging.debug("Executing query: " + update_user_query)
+            cursor.execute(update_user_query, user_params)
+            logging.debug("User was updated successfully!.")
+            return func.HttpResponse(
+                "User updated",
+                status_code=200
+            )
+        except Exception as e:
+            logging.critical("Error: " + e.args[1])
+            return func.HttpResponse(
+                "Internal Server Error",
+                status_code=500
+            )
 
 
-def patch(req, conn, id):
+def patch():
+    logging.debug("PATCH is not implemented")
     return func.HttpResponse(
         "Method not allowed!",
         status_code=405
@@ -132,24 +159,33 @@ def patch(req, conn, id):
 
 
 def delete(req, conn, id):
-    return ""
-# Implement Response codes:
-#  responses:
-#         "200":
-#           description: "User Deleted Successfully"
-#         "400":
-#           description: "Bad Request"
-#         "401":
-#           description: "Unauthorized"
-#         "403":
-#           description: "Forbidden"
-#         "404":
-#           description: "User Not Found"
-#         "429":
-#           description: "Too Many Requests"
-#         "500":
-#           description: "Internal Server Error"
-#         "502":
-#           description: "Bad Gateway"
-#         "503":
-#           description: "Service Unavailable"
+    logging.debug("Attempting to retrieve user by ID and delete the user...")
+    with conn.cursor() as cursor:
+
+        # Delete user  query
+        delete_user_query = "DELETE FROM dbo.users  WHERE userId={}".format(
+            id)
+
+        try:
+            logging.debug("Check if userId exists in database: " + id)
+            cursor.execute(
+                "SELECT * FROM users WHERE userId={}".format(id))
+            row = cursor.fetchone()
+            if not row:
+                return func.HttpResponse(
+                    "User not found",
+                    status_code=404
+                )
+            logging.debug("Executing query: " + delete_user_query)
+            cursor.execute(delete_user_query)
+            logging.debug("User was deleted successfully!.")
+            return func.HttpResponse(
+                "User deleted",
+                status_code=200
+            )
+        except Exception as e:
+            logging.critical("Error: " + e.args[1])
+            return func.HttpResponse(
+                "Internal Server Error",
+                status_code=500
+            )
