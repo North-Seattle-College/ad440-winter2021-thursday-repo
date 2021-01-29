@@ -11,12 +11,12 @@ var BootstrapTable = (props) => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              {heatherItems.map(item => <th>{item}</th>)}
+              {heatherItems.map((item, index) => <th key={index}>{item}</th>)}
             </tr>
           </thead>
           {rows.map(row => (
             <tbody key={row[heatherItems[0]]}>
-              <tr>{heatherItems.map(item => <td>{row[item]}</td>)}</tr>
+              <tr>{heatherItems.map(item => <td key={item}>{row[item]}</td>)}</tr>
             </tbody>
           ))}
         </Table>
