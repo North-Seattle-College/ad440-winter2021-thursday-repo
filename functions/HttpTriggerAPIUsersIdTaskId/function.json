@@ -9,6 +9,7 @@
       "methods": [
         "get",
         "put",
+        "patch",
         "delete"
       ],
       "route": "users/{userId:int?}/task/{taskId:int?}"
