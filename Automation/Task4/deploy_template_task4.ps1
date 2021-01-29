@@ -38,7 +38,7 @@ param(
 
     [Parameter(Mandatory=$True)]
     [string]
-    $templateFilePath,
+    $templateFilePath
 )
 
 Clear-AzContext -Force;
