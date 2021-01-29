@@ -37,7 +37,7 @@ jobs:
         run: |
           ~/.npm-global/bin/slsart configure
           npm install yaml
-          node ./serverless/serverlessRegionYamlFix.js
+          node ./serverless/serverlessYamlEditor.js
       - name: Deploy, invoke, remove functions
         run: |
           ~/.npm-global/bin/slsart deploy
