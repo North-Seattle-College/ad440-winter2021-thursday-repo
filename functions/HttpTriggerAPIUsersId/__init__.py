@@ -6,8 +6,6 @@ import json
 
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
-# Additional work to be done:
-# Add Http Response for UPDATE, DELETE, POST
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -46,7 +44,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.debug('Connection to DB closed')
 
     except Exception as e:
-        logging.critical("Error: " + e.args[1])
+        logging.critical("Error: %s" % str(e))
         return func.HttpResponse(
             "Internal Server Error",
             status_code=500
@@ -55,9 +53,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 def get(conn, user_id):
     logging.debug("Attempting to retrieve user by ID...")
+    query_params = (user_id,)
     with conn.cursor() as cursor:
         cursor.execute(
-            "SELECT * FROM users WHERE userId={}".format(user_id))
+            "SELECT * FROM users WHERE userId= ?", query_params)
         row = cursor.fetchone()
         if not row:
             logging.debug("User Id not found")
@@ -106,24 +105,24 @@ def put(req, conn, user_id):
         firstName = user_req_body["firstName"]
         lastName = user_req_body["lastName"]
         email = user_req_body["email"]
-        user_params = (firstName, lastName, email)
-
-        # Update user  query
-        update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId={}".format(
-            user_id)
+        query_params1 = (user_id,)
+        query_params2 = (firstName, lastName, email, user_id)
 
         try:
             logging.debug("Check if userId exists: " + user_id)
             cursor.execute(
-                "SELECT * FROM users WHERE userId={}".format(user_id))
+                "SELECT * FROM users WHERE userId= ?", query_params1)
             row = cursor.fetchone()
             if not row:
                 return func.HttpResponse(
                     "User not found",
                     status_code=404
                 )
+
+            # Update user  query
+            update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId= ?"
             logging.debug("Executing query: " + update_user_query)
-            cursor.execute(update_user_query, user_params)
+            cursor.execute(update_user_query, query_params2)
             logging.debug("User was updated successfully!.")
             return func.HttpResponse(
                 "User updated",
@@ -148,23 +147,20 @@ def patch():
 def delete(conn, user_id):
     logging.debug("Attempting to retrieve user by ID and delete the user...")
     with conn.cursor() as cursor:
-
-        # Delete user  query
-        delete_user_query = "DELETE FROM dbo.users  WHERE userId={}".format(
-            user_id)
-
+        query_params = (user_id,)
         try:
             logging.debug("Check if userId exists in database: " + user_id)
             cursor.execute(
-                "SELECT * FROM users WHERE userId={}".format(user_id))
+                "SELECT * FROM users WHERE userId= ?", query_params)
             row = cursor.fetchone()
             if not row:
                 return func.HttpResponse(
                     "User not found",
                     status_code=404
                 )
+            delete_user_query = "DELETE FROM dbo.users  WHERE userId= ?"
             logging.debug("Executing query: " + delete_user_query)
-            cursor.execute(delete_user_query)
+            cursor.execute(delete_user_query, query_params)
             logging.debug("User was deleted successfully!.")
             return func.HttpResponse(
                 "User deleted",
