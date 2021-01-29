@@ -113,7 +113,7 @@ def put(req, conn, id):
             "User request body did not contain the necessary fields!")
         return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
 
-    logging.debug("New user request body contains all the necessary fields!")
+    logging.debug("User request body contains all the necessary fields!")
     with conn.cursor() as cursor:
         # Unpack user data
         firstName = user_req_body["firstName"]
