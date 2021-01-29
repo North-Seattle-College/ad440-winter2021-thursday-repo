@@ -2,35 +2,35 @@
 param(
     [Parameter(Mandatory=$True)]
     [string]
-    $SubscriptionId,
+    $subscriptionId,
 
     [Parameter(Mandatory=$True)]
     [string]
-    $TenantId,
+    $tenantId,
 
     [Parameter(Mandatory=$True)]
     [string]
-    $ServicePrincipalId,
+    $servicePrincipalId,
 
     [Parameter(Mandatory=$True)]
     [String]
-    $ServicePrincipalPassword,
+    $servicePrincipalPassword,
 
     [Parameter(Mandatory=$True)]
     [string]
-    $Resource_Group_Name,
+    $resourceGroupName,
 
     [Parameter(Mandatory=$True)]
     [string]
-    $function_name,
+    $functionName,
 
     [Parameter(Mandatory=$True)]
     [string]
-    $storage_account_name,
+    $storageAccountName,
 
     [Parameter(Mandatory=$True)]
     [string]
-    $app_service_plan_name,
+    $appServicePlanName,
 
     [Parameter(Mandatory=$True)]
     [string]
@@ -38,21 +38,16 @@ param(
 
     [Parameter(Mandatory=$True)]
     [string]
-    $template_file_path
-
-
-
+    $templateFilePath,
 )
 
-
 Clear-AzContext -Force;
-$securePassword = ConvertTo-SecureString -String $ServicePrincipalPassword -AsPlainText -Force;
-$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $securePassword);
+$securePassword = ConvertTo-SecureString -String $servicePrincipalPassword -AsPlainText -Force;
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalId, $securePassword);
 
+Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $tenantId -SubscriptionId $subscriptionId;
 
-Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -SubscriptionId $SubscriptionId;
+New-AzResourceGroup -Name $resourceGroupName -Location $location
 
-New-AzResourceGroup -Name $Resource_Group_Name -Location $location
-
-New-AzResourceGroupDeployment -ResourceGroupName $Resource_Group_Name -TemplateFile "./template.json" -function_name $function_name -storage_account_name $storage_account_name -app_service_plan_name $app_service_plan_name -location $location
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile  $templateFilePath -functionName $functionName -storageAccountName $storageAccountName -appServicePlanName $appServicePlanName -location $location
 
