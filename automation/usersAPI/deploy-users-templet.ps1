@@ -1,4 +1,5 @@
-param(
+[CmdletBinding()]
+param (
     [Parameter(Mandatory=$True)]
     [string]
     $SubscriptionId,
@@ -13,8 +14,7 @@ param(
 
     [Parameter(Mandatory=$True)]
     [SecureString]
-    [ValidateNotNullOrEmpty()]
-    [String]$ServicePrincipalPassword=$(Throw "Password required."),
+    $ServicePrincipalPassword,
    
     
     [Parameter(Mandatory=$True)]
@@ -41,14 +41,15 @@ param(
     [string]
     $TemplatePath
 )
-Clear-AzContext -Force;
-$securePassword = ConvertTo-SecureString -String $ServicePrincipalPassword -AsPlainText -Force;
-$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $securePassword);
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword );
+
+Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -Subscription $SubscriptionId;
 
 
-Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -SubscriptionId $SubscriptionId;
-
+Set-AzContext $SubscriptionId
 New-AzResourceGroup -Name $ResourceGroupName -Location $location
 
-New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplatePath "./template.json" -functionName $functionName -storageAccountName $storageAccountName -app_service_plan_name $AppServicePlanName -location $location
+New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -functionName $functionName -storageAccountName $storageAccountName 
+-AppServicePlanName  $AppServicePlanName -location $location -TemplatePath $TemplatePath
 
+ 
