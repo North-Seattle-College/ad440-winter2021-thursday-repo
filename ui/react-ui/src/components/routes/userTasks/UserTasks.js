@@ -9,9 +9,11 @@ var UserTasks = () => {
 
   useEffect(() => {
     fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/${userId}/tasks?`)
-      .then(response => response.json())
-      .then(data => setUserTasks(data))
-      .catch((error) => console.error(error))
+    .then(response => response.json())
+    .then(data => setUserTasks(data))
+    .catch((error) => console.error(error))
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
