@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
-      STAGE_NAME: merge-perf-test
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -34,12 +33,13 @@ jobs:
       # - currently this just runs the defaults
       # examples for future:
       # - run: cp ./slsart/script.yml ./
-      - name: Moving slsart yml files
+      - name: Editing serverless yml
         run: |
           ~/.npm-global/bin/slsart configure
-          cp ./serverless/serverless.yml ./
+          npm install yaml
+          node ./serverless/serverlessRegionYamlFix.js
       - name: Deploy, invoke, remove functions
         run: |
-          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
-          ~/.npm-global/bin/slsart invoke --stage $STAGE_NAME
-          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+          ~/.npm-global/bin/slsart deploy
+          ~/.npm-global/bin/slsart invoke
+          ~/.npm-global/bin/slsart remove
