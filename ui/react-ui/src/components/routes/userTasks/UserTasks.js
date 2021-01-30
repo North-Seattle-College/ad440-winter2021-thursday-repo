@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import Container from 'react-bootstrap/esm/Container';
 import {useParams} from "react-router-dom";
 import BootstrapTable from '../../bootstrapTable/BootstrapTable.js';
 
@@ -18,16 +19,16 @@ var UserTasks = () => {
   }, []);
 
   return (
-    <div>
-      <h3>all tasks for user with userId {userId}</h3>
+      <Container>
+      <h3>All Tasks for user with userId {userId}</h3>
       {userTasks.length > 0 ? 
         <BootstrapTable 
           heatherItems={Object.keys(userTasks[0])}
           rows={userTasks}
         /> :
-        <h4>there is no task for this user</h4>
+        <h4>There is no task for this user</h4>
       }
-    </div>
+      </Container>
   )
 }
 
