@@ -41,6 +41,6 @@ jobs:
           
       - name: Deploy, invoke, remove functions
         run: |
-          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
-          ~/.npm-global/bin/slsart invoke -s ../../test/artillery/performanceScript-users-userID.yaml --stage $STAGE_NAME > ../../test/results/performanceResults-users-userID.json
-          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+          ~/.npm-global/bin/slsart deploy 
+          ~/.npm-global/bin/slsart invoke -s ../../test/artillery/performanceScript-users-userID.yaml > ../../test/results/performanceResults-users-userID.json
+          ~/.npm-global/bin/slsart remove 
