@@ -3,31 +3,33 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "functionName": {
+         "type": "string"
+        },
+        "location":{
             "type": "string"
         },
         "storageAccountName": {
+     
             "type": "string"
         },
         "AppServicePlanName": {
-            "type": "string"
-        },
-         "location": {
-            "type": "string" 
+           "type": "string"
         }
+        
     },
     "functions": [],
     "variables": {},
     "resources": [
-        
+    
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-08-01-preview",
             "name": "[parameters('storageAccountName')]",
-            "location": "westus2",
+            "location": "[parameters('location')]",
             "tags": {
                 "Application": "Tasks App",
-                "Owner": "yergu",
-                "Role": "TestTeam2"
+                "Owner": "Toddy Mladenov",
+                "Role": "Test for Artillery"
             },
             "sku": {
                 "name": "Standard_LRS",
@@ -65,8 +67,8 @@
             "location": "[parameters('location')]",
             "tags": {
                 "Application": "Tasks App",
-                "Owner": "yergu",
-                "Role": "TestTeam2"
+                "Owner": "Toddy Mladenov",
+                "Role": "Test for Artillery"
             },
             "sku": {
                 "name": "Y1",
@@ -90,7 +92,7 @@
       
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-08-01-preview",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -108,10 +110,29 @@
                 }
             }
         },
-       
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('storageAccountName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-08-01-preview",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -124,7 +145,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/tableServices",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-08-01-preview",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -145,13 +166,13 @@
             ],
             "tags": {
                 "Application": "Tasks App",
-                "Owner": "yergu",
-                "Role": "TestTeam2"
+                "Owner": "Toddy Mladenov",
+                "Role": "Test for Artillery"
             },
             "kind": "functionapp,linux",
             "identity": {
-                "principalId": " ",
-                "tenantId": "",
+                "principalId": null,
+                "tenantId": null,
                 "type": "SystemAssigned"
             },
             "properties": {
@@ -183,12 +204,98 @@
                 "redundancyMode": "None"
             }
         },
-      
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionName'), '/web')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
+            ],
+            "tags": {
+                "Application": "Tasks App",
+                "Owner": "Toddy Mladenov",
+                "Role": "Test for Artillery"
+            },
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "linuxFxVersion": "PYTHON|3.8",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$nsc-fun-dev-usw2-tsmtestfunction",
+                "azureStorageAccounts": {},
+                "scmType": "None",
+                "use32BitWorkerProcess": false,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "cors": {
+                    "allowedOrigins": [
+                        "https://functions.azure.com",
+                        "https://functions-staging.azure.com",
+                        "https://functions-next.azure.com"
+                    ],
+                    "supportCredentials": false
+                },
+                "localMySqlEnabled": false,
+                "managedServiceIdentityId": 6652,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
         {
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
             "name": "[concat(parameters('functionName'), '/HttpTriggerLoadTest')]",
-            "location": "[parameters('location')]",
+  "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
@@ -204,7 +311,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2018-11-01",
             "name": "[concat(parameters('functionName'), '/', parameters('functionName'), '.azurewebsites.net')]",
-            "location": "[parameters('location')]",
+  "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
@@ -215,36 +322,36 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('functionName'), '/', parameters('functionName'), '.azurewebsites.net')]",
-            "location": "[parameters('location')]",
-               "dependsOn": [
-
-                "[resourceId('Microsoft.Web/sites, parameters('functionName'))]"
-            ],
-            "properties": {
-                "siteName": "nsc-fun-dev-usw2-tsmtestfunction",
-                "hostNameType": "Verified"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/hostNameBindings",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('functionName'), '/', parameters('functionName'), '.azurewebsites.net')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
-            ],
-            "properties": {
-                "siteName": "nsc-fun-dev-usw2-tsmtestfunction",
-                "hostNameType": "Verified"
-            }
-        },
-        {
-        
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2020-08-01-preview",
             "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-hosts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-secrets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2020-08-01",
+            "name": "[concat(parameters('storageAccountName'), '/default/scm-releases')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
