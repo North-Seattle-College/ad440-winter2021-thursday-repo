@@ -18,7 +18,7 @@ var UserTasks = () => {
   }, []);
 
   return (
-    <div className='user-tasks-container'>
+    <div>
       <h3>all tasks for user with userId {userId}</h3>
       {userTasks.length > 0 ? 
         <BootstrapTable 
