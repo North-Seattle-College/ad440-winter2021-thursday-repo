@@ -112,4 +112,5 @@ vscode
 DS_Store
 
 # ignore .vscode
+.DS_Store
 .vscode/
