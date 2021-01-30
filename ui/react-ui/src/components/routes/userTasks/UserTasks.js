@@ -22,8 +22,8 @@ var UserTasks = () => {
       <h3>all tasks for user with userId {userId}</h3>
       {userTasks.length > 0 ? 
         <BootstrapTable 
-          heatherItems={userTasks.length > 0 ? Object.keys(userTasks[0]) : []}
-          rows={userTasks.length > 0 ? userTasks : []}
+          heatherItems={Object.keys(userTasks[0])}
+          rows={userTasks}
         /> :
         <h4>there is no task for this user</h4>
       }
