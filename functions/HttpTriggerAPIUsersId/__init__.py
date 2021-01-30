@@ -25,26 +25,27 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Create a new connection
         logging.debug("Attempting DB connection!")
         with pypyodbc.connect(connectionString) as conn:
-            logging.debug("Connection to DB successful!")
+            with conn.cursor() as cursor:
+                logging.debug("Connection to DB successful!")
 
-            # Get user id from url (...api/users/{user_id}) and query db to check if it exists
-            user_id = req.route_params.get('userId')
-            logging.debug("Check if userId exists in database: " + user_id)
-            row = get_user_row(user_id, conn)
-            if not row:
-                logging.debug("User Id not found")
-                return func.HttpResponse(
-                    "User not found",
-                    status_code=404
-                )
-            if req.method == 'GET':
-                return get(conn, row)
-            elif req.method == 'PUT':
-                return put(req, conn, user_id)
-            elif req.method == 'DELETE':
-                return delete(conn, user_id)
-            else:
-                return methodNotAllowed()
+                # Get user id from url (...api/users/{user_id}) and query db to check if it exists
+                user_id = req.route_params.get('userId')
+                logging.debug("Check if userId exists in database: " + user_id)
+                row = get_user_row(cursor, user_id)
+                if not row:
+                    logging.debug("User Id not found")
+                    return func.HttpResponse(
+                        "User not found",
+                        status_code=404
+                    )
+                if req.method == 'GET':
+                    return get(cursor, row)
+                elif req.method == 'PUT':
+                    return put(req, cursor, user_id)
+                elif req.method == 'DELETE':
+                    return delete(cursor, user_id)
+                else:
+                    return methodNotAllowed()
 
     except Exception as e:
         logging.critical("Error: %s" % str(e))
@@ -54,21 +55,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-def get(conn, row):
+def get(cursor, row):
     logging.debug("Attempting to retrieve user by ID...")
-    with conn.cursor() as cursor:
-        # This will convert the results from the query into json properties.
-        # More information can be found on the link below:
-        # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
-        columns = [column[0] for column in cursor.description]
-        data = dict(zip(columns, row))
+    # This will convert the results from the query into json properties.
+    # More information can be found on the link below:
+    # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
+    columns = [column[0] for column in cursor.description]
+    data = dict(zip(columns, row))
 
-        logging.debug("Users retrieved successfully!")
-        return func.HttpResponse(
-            json.dumps(data),
-            status_code=200,
-            mimetype="application/json"
-        )
+    logging.debug("Users retrieved successfully!")
+    return func.HttpResponse(
+        json.dumps(data),
+        status_code=200,
+        mimetype="application/json"
+    )
 
 
 # For POST and PATCH
@@ -80,7 +80,7 @@ def methodNotAllowed():
     )
 
 
-def put(req, conn, user_id):
+def put(req, cursor, user_id):
     user_req_body = req.get_json()
 
     # Validate request body
@@ -101,34 +101,31 @@ def put(req, conn, user_id):
     email = user_req_body["email"]
 
     # Update user in DB
-    with conn.cursor() as cursor:
-        update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId= ?"
-        logging.debug("Executing query: " + update_user_query)
-        cursor.execute(update_user_query,
-                       (firstName, lastName, email, user_id))
-        logging.debug("User was updated successfully!.")
-        return func.HttpResponse(
-            "User updated",
-            status_code=200
-        )
+    update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId= ?"
+    logging.debug("Executing query: " + update_user_query)
+    cursor.execute(update_user_query,
+                   (firstName, lastName, email, user_id))
+    logging.debug("User was updated successfully!.")
+    return func.HttpResponse(
+        "User updated",
+        status_code=200
+    )
 
 
-def delete(conn, user_id):
+def delete(cursor, user_id):
     logging.debug("Attempting to retrieve user by ID and delete the user...")
-    with conn.cursor() as cursor:
-        delete_user_query = "DELETE FROM dbo.users  WHERE userId= ?"
-        logging.debug("Executing query: " + delete_user_query)
-        cursor.execute(delete_user_query, (user_id,))
-        logging.debug("User was deleted successfully!.")
-        return func.HttpResponse(
-            "User deleted",
-            status_code=200
-        )
+    delete_user_query = "DELETE FROM dbo.users  WHERE userId= ?"
+    logging.debug("Executing query: " + delete_user_query)
+    cursor.execute(delete_user_query, (user_id,))
+    logging.debug("User was deleted successfully!.")
+    return func.HttpResponse(
+        "User deleted",
+        status_code=200
+    )
 
 
-def get_user_row(user_id, conn):
-    with conn.cursor() as cursor:
-        cursor.execute(
-            "SELECT * FROM users WHERE userId= ?", (user_id,))
+def get_user_row(cursor, user_id):
+    cursor.execute(
+        "SELECT * FROM dbo.users WHERE userId= ?", (user_id,))
 
     return cursor.fetchone()
