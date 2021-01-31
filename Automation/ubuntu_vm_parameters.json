@@ -2,54 +2,84 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "vmName": {
-        "type": "string",
-        "defaultValue": "simpleLinuxVM",
-        "metadata": {
-          "description": "The name of you Virtual Machine."
-        }
-      },
       "adminUsername": {
         "type": "string",
         "metadata": {
           "description": "Username for the Virtual Machine."
         }
       },
-      "authenticationType": {
-        "type": "string",
-        "defaultValue": "password",
-        "allowedValues": [
-          "sshPublicKey",
-          "password"
-        ],
-        "metadata": {
-          "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
-        }
-      },
-      "adminPasswordOrKey": {
+      "adminPassword": {
         "type": "securestring",
+        "minLength": 12,
         "metadata": {
-          "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+          "description": "Password for the Virtual Machine."
         }
       },
       "dnsLabelPrefix": {
         "type": "string",
-        "defaultValue": "[toLower(concat('simplelinuxvm-', uniqueString(resourceGroup().id)))]",
+        "defaultValue": "[toLower(concat(parameters('vmName'),'-', uniqueString(resourceGroup().id, parameters('vmName'))))]",
         "metadata": {
           "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
         }
       },
-      "ubuntuOSVersion": {
+      "publicIpName": {
         "type": "string",
-        "defaultValue": "18.04-LTS",
+        "defaultValue": "myPublicIP",
+        "metadata": {
+          "description": "Name for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "publicIPAllocationMethod": {
+        "type": "string",
+        "defaultValue": "Dynamic",
         "allowedValues": [
-          "12.04.5-LTS",
-          "14.04.5-LTS",
-          "16.04.0-LTS",
-          "18.04-LTS"
+          "Dynamic",
+          "Static"
         ],
         "metadata": {
-          "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+          "description": "Allocation method for the Public IP used to access the Virtual Machine."
+        }
+      },
+      "publicIpSku": {
+        "type": "string",
+        "defaultValue": "Basic",
+        "allowedValues": [
+          "Basic",
+          "Standard"
+        ],
+        "metadata": {
+          "description": "SKU for the Public IP used to access the Virtual Machine."
+        }
+      },
+  
+      "OSVersion": {
+        "type": "string",
+        "defaultValue": "2019-Datacenter",
+        "allowedValues": [
+          "2008-R2-SP1",
+          "2012-Datacenter",
+          "2012-R2-Datacenter",
+          "2016-Nano-Server",
+          "2016-Datacenter-with-Containers",
+          "2016-Datacenter",
+          "2019-Datacenter",
+          "2019-Datacenter-Core",
+          "2019-Datacenter-Core-smalldisk",
+          "2019-Datacenter-Core-with-Containers",
+          "2019-Datacenter-Core-with-Containers-smalldisk",
+          "2019-Datacenter-smalldisk",
+          "2019-Datacenter-with-Containers",
+          "2019-Datacenter-with-Containers-smalldisk"
+        ],
+        "metadata": {
+          "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+        }
+      },
+      "vmSize": {
+        "type": "string",
+        "defaultValue": "Standard_B1s",
+        "metadata": {
+          "description": "Size of the virtual machine."
         }
       },
       "location": {
@@ -59,82 +89,60 @@
           "description": "Location for all resources."
         }
       },
-      "VmSize": {
-        "type": "string",
-        "defaultValue": "Standard_B1s",
-        "metadata": {
-          "description": "The size of the VM"
-        }
-      },
       "virtualNetworkName": {
         "type": "string",
-        "defaultValue": "vNet",
+        "defaultValue": "defaultvNet",
         "metadata": {
-          "description": "Name of the VNET"
-        }
-      },
-      "subnetName": {
-        "type": "string",
-        "defaultValue": "Subnet",
-        "metadata": {
-          "description": "Name of the subnet in the virtual network"
+          "description": "Name."
         }
       },
       "networkSecurityGroupName": {
         "type": "string",
-        "defaultValue": "SecGroupNet",
+        "defaultValue": "defaultvNet",
         "metadata": {
-          "description": "Name of the Network Security Group"
+          "description": "Name."
+        }
+      },
+      "vmName": {
+        "type": "string",
+        "defaultValue": "simple-vm",
+        "metadata": {
+          "description": "Name of the virtual machine."
         }
       }
     },
     "variables": {
-      "publicIpAddressName": "[concat(parameters('vmName'), 'PublicIP' )]",
-      "networkInterfaceName": "[concat(parameters('vmName'),'NetInt')]",
-      "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-      "osDiskType": "Standard_LRS",
-      "subnetAddressPrefix": "10.1.0.0/24",
-      "addressPrefix": "10.1.0.0/16",
-      "linuxConfiguration": {
-        "disablePasswordAuthentication": true,
-        "ssh": {
-          "publicKeys": [
-            {
-              "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('adminPasswordOrKey')]"
-            }
-          ]
-        }
-      }
+      "storageAccountName": "[concat('bootdiags', uniquestring(resourceGroup().id))]",
+      "nicName": "myVMNic",
+      "addressPrefix": "10.0.0.0/16",
+      "subnetName": "Subnet",
+      "subnetPrefix": "10.0.0.0/24",
+      "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('subnetName'))]"
     },
     "resources": [
       {
-        "type": "Microsoft.Network/networkInterfaces",
-        "apiVersion": "2020-06-01",
-        "name": "[variables('networkInterfaceName')]",
+        "type": "Microsoft.Storage/storageAccounts",
+        "apiVersion": "2019-06-01",
+        "name": "[variables('storageAccountName')]",
         "location": "[parameters('location')]",
-        "dependsOn": [
-          "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-          "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-          "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
-        ],
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "kind": "Storage",
+        "properties": {}
+      },
+      {
+        "type": "Microsoft.Network/publicIPAddresses",
+        "apiVersion": "2020-06-01",
+        "name": "[parameters('publicIPName')]",
+        "location": "[parameters('location')]",
+        "sku": {
+          "name": "[parameters('publicIpSku')]"
+        },
         "properties": {
-          "ipConfigurations": [
-            {
-              "name": "ipconfig1",
-              "properties": {
-                "subnet": {
-                  "id": "[variables('subnetRef')]"
-                },
-                "privateIPAllocationMethod": "Dynamic",
-                "publicIpAddress": {
-                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                }
-              }
-            }
-          ],
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+          "publicIPAllocationMethod": "[parameters('publicIPAllocationMethod')]",
+          "dnsSettings": {
+            "domainNameLabel": "[parameters('dnsLabelPrefix')]"
           }
         }
       },
@@ -146,16 +154,16 @@
         "properties": {
           "securityRules": [
             {
-              "name": "SSH",
+              "name": "default-allow-3389",
               "properties": {
                 "priority": 1000,
-                "protocol": "TCP",
                 "access": "Allow",
                 "direction": "Inbound",
-                "sourceAddressPrefix": "*",
+                "destinationPortRange": "3389",
+                "protocol": "Tcp",
                 "sourcePortRange": "*",
-                "destinationAddressPrefix": "*",
-                "destinationPortRange": "22"
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*"
               }
             }
           ]
@@ -166,6 +174,9 @@
         "apiVersion": "2020-06-01",
         "name": "[parameters('virtualNetworkName')]",
         "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+        ],
         "properties": {
           "addressSpace": {
             "addressPrefixes": [
@@ -174,32 +185,41 @@
           },
           "subnets": [
             {
-              "name": "[parameters('subnetName')]",
+              "name": "[variables('subnetName')]",
               "properties": {
-                "addressPrefix": "[variables('subnetAddressPrefix')]",
-                "privateEndpointNetworkPolicies": "Enabled",
-                "privateLinkServiceNetworkPolicies": "Enabled"
+                "addressPrefix": "[variables('subnetPrefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+                }
               }
             }
           ]
         }
       },
       {
-        "type": "Microsoft.Network/publicIpAddresses",
+        "type": "Microsoft.Network/networkInterfaces",
         "apiVersion": "2020-06-01",
-        "name": "[variables('publicIpAddressName')]",
+        "name": "[variables('nicName')]",
         "location": "[parameters('location')]",
-        "sku": {
-          "name": "Basic",
-          "tier": "Regional"
-        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPName'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        ],
         "properties": {
-          "publicIpAllocationMethod": "Dynamic",
-          "publicIPAddressVersion": "IPv4",
-          "dnsSettings": {
-            "domainNameLabel": "[parameters('dnsLabelPrefix')]"
-          },
-          "idleTimeoutInMinutes": 4
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPName'))]"
+                },
+                "subnet": {
+                  "id": "[variables('subnetRef')]"
+                }
+              }
+            }
+          ]
         }
       },
       {
@@ -208,54 +228,59 @@
         "name": "[parameters('vmName')]",
         "location": "[parameters('location')]",
         "dependsOn": [
-          "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+          "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+          "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
         ],
         "properties": {
           "hardwareProfile": {
-            "vmSize": "[parameters('VmSize')]"
-          },
-          "storageProfile": {
-            "osDisk": {
-              "createOption": "fromImage",
-              "managedDisk": {
-                "storageAccountType": "[variables('osDiskType')]"
-              }
-            },
-            "imageReference": {
-              "publisher": "Canonical",
-              "offer": "UbuntuServer",
-              "sku": "[parameters('ubuntuOSVersion')]",
-              "version": "latest"
-            }
-          },
-          "networkProfile": {
-            "networkInterfaces": [
-              {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
-              }
-            ]
+            "vmSize": "[parameters('vmSize')]"
           },
           "osProfile": {
             "computerName": "[parameters('vmName')]",
             "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPasswordOrKey')]",
-            "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "[parameters('OSVersion')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "StandardSSD_LRS"
+              }
+            },
+            "dataDisks": [
+              {
+                "diskSizeGB": 1023,
+                "lun": 0,
+                "createOption": "Empty"
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              }
+            ]
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).primaryEndpoints.blob]"
+            }
           }
         }
       }
     ],
     "outputs": {
-      "adminUsername": {
-        "type": "string",
-        "value": "[parameters('adminUsername')]"
-      },
       "hostname": {
         "type": "string",
-        "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]"
-      },
-      "sshCommand": {
-        "type": "string",
-        "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(variables('publicIPAddressName')).dnsSettings.fqdn)]"
+        "value": "[reference(parameters('publicIPName')).dnsSettings.fqdn]"
       }
     }
   }

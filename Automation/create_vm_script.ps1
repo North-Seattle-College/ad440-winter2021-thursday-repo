@@ -1,43 +1,70 @@
-#Script to create a Virtual Machine on Azure.
-#https://docs.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-powershell
+#This script creates a Ubuntu VM on Azure.
+#The script logs user into Azure using Service Principal. To log in,
+#Tenant ID, App ID, Secret, and Subscription ID are required.
+#User must provide Azure Resource Group Name, VM Name, Admin Username/Password
 
-#Note: This creates a Windows VM, but the end goal is a Linux VM. This will be the next sprint.
-#Note: There are extra parameters that are not being used yet. These will be used when creating Linux machine.
 param (
-    [string] [Parameter(Mandatory=$true)] $tenantId, #Tenant ID used to login to Azure with Service Provider
-    [string] [Parameter(Mandatory=$true)] $applicationId, #App ID used to login to Azure with Service Provider
-    [string] [Parameter(Mandatory=$true)] $secret, #Azure Secret used to login to Azure with Service Provider
-    [string] [Parameter(Mandatory=$true)] $subscriptionId, #Subscr. ID used to login to Azure with Service Provider
-    [string] [Parameter(Mandatory)] $rgname, #Resource Group Name required.
-    [string] [Parameter(Mandatory)] $vmname, #VM Name required
+    [string] [Parameter(Mandatory=$true)] $tenantId, #Tenant ID used to login to Azure with Service Principal
+    [string] [Parameter(Mandatory=$true)] $applicationId, #App ID used to login to Azure with Service Principal
+    [string] [Parameter(Mandatory=$true)] $secret, #Azure Secret used to login to Azure with Service Principal
+    [string] [Parameter(Mandatory=$true)] $subscriptionId, #Subscr. ID used to login to Azure with Service Principal
+    [string] [Parameter(Mandatory)] $rgName, #Resource Group Name required
+    [string] [Parameter(Mandatory)] $vmName, #VM Name required
+    [string] [Parameter(Mandatory)] $adminUsername, #Admin Username required
+    [String] [Parameter(Mandatory)] $adminPassword, #Admin Password required
     [string] $location='West US2', #Default value for RG/VM Location
-    [string] $vnetname='myVnet',  #Default value
-    [string] $subnetname='mySubnet', #Default value
-    [string] $nsgname='myNetworkSecurityGroup', #Default value
-    [string] $publicipname='myPublicIpAddress', #Default value
-    [string] $dnsLabelPrefix=$rgname #Default value
+    [string] $vnetName='myVnet',  #Default value for Virtual Network Name
+    [string] $nsgName='myNetworkSecurityGroup', #Default value for Network Security Group Name
+    [string] $publicIpName='myPublicIpAddress' #Default value for Public IP Address Name
     )
 
-$templatefile = "$PSScriptRoot\ubuntu_vm_parameters.json" #template file for Virtual Machine Resource
+#convert password to secure string
+[securestring]$securePassword = ConvertTo-SecureString $adminPassword -AsPlainText -Force  
 
-#Authentication for VM. This will be replaced with ssh key soon.
-$adminUsername = Read-Host -Prompt "Enter the admin username for new VM"
-$adminPassword = Read-Host -Prompt "Enter the admin password for new VM" -AsSecureString
-    
-# Logs in and sets subscription      
-& "$PSScriptRoot\login.ps1" $tenantId $applicationId $secret $subscriptionId
+#template file for Virtual Machine ARM Template    
+$templateFile = "$PSScriptRoot\ubuntu_vm_parameters.json" 
 
+#Log user into Azure:
+# If the Subscription Id is NOT null, the user is logged in
+$loggedIn = ((Get-AzContext).Tenant.Id -eq $tenantId)
+
+# Checks to see if user is logged into Azure, and if not uses
+# Service Principal to log in
+if ($loggedIn) {
+  Write-Host("Already logged in")
+
+  # Check we're on the correct Subscription
+  $correctSub = (Get-AzContext).Subscription.Id -eq $subscriptionId
+  if ($correctSub) {
+    Write-Host("Correct subscription")
+  } else {
+    Write-Host("Wrong subscription. Logging out...")
+    Disconnect-AzAccount
+    $loggedIn = False
+  }
+
+} 
+if (!$loggedIn) {
+  # Log In
+  Write-Host("Logging in...")
+  [securestring]$secureSecret = ConvertTo-SecureString $secret -AsPlainText -Force      
+  [pscredential]$credObject = New-Object System.Management.Automation.PSCredential ($applicationId, $secureSecret)
+  Connect-AzAccount -ServicePrincipal -Credential $credObject -Tenant $tenantId      
+  Write-Host "Logged into the account $applicationId"
+
+  # Set Subscription
+  Set-AzContext -Subscription $subscriptionId
+  Write-Host "Set to subscription $subscriptionId"
+} 
 
 #Check to see if resource group name exists. If not it will create one by that name.
-#If Resource Group already exists, the script this step and proceed to the VM.
-#This should probably be broken down in to a reuseable funtion.
-
+#If Resource Group already exists, the script will proceed to the VM.
 Write-Output "Checking to see if Azure Resource Group exists."
-Get-AzResourceGroup -Name $rgname -ErrorVariable norg -ErrorAction SilentlyContinue
+Get-AzResourceGroup -Name $rgName -ErrorVariable norg -ErrorAction SilentlyContinue
 if ($norg)
 { 
     Write-Output "Resource group did not exist. Creating now."
-    New-AzResourceGroup -Name $rgname -Location $location
+    New-AzResourceGroup -Name $rgName -Location $location
 }
 else
 {
@@ -46,30 +73,26 @@ else
 }
 
 #Check to see if VM exists
-Write-Output "Checking to see if Virtual Machine by this name exists in resource group $rgname."
-Get-AzVM -Name "$vmname" -ResourceGroupName $rgname -ErrorVariable notPresent -ErrorAction SilentlyContinue
+#If not, it will create VM using ARM Template/User provided parameters
+Write-Output "Checking to see if Virtual Machine by this name exists in resource group $rgName."
+Get-AzVM -Name "$vmName" -ResourceGroupName $rgName -ErrorVariable notPresent -ErrorAction SilentlyContinue
 
 if ($notPresent) {
-    #Create VM using provided template file
-    #https://azure.microsoft.com/en-us/resources/templates/101-vm-simple-linux/
-
-    # New-AzResourceGroupDeployment `
-    # -ResourceGroupName $rgname `
-    # -TemplateFile $templatefile `
-    # -vmName $vmname `
-    # -adminUsername $adminUsername `
-    # -adminPassword $adminPassword `
-    # -dnsLabelPrefix $dnsLabelPrefix
-
-    Write-Output "Virtual Machine did not exist in resource group $rgname. Creating Now."  
+    Write-Output "Virtual Machine did not exist in resource group $rgName. Creating Now."  
+    
+    #Create VM
     New-AzResourceGroupDeployment `
-    -ResourceGroupName "$rgname" `
-    -TemplateFile $templatefile `
-    -adminUsername $adminUsername `
-    -adminPassword $adminPassword
+    -ResourceGroupName "$rgName" `
+    -TemplateFile "$templateFile" `
+    -adminUsername "$adminUsername" `
+    -adminPassword $securePassword `
+    -vmName "$vmName" `
+    -virtualNetworkName "$vnetName" `
+    -networkSecurityGroupName "$nsgName" `
+    -publicIpName "$publicIpName" 
 }
 else {
-    Write-Output "Error: A Virtual Machine by this name already exists in Resource Group $rgname."  
+    Write-Output "Error: A Virtual Machine by this name already exists in Resource Group $rgName."  
 }
 
 
