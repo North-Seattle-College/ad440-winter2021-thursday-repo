@@ -1,29 +1,25 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "functionName": {
-         "type": "string"
-        },
-        "location":{
-            "type": "string"
+            "type": "String"
         },
         "storageAccountName": {
-     
-            "type": "string"
+            "type": "String"
         },
-        "AppServicePlanName": {
-           "type": "string"
+        "appServicePlanName": {
+            "type": "String"
+        },
+         "location": {
+            "type": "String" 
         }
-        
     },
-    "functions": [],
     "variables": {},
     "resources": [
-    
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2020-08-01",
+            "apiVersion": "2019-06-01",
             "name": "[parameters('storageAccountName')]",
             "location": "[parameters('location')]",
             "tags": {
@@ -63,7 +59,7 @@
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2018-02-01",
-            "name": "[parameters('AppServicePlanName')]",
+            "name": "[parameters('appServicePlanName')]",
             "location": "[parameters('location')]",
             "tags": {
                 "Application": "Tasks App",
@@ -89,10 +85,9 @@
                 "targetWorkerSizeId": 0
             }
         },
-      
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -112,7 +107,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -132,7 +127,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -145,7 +140,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/tableServices",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -162,7 +157,7 @@
             "name": "[parameters('functionName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
             ],
             "tags": {
                 "Application": "Tasks App",
@@ -189,7 +184,7 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('AppServicePlanName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
                 "reserved": true,
                 "isXenon": false,
                 "hyperV": false,
@@ -295,7 +290,7 @@
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
             "name": "[concat(parameters('functionName'), '/HttpTriggerLoadTest')]",
-  "location": "[parameters('location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
@@ -311,7 +306,7 @@
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2018-11-01",
             "name": "[concat(parameters('functionName'), '/', parameters('functionName'), '.azurewebsites.net')]",
-  "location": "[parameters('location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
             ],
@@ -322,7 +317,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
@@ -336,7 +331,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default/azure-webjobs-secrets')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
@@ -350,7 +345,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2020-08-01",
+            "apiVersion": "2019-06-01",
             "name": "[concat(parameters('storageAccountName'), '/default/scm-releases')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
@@ -362,6 +357,5 @@
                 "publicAccess": "None"
             }
         }
-    ],
-    "outputs": {}
+    ]
 }
