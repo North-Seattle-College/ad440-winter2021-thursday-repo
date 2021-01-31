@@ -58,17 +58,9 @@ $credentials = New-Object -TypeName System.Management.Automation.PSCredential($s
 Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -Subscription $SubscriptionId;
 
 Set-AzContext $SubscriptionId
-New-AzResourceGroup 
--Name $resourceGroupName
--Location $location
+New-AzResourceGroup -Name $resourceGroupName -Location $location
 
-New-AzResourceGroupDeployment 
--resourceGroupName $resourceGroupName 
--functionName $functionName 
--storageAccountName $storageAccountName
--AppServicePlanName  $AppServicePlanName 
--location $location 
--TemplatePath $TemplatePath
+New-AzResourceGroupDeployment -resourceGroupName $resourceGroupName -functionName $functionName -storageAccountName $storageAccountName -AppServicePlanName  $AppServicePlanName -location $location -TemplatePath $TemplatePath
 Stop-Transcript
 
 
