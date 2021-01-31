@@ -5,12 +5,23 @@ on:
     branches:
       - development
 
+env:
+  AZURE_WEBAPP_NAME: thursdayReactUIApp # set this to your application's name
+  AZURE_WEBAPP_PACKAGE_PATH: 'ui/react-ui/build'  # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '10.x'                # set this to the node version to use
+
 jobs:
-  build:
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: azure/login@v1
+      - name: npm install, build, and test
+        run: |
+          # Build the project, then deploy to Azure Web App.
+          npm install
+          npm run build --if-present
+      - uses: azure/actions/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
@@ -19,9 +30,22 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az storage blob upload-batch --account-name nordstromui -d '$web' -s .
-
+            az storage blob upload-batch --account-name reactappthursday -d '$web' -s .
       # Azure logout
       - name: logout
         run: |
           az logout
+
+
+
+
+# jobs:
+#   build-and-deploy:
+#     steps:
+
+#     - name: 'Deploy to Azure WebApp'
+#       uses: azure/webapps-deploy@v2
+#       with:
+#         app-name: ${{ env.AZURE_WEBAPP_NAME }}
+#         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+#         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
