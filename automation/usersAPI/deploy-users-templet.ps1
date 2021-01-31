@@ -1,5 +1,4 @@
 
-[CmdletBinding()]
 param (
     [Parameter(Mandatory=$True)]
     [string]
@@ -13,9 +12,10 @@ param (
     [string]
     $ServicePrincipalId,
 
-    [Parameter(Mandatory=$True)]
-    [string][ValidateNotNullOrEmpty()]
-    $ServicePrincipalPassword,
+   
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$ServicePrincipalPassword=$(Throw "Password required."),
    
     
     [Parameter(Mandatory=$True)]
@@ -32,7 +32,7 @@ param (
 
     [Parameter(Mandatory=$True)]
     [string]
-    $AppServicePlanName,
+    $appServicePlanName,
 
     [Parameter(Mandatory=$True)]
     [string]
@@ -40,7 +40,7 @@ param (
 
     [Parameter(Mandatory=$True)]
     [string]
-    $TemplatePath
+    $templateFilePath
 )
 
 #open log
@@ -50,7 +50,7 @@ Start-Transcript "./$prefix-$stamp.log"
 
 
 Clear-AzContext -Force;
-$securePassword = ConvertTo-SecureString -String $servicePrincipalPassword -AsPlainText -Force;
+$securePassword = $servicePrincipalPassword | ConvertTo-SecureString -AsPlainText -Force
 
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalId, $securePassword);
 
@@ -59,11 +59,10 @@ Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -
 
 Set-AzContext $SubscriptionId
 New-AzResourceGroup -Name $resourceGroupName -Location $location
+New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile  $templateFilePath -functionName $functionName -storageAccountName $storageAccountName -appServicePlanName $appServicePlanName -location $location
 
-New-AzResourceGroupDeployment -resourceGroupName $resourceGroupName -functionName $functionName -storageAccountName $storageAccountName -AppServicePlanName  $AppServicePlanName -location $location -TemplatePath $TemplatePath
+
 Stop-Transcript
-
-
 
 
 
