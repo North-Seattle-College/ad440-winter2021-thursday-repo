@@ -1,4 +1,5 @@
 
+[CmdletBinding()]
 param (
     [Parameter(Mandatory=$True)]
     [string]
@@ -13,7 +14,7 @@ param (
     $ServicePrincipalId,
 
     [Parameter(Mandatory=$True)]
-    [string]
+    [string][ValidateNotNullOrEmpty()]
     $ServicePrincipalPassword,
    
     
@@ -41,15 +42,20 @@ param (
     [string]
     $TemplatePath
 )
+
 #open log
 $prefix = "yergu-Arm-deplo"
 $stamp = (Get-Date).toString().Replace("/","-").Replace(":","-")
 Start-Transcript "./$prefix-$stamp.log"
 
-$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword );
+
+Clear-AzContext -Force;
+$securePassword = ConvertTo-SecureString -String $servicePrincipalPassword -AsPlainText -Force;
+
+$credentials = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalId, $securePassword);
+
 
 Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -Subscription $SubscriptionId;
-
 
 Set-AzContext $SubscriptionId
 New-AzResourceGroup 
@@ -57,11 +63,15 @@ New-AzResourceGroup
 -Location $location
 
 New-AzResourceGroupDeployment 
--ResourceGroupName $ResourceGroupName 
+-resourceGroupName $resourceGroupName 
 -functionName $functionName 
 -storageAccountName $storageAccountName
 -AppServicePlanName  $AppServicePlanName 
 -location $location 
 -TemplatePath $TemplatePath
+Stop-Transcript
 
- 
+
+
+
+
