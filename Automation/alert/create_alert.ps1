@@ -9,16 +9,16 @@ param(
         [string] [Parameter(Mandatory=$true)] $Location, 
         [string] [Parameter(Mandatory=$true)] $ResourceGroupName,
         [string] [Parameter(Mandatory=$true)] $AlertName,
-        [string] $AlertDescription = "Check every 5 minutes to see if more than 30 5xx responses have been generated",
-        [int] $AlertSeverity = 3,
-        [string] $ResourceId = "/subscriptions/9f4dcf43-aa06-457b-b975-f0216baef20d/resourceGroups/nsc-functions-team1/providers/Microsoft.Web/sites/nsc-functionsapp-team1",
-        [string] $MetricName = "Http5xx",       # get possible metric names: Get-AzMetricDefinition [resourceId]
-        [string] $Operator = "GreaterThanOrEqual",
-        [int] $Threshold = 30,
-        [string] $TimeAggregation = "Count",
-        [string] $WindowSize = "PT5M",
-        [string] $EvaluationFrequency = "PT5M",
-        [string] $ActionGroupId = "/subscriptions/9f4dcf43-aa06-457b-b975-f0216baef20d/resourcegroups/nataliasprint1test/providers/microsoft.insights/actiongroups/application insights smart detection"
+        [string] [Parameter (Mandatory=$false)] $AlertDescription = "Check every 5 minutes to see if more than 30 5xx responses have been generated",
+        [int]    [Parameter (Mandatory=$false)] $AlertSeverity = 3,
+        [string] [Parameter (Mandatory=$false)] $ResourceId = "/subscriptions/9f4dcf43-aa06-457b-b975-f0216baef20d/resourceGroups/nsc-functions-team1/providers/Microsoft.Web/sites/nsc-functionsapp-team1",
+        [string] [Parameter (Mandatory=$false)] $MetricName = "Http5xx",       # get possible metric names: Get-AzMetricDefinition [resourceId]
+        [string] [Parameter (Mandatory=$false)] $Operator = "GreaterThanOrEqual",
+        [int]    [Parameter (Mandatory=$false)] $Threshold = 30,
+        [string] [Parameter (Mandatory=$false)] $TimeAggregation = "Count",
+        [string] [Parameter (Mandatory=$false)] $WindowSize = "PT5M",
+        [string] [Parameter (Mandatory=$false)] $EvaluationFrequency = "PT5M",
+        [string] [Parameter (Mandatory=$false)] $ActionGroupId = "/subscriptions/9f4dcf43-aa06-457b-b975-f0216baef20d/resourcegroups/nataliasprint1test/providers/microsoft.insights/actiongroups/application insights smart detection"
       )
 
 $pathToAlertTemplate = "./alert_template.json"   
