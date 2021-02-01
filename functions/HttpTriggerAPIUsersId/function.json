@@ -8,8 +8,12 @@
       "name": "req",
       "methods": [
         "get",
-        "post"
-      ]
+        "post",
+        "put",
+        "patch",
+        "delete"
+      ],
+      "route":"users/{userId:int?}"
     },
     {
       "type": "http",

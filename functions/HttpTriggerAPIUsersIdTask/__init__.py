@@ -12,6 +12,11 @@ def default(dateHandle):
   if isinstance(dateHandle, (datetime.datetime, datetime.date)):
     return dateHandle.isoformat()
 
+# to handle datetime with JSON
+# It serialize datetime by converting it into string
+def default(o):
+  if isinstance(o, (datetime.datetime, datetime.date)):
+    return o.isoformat()
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
