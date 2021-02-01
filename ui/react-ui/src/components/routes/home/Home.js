@@ -4,7 +4,7 @@ import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 import Tooltip from 'react-bootstrap/esm/Tooltip';
 import {useHistory} from "react-router-dom";
 
-var Home = () => {
+let Home = () => {
   const history = useHistory();
 
   let endpoints = ['/users', '/users/{userId}/tasks'];
