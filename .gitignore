@@ -103,8 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
-#VsCode Configs
-.vscode
+.idea
 
 #artillery report output
 test/artillery/report.json
@@ -116,3 +115,4 @@ DS_Store
 
 # ignore .vscode
 .vscode/
+
