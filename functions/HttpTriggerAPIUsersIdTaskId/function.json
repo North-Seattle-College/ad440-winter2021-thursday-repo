@@ -12,7 +12,7 @@
         "patch",
         "delete"
       ],
-      "route": "users/{userId:int?}/task/{taskId:int?}"
+      "route": "users/{userId:int?}/tasks/{taskId:int?}"
     },
     {
       "type": "http",

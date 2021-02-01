@@ -10,7 +10,6 @@ import azure.functions as func
 #GET API method function
 def get(userId, taskId):
     #connects to db
-
     try:
         logging.debug('Attempting a db connection')
         cnxn = connect()
@@ -18,6 +17,7 @@ def get(userId, taskId):
         logging.debug('opened connection')        
         logging.debug(f'Attempting to execute GET task query for task {taskId}')
         #Get task title, description and user name by userId and taskId
+        #Avoids using SELECT * to prevent retuning unwanted unformation
         sql_query = ("""SELECT tasks.userId, CONCAT (users.firstName, ' ', users.lastName) AS "user",
                     tasks.taskId, tasks.title, tasks.description, tasks.createdDate, tasks.dueDate, 
                     tasks.completed, tasks.completedDate 
@@ -43,30 +43,80 @@ def get(userId, taskId):
 #PUT API method function
 def update(userId, taskId, task_fields):
     #connects to db
-    cnxn = connect()
-    cursor = cnxn.cursor()
     try:
+        cnxn = connect()
+        cursor = cnxn.cursor()
         logging.debug('opened connection')        
-        logging.debug(f'Going to execute UPDATE task {taskId} for user {userId} query')
-        # task_req_body input check
-        logging.debug("Checking the request body for necessary fields to update a task")    
-        # update task: with all passed JSON fields
+        logging.debug(f'Going to execute UPDATE query task {taskId} for user {userId}') 
+        try:
+            # update task: with 5 required JSON fields
+            assert len(task_fields) == 4, "Pass five required fields to update the task"
+        except AssertionError as req_body_content_error:
+            logging.error('Query did not contain all fields to update the task') 
+            return func.HttpResponse(req_body_content_error.args[0], status_code=400)
         sql_query = """UPDATE [dbo].[tasks]
             SET title = ?, description = ?, dueDate = ?, completed = ?, completedDate = ?
-            WHERE userId = ? AND taskId = ?"""
-        try:
-            rowcount = cursor.execute(sql_query, task_fields.get('title'), task_fields.get('description'), 
-            task_fields.get('dueDate'), task_fields.get('completed'), task_fields.get('completedDate'), 
-            userId, taskId).rowcount
-            if not rowcount:
-                logging.error('Invalid input and/or no record with the requested parameters exists in db')
-                return func.HttpResponse('Invalid input', status_code=404)                
-            logging.debug('UPDATE query executed')
-            logging.debug(f"Executed the query: {rowcount} rows affected for taskId {taskId}")
-            return func.HttpResponse(status_code=200)
-        except Exception as e:
-            logging.critical('Unable to execute the query')
-            return func.HttpResponse("Error: %s" % str(e), status_code=400)
+            WHERE userId = ? AND taskId = ?"""   
+
+        rowcount = cursor.execute(sql_query, task_fields.get('title'), task_fields.get('description'), 
+        task_fields.get('dueDate'), task_fields.get('completed'), task_fields.get('completedDate'), 
+        userId, taskId).rowcount
+        if not rowcount:
+            logging.error('Bad input and/or no record with the requested parameters exists in db')
+            return func.HttpResponse('Bad or invalid input', status_code=404)                
+        logging.debug('UPDATE task query executed')
+        logging.debug(f"Executed the query: {rowcount} rows affected for taskId {taskId}")
+        return func.HttpResponse(status_code=200)
+    except Exception as e:
+        logging.critical('Unable to execute the query')
+        return func.HttpResponse("Error: %s" % str(e), status_code=400)
+    finally:
+        #commits changes to db
+        cnxn.commit()
+        #properly closes the connection
+        cursor.close()
+        cnxn.close()
+        logging.debug('Closed the db connection')    
+
+#PATCH API method function, permits min 1 field passed in task_fields
+def patch(userId, taskId, task_fields):
+    #connects to db
+    cnxn = connect()
+    cursor = cnxn.cursor()
+    logging.debug('opened connection')        
+    logging.debug(f'Going to execute PATCH query on task {taskId} for user {userId}')  
+    #creates a list of fields to update
+    columnsToUpdate = list(task_fields.keys())
+    #params list to later use in sql query
+    params = []
+    fieldsInQuery = ''
+    #iterates through column values and adds them as params to be passed into sql query
+    for column in columnsToUpdate:
+        #accounts for no comma after the last param in the sql guery string
+        if column == columnsToUpdate[-1]:
+            comma = ' '
+        else:
+            comma = ', '
+        #avoids potential sql injection by using ? placeholder for column values
+        fieldsInQuery += "{} = ?{}".format(column, comma)
+        #appends each of columns to the list
+        params.append(task_fields.get(column))
+    #adds userId and taskId to params
+    params.extend([userId, taskId])
+    #set the query body
+    sql_query = """UPDATE [dbo].[tasks] SET {} WHERE userId = ? AND taskId = ?""".format(fieldsInQuery)
+    try: 
+        rowcount = cursor.execute(sql_query, params).rowcount
+        #reports out an unsuccessful result
+        if not rowcount:
+            logging.error('Invalid input and/or no record with the requested parameters exists in db')
+            return func.HttpResponse('Invalid input', status_code=404)                
+        logging.debug('UPDATE query executed')
+        logging.debug(f"Executed the query: {rowcount} rows affected for taskId {taskId}")
+        return func.HttpResponse(status_code=200)
+    except Exception as e:
+        logging.critical('Unable to execute the query')
+        return func.HttpResponse("Error: %s" % str(e), status_code=400)
     finally:
         #commits changes to db
         cnxn.commit()
@@ -80,20 +130,20 @@ def delete(userId, taskId):
     #connects to db
     cnxn = connect()
     cursor = cnxn.cursor()
+    logging.debug('opened connection')        
+    logging.debug(f'Going to execute DELETE query on task {taskId} for user {userId}')
+    sql_query = ("""DELETE FROM [dbo].[tasks] WHERE userId = ? AND taskId = ?""")
     try:
-        logging.debug('opened connection')        
-        logging.debug(f'Going to execute DELETE task {taskId} for user {userId} query')
-        sql_query = ("""DELETE FROM [dbo].[tasks] WHERE userId = ? AND taskId = ?""")
-        try:
-            rowcount = cursor.execute(sql_query, userId, taskId).rowcount
-            if not rowcount:
-                logging.error('No record with the requested parameters exists in db')
-                return func.HttpResponse('No record to delete', status_code=404)                
-            logging.debug(f"Executed the DELETE query: {rowcount} rows affected for taskId {taskId}")
-            return func.HttpResponse(status_code=200)
-        except Exception as e:
-            logging.error('Unable to execute the query')
-            return func.HttpResponse("Error: %s" % str(e), status_code=400)
+        rowcount = cursor.execute(sql_query, userId, taskId).rowcount
+        #returns error in the event of unsuccessful query
+        if not rowcount:
+            logging.error('No record with the requested parameters exists in db')
+            return func.HttpResponse('No record to delete', status_code=404)                
+        logging.debug(f"Executed the DELETE query: {rowcount} rows affected for taskId {taskId}")
+        return func.HttpResponse(status_code=200)
+    except Exception as e:
+        logging.error('Unable to execute the query')
+        return func.HttpResponse("Error: %s" % str(e), status_code=400)
     finally:
         #commits changes to db
         cnxn.commit()
@@ -132,58 +182,67 @@ def connect():
     except Exception as e:
         logging.error('Failure: ' + str(e))
         return func.HttpResponse(status_code=500)
-#parse the request body
-def parse(req_body):
-###parse JSON in a separate file and validate there, pass the dictionary to this function
-    try:
-        #assert for the presense of appropriate fields in JSON
-        assert 'title' in req_body, "New task request body did not contain field: 'title'"
-        assert 'description' in req_body, "New task request body did not contain field: 'description'"
-        assert 'dueDate' in req_body, "New user request body did not contain field: 'dueDate'"
-        assert 'completed' in req_body, "New user request body did not contain field: 'completed'"
-        assert 'completedDate' in req_body, "New user request body did not contain field: 'completedDate'"
-    except AssertionError as req_body_content_error:
-        logging.error('New user request body did not contain fields to update a task')
-        return func.HttpResponse(req_body_content_error.args[0], status_code=400)
-    logging.debug('New user request body contained necessary fields to update a task')  
-    # Unpack task data
-    title = req_body.get('title')
-    description = req_body.get('description')
+
+# Parses the request body
+def parse(req_body): 
+    # sets up a dictionary to use in METHOD requests
+    task_fields = {}
+    logging.debug('''Parsing req_body into a dictionary. 
+                Only title, description, completed, dueDate and completedDate may be updated''')
+    #unpacks task data 
+    #creates no dictionary entry if no corresponding field in req_body
+    if req_body.get('completed'):
+        #ensures "completed" value is not null
+        try:
+            assert req_body.get('completed') is not None, "Null value not permitted for the 'completed' field"
+        except AssertionError as req_body_content_error:
+            logging.error('Completed value may not be null') 
+            return func.HttpResponse(req_body_content_error.args[0], status_code=400)
+        #adds 'completed' to the dictionary
+        task_fields['completed'] = req_body.get('completed')     
+  
+    if req_body.get('title'):
+        task_fields['title'] = req_body.get('title')
+ 
+    if req_body.get('description'):
+        task_fields['description'] = req_body.get('description')
+ 
     dueDate = None
-    if req_body.get('dueDate') != None:
+    #accounts for instances when the dueDate value passed is null, to avoid datetime conversion error
+    if req_body.get('dueDate') is not None:
         dueDate = datetime.strptime(req_body.get('dueDate'), '%d/%m/%y %H:%M:%S')  
-    completed = req_body.get('completed')
+    task_fields['dueDate'] = dueDate
+    
     completedDate = None
-    if req_body.get('completedDate') != None:
+    #account for instances when the completedDate value passed is null, to avoid datetime conversion error
+    if req_body.get('completedDate') is not None:
         completedDate = datetime.strptime(req_body.get('completedDate'), '%d/%m/%y %H:%M:%S')  
-    task_fields = {
-        "title": title,
-        "description": description,
-        "dueDate": dueDate,
-        "completed": completed,
-        "completedDate": completedDate
-    }
-    return task_fields
+    task_fields['completedDate'] = completedDate
+
+    #ensures there is at least one value passed from req_body to the dictionary / dict not empty
+    try:
+        assert bool(task_fields), "JSON Body must contain at least one task field"
+    #raises error when the dictionary is empty
+    except AssertionError as req_body_content_error:
+        logging.error('New user request body did not contain fields to update the task')
+        return func.HttpResponse(req_body_content_error.args[0], status_code=400)
+    logging.debug(f'Request body contained one or more fields to update the task: {task_fields}')  
+    return task_fields 
 
 #MAIN FUNCTION
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function started processing a userId taskId request.')
 
-#collects parameters passed in url        
+    #collects userId and taskId parameters passed in url        
+    logging.debug('Trying to get userId and taskId')
     userId = req.route_params.get('userId')
     taskId = req.route_params.get('taskId')
-    logging.debug('Trying to get userId and taskId')
-    req_body = {}
-    try:
-        req_body = req.get_json()
-    except ValueError:
-        logging.error('Empty req body or non-JSON file passed')
-        pass
     if userId and taskId: 
         logging.debug(f"Got userId:{userId} and taskId: {taskId}")
-    task_fields = parse(req_body)
-
-#determines which API method was requested, and calls the API method
+    if (not userId) and (not taskId):
+        logging.debug("Did not receive userId and/or taskId")
+        return func.HttpResponse('Endpoint requires userId and taskId', status_code=400)
+    #determines which API method was requested, and calls the API method
     method = req.method
     try:
     #if GET method is selected, it executes here
@@ -191,24 +250,34 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.debug('Passed GET method')      
             return (get(userId, taskId))
 
-    #if PUT method is selected, it executes here
-        elif method == "PUT":
+    #if DELETE method is selected, it executes here
+        if method == "DELETE":
+            logging.debug('Passed DELETE method')   
+            return (delete(userId, taskId))
+
+        #examines JSON passed by the client, required for PUT and PATCH execution
+        req_body = {}
+        try:
+            req_body = req.get_json()
+        #passes error if not
+        except ValueError:
+            logging.error('Empty req body or non-JSON file passed')
+            pass
+        task_fields = parse(req_body)
+
+        #if PUT method is selected, it executes here
+        if method == "PUT":
             logging.debug('Passed PUT method')   
             return (update(userId, taskId, task_fields))
 
-    #if PATCH method is selected, it executes here
+        #if PATCH method is selected, it executes here
         elif method == "PATCH":
             logging.debug('Passed PATCH method')   
-            return 
-
-    #if DELETE method is selected, it executes here
-        elif method == "DELETE":
-            logging.debug('Passed DELETE method')   
-            return (delete(userId, taskId))
+            return (patch(userId, taskId, task_fields))
         else:
             logging.warn(f"Request with method {method} is not allowed for this endpoint")
             func.HttpResponse(status_code=405)
 
-    #displays erros, if any, encountered when API methods were called
+    #displays other erros, if any, encountered when API methods were called
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500) 
