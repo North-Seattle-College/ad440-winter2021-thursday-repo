@@ -24,6 +24,8 @@ var UserTasks = () => {
   }, []);
 
   var tasks;
+  var backHomeButtonStyle = {marginLeft: '1rem', marginBottom: '2rem'};
+  var backIcon = '<====';
 
   if (userTasks[0] === 'loading') tasks = <Container>...loading</Container>;
   else {
@@ -35,7 +37,7 @@ var UserTasks = () => {
 
   return (
     <>
-      <Button variant="dark" style={{marginLeft: '1rem', marginBottom: '2rem'}} onClick={() => history.push('/')}>Back to Home</Button>
+      <Button variant="dark" style={backHomeButtonStyle} onClick={() => history.push('/')}>{backIcon}</Button>
       <Container>
         <h3>All Tasks for user with userId {userId}</h3>
         {tasks}
