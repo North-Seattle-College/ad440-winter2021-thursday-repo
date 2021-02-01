@@ -1,76 +1,158 @@
+"""This script runs the userId/taskId API endpoint functionality and consists of
+    the main function, ODBC conenct function and 4 CRUD methods functions"""
+import json
+from datetime import datetime
 import logging
 import os
 import pyodbc
 import azure.functions as func
 
 #GET API method function
-def get(param1, param2):
+def get(userId, taskId):
     #connects to db
-    cnxn = connect()
-    cursor = cnxn.cursor()
-    logging.info('opened connection')        
-    logging.info('Going to execute select query')
     try:
+        logging.debug('Attempting a db connection')
+        cnxn = connect()
+        cursor = cnxn.cursor() 
+        logging.debug('opened connection')        
+        logging.debug(f'Attempting to execute GET task query for task {taskId}')
         #Get task title, description and user name by userId and taskId
-        sql_query = ("""SELECT tasks.title, tasks.description, CONCAT (users.firstName, ' ', users.lastName) AS "user" 
-        FROM [dbo].[tasks] JOIN [dbo].[users] 
-        on [dbo].[tasks].userId = [dbo].[users].userId
-        WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
-        cursor.execute(sql_query, param1, param2)
-        logging.info('Executed the query')         
-        data = cursor.fetchall()
-        logging.info(f"Got result: {data}")
-        return data
-#irrespective of results, closes connection
+        #Avoids using SELECT * to prevent retuning unwanted unformation
+        sql_query = ("""SELECT tasks.userId, CONCAT (users.firstName, ' ', users.lastName) AS "user",
+                    tasks.taskId, tasks.title, tasks.description, tasks.createdDate, tasks.dueDate, 
+                    tasks.completed, tasks.completedDate 
+                    FROM [dbo].[tasks] JOIN [dbo].[users] 
+                    on [dbo].[tasks].userId = [dbo].[users].userId
+                    WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
+        cursor.execute(sql_query, userId, taskId)
+        logging.debug(f'Executed the GET query for {taskId}')          
+        row = cursor.fetchone()
+        logging.debug(f"Got result: {row}")
+        if not row:
+            logging.error('No record with the requested parameters')
+            return func.HttpResponse('Task not found', status_code=404)
+        else:
+            columns = [column[0] for column in cursor.description]
+            data = dict(zip(columns, row))
+        return func.HttpResponse(json.dumps(data, default=str), status_code=200, mimetype="application/json")
     finally:
         cursor.close()
         cnxn.close()
-        logging.info('Closed the connection')
+        logging.debug('Closed the db connection')   
 
-#POST API method function       
-def post(param):
-    return ('You selected POST method with {param} values. Functionality under construction')
-            # STARTER CODE FOR NEXT SPRINT, SQL QUERY TESTED
-            #     #insert row into tasks table / create a new task
-            #     #createdDate #'20120618 10:34:09 AM' and title/description are hardcoded for sprint1, update with automated date stamp and url params later
-            #     sql_query = ("""INSERT INTO dbo.tasks (userId, title, description, createdDate)
-            #     VALUES (?, ?, ?, '20120618 10:34:09 AM')""")
-            #     cursor.execute(sql_query, userId, 'Do It', 'Almost like Nike motto')   
-            #     logging.info('Executed the query')
+#PUT API method function
+def update(userId, taskId, task_fields):
+    #connects to db
+    try:
+        cnxn = connect()
+        cursor = cnxn.cursor()
+        logging.debug('opened connection')        
+        logging.debug(f'Going to execute UPDATE query task {taskId} for user {userId}') 
+        try:
+            # update task: with 5 required JSON fields
+            assert len(task_fields) == 4, "Pass five required fields to update the task"
+        except AssertionError as req_body_content_error:
+            logging.error('Query did not contain all fields to update the task') 
+            return func.HttpResponse(req_body_content_error.args[0], status_code=400)
+        sql_query = """UPDATE [dbo].[tasks]
+            SET title = ?, description = ?, dueDate = ?, completed = ?, completedDate = ?
+            WHERE userId = ? AND taskId = ?"""   
 
-#UPDATE API method function
-def update(param1, param2):
+        rowcount = cursor.execute(sql_query, task_fields.get('title'), task_fields.get('description'), 
+        task_fields.get('dueDate'), task_fields.get('completed'), task_fields.get('completedDate'), 
+        userId, taskId).rowcount
+        if not rowcount:
+            logging.error('Bad input and/or no record with the requested parameters exists in db')
+            return func.HttpResponse('Bad or invalid input', status_code=404)                
+        logging.debug('UPDATE task query executed')
+        logging.debug(f"Executed the query: {rowcount} rows affected for taskId {taskId}")
+        return func.HttpResponse(status_code=200)
+    except Exception as e:
+        logging.critical('Unable to execute the query')
+        return func.HttpResponse("Error: %s" % str(e), status_code=400)
+    finally:
+        #commits changes to db
+        cnxn.commit()
+        #properly closes the connection
+        cursor.close()
+        cnxn.close()
+        logging.debug('Closed the db connection')    
+
+#PATCH API method function, permits min 1 field passed in task_fields
+def patch(userId, taskId, task_fields):
     #connects to db
     cnxn = connect()
     cursor = cnxn.cursor()
-    logging.info('opened connection')        
-    logging.info('Going to execute update query')
-    try:
-        # update task: title and description. Client passes userId and taskId, 
-        # for sprint 1 other fields are HARDCODED
-        sql_query = ("""UPDATE [dbo].[tasks]
-        SET title = 'Title updated by team1', description = 'Description updated by team1'
-        WHERE userId = ? AND taskId = ?""")   
-        rowcount = cursor.execute(sql_query, param1, param2).rowcount
-        logging.info(f"Executed the query: {rowcount} rows affected")
-#commits changes to db
+    logging.debug('opened connection')        
+    logging.debug(f'Going to execute PATCH query on task {taskId} for user {userId}')  
+    #creates a list of fields to update
+    columnsToUpdate = list(task_fields.keys())
+    #params list to later use in sql query
+    params = []
+    fieldsInQuery = ''
+    #iterates through column values and adds them as params to be passed into sql query
+    for column in columnsToUpdate:
+        #accounts for no comma after the last param in the sql guery string
+        if column == columnsToUpdate[-1]:
+            comma = ' '
+        else:
+            comma = ', '
+        #avoids potential sql injection by using ? placeholder for column values
+        fieldsInQuery += "{} = ?{}".format(column, comma)
+        #appends each of columns to the list
+        params.append(task_fields.get(column))
+    #adds userId and taskId to params
+    params.extend([userId, taskId])
+    #set the query body
+    sql_query = """UPDATE [dbo].[tasks] SET {} WHERE userId = ? AND taskId = ?""".format(fieldsInQuery)
+    try: 
+        rowcount = cursor.execute(sql_query, params).rowcount
+        #reports out an unsuccessful result
+        if not rowcount:
+            logging.error('Invalid input and/or no record with the requested parameters exists in db')
+            return func.HttpResponse('Invalid input', status_code=404)                
+        logging.debug('UPDATE query executed')
+        logging.debug(f"Executed the query: {rowcount} rows affected for taskId {taskId}")
+        return func.HttpResponse(status_code=200)
+    except Exception as e:
+        logging.critical('Unable to execute the query')
+        return func.HttpResponse("Error: %s" % str(e), status_code=400)
+    finally:
+        #commits changes to db
         cnxn.commit()
-        return rowcount
-#irrespective of results, closes connection
-    finally: 
+        #properly closes the connection
         cursor.close()
         cnxn.close()
-        logging.info('Closed the connection')
+        logging.debug('Closed the db connection')    
 
 #DELETE API method function
-def delete(param):
-    return ('You selected POST method with {param} values. Functionality under construction')
-            # STARTER CODE FOR NEXT SPRINT, SQL QUERY TESTED
-            #     # #delete row, client passes in userId and taskId
-            #     sql_query = ("""DELETE FROM [dbo].[tasks] WHERE userId = ? AND taskId = ?""")
-            #     cursor.execute(sql_query, userId, taskId)
-            #     logging.info('Executed the query')
-            #     cnxn.commit()
+def delete(userId, taskId):
+    #connects to db
+    cnxn = connect()
+    cursor = cnxn.cursor()
+    logging.debug('opened connection')        
+    logging.debug(f'Going to execute DELETE query on task {taskId} for user {userId}')
+    sql_query = ("""DELETE FROM [dbo].[tasks] WHERE userId = ? AND taskId = ?""")
+    try:
+        rowcount = cursor.execute(sql_query, userId, taskId).rowcount
+        #returns error in the event of unsuccessful query
+        if not rowcount:
+            logging.error('No record with the requested parameters exists in db')
+            return func.HttpResponse('No record to delete', status_code=404)                
+        logging.debug(f"Executed the DELETE query: {rowcount} rows affected for taskId {taskId}")
+        return func.HttpResponse(status_code=200)
+    except Exception as e:
+        logging.error('Unable to execute the query')
+        return func.HttpResponse("Error: %s" % str(e), status_code=400)
+    finally:
+        #commits changes to db
+        cnxn.commit()
+        #properly closes the connection
+        cursor.close()
+        cnxn.close()
+        logging.debug('Closed the db connection')   
+
+### POST API method function not implemented for this endpoint, use userId/tasks instead ### 
 
 #connect to db function
 def connect():
@@ -81,74 +163,121 @@ def connect():
         db_username = os.environ["ENV_DATABASE_USERNAME"]
         db_password = os.environ["ENV_DATABASE_PASSWORD"]
         driver = '{ODBC Driver 17 for SQL Server}'
+        logging.debug('Uses hardcoded ODBC Driver 17 for SQL Server string')
+        #assigns the connection string
         conn_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
         driver, db_server, db_name, db_username, db_password)
-
-# when passwords are permitted be saved to the config of the Azure function app, 
-# using a single connection string value, saved to the config of the app, 
-# is more economical : <conn_string = os.getenv('SQL_CONNECTION_STRING')>, get the string
-# from "Connection strings" menu on the left, in the database of interest        
+     
         #creates and returns connection variable
-        cnxn = pyodbc.connect(conn_string)
+        try:         
+            logging.debug('Attempting DB connection')
+            cnxn = pyodbc.connect(conn_string)
+        except (pyodbc.InterfaceError) as e:
+            logging.critical('Failed to connect to DB: ' + e.args[0])
+        except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
+            logging.debug('Failed to connect to DB: ' + e.args[1])
+            return func.HttpResponse(status_code=500)
+        logging.debug("Connection to DB successful!")
         return cnxn
-    except Exception:
-        print ("Unable to connect to db. Code 503: Service unavailable")
+    except Exception as e:
+        logging.error('Failure: ' + str(e))
+        return func.HttpResponse(status_code=500)
+
+# Parses the request body
+def parse(req_body): 
+    # sets up a dictionary to use in METHOD requests
+    task_fields = {}
+    logging.debug('''Parsing req_body into a dictionary. 
+                Only title, description, completed, dueDate and completedDate may be updated''')
+    #unpacks task data 
+    #creates no dictionary entry if no corresponding field in req_body
+    if req_body.get('completed'):
+        #ensures "completed" value is not null
+        try:
+            assert req_body.get('completed') is not None, "Null value not permitted for the 'completed' field"
+        except AssertionError as req_body_content_error:
+            logging.error('Completed value may not be null') 
+            return func.HttpResponse(req_body_content_error.args[0], status_code=400)
+        #adds 'completed' to the dictionary
+        task_fields['completed'] = req_body.get('completed')     
+  
+    if req_body.get('title'):
+        task_fields['title'] = req_body.get('title')
+ 
+    if req_body.get('description'):
+        task_fields['description'] = req_body.get('description')
+ 
+    dueDate = None
+    #accounts for instances when the dueDate value passed is null, to avoid datetime conversion error
+    if req_body.get('dueDate') is not None:
+        dueDate = datetime.strptime(req_body.get('dueDate'), '%d/%m/%y %H:%M:%S')  
+    task_fields['dueDate'] = dueDate
+    
+    completedDate = None
+    #account for instances when the completedDate value passed is null, to avoid datetime conversion error
+    if req_body.get('completedDate') is not None:
+        completedDate = datetime.strptime(req_body.get('completedDate'), '%d/%m/%y %H:%M:%S')  
+    task_fields['completedDate'] = completedDate
+
+    #ensures there is at least one value passed from req_body to the dictionary / dict not empty
+    try:
+        assert bool(task_fields), "JSON Body must contain at least one task field"
+    #raises error when the dictionary is empty
+    except AssertionError as req_body_content_error:
+        logging.error('New user request body did not contain fields to update the task')
+        return func.HttpResponse(req_body_content_error.args[0], status_code=400)
+    logging.debug(f'Request body contained one or more fields to update the task: {task_fields}')  
+    return task_fields 
 
 #MAIN FUNCTION
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
+    logging.info('Python HTTP trigger function started processing a userId taskId request.')
 
-#collects parameters passed in url        
-    userId = req.params.get('userId')
-    taskId = req.params.get('taskId')
-    logging.info('Trying to get userId and taskId')
-    if (not userId) and (not taskId):
-        logging.info("Got neither userId nor taskId")
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            pass
-        else:
-            userId = req_body.get('userId')
-            taskId = req_body.get('taskId')
+    #collects userId and taskId parameters passed in url        
+    logging.debug('Trying to get userId and taskId')
+    userId = req.route_params.get('userId')
+    taskId = req.route_params.get('taskId')
     if userId and taskId: 
-        logging.info(f"Got userId:{userId} and taskId: {taskId}")
-
-#determines which API method was requested, and calls the API method
+        logging.debug(f"Got userId:{userId} and taskId: {taskId}")
+    if (not userId) and (not taskId):
+        logging.debug("Did not receive userId and/or taskId")
+        return func.HttpResponse('Endpoint requires userId and taskId', status_code=400)
+    #determines which API method was requested, and calls the API method
     method = req.method
-    if not method:
-        logging.critical('No method available')
-        raise Exception('No method passed')
-
     try:
     #if GET method is selected, it executes here
-        if method == "GET":        
-            getResult = get(userId, taskId)
-            return func.HttpResponse(f"This {method} method was called. You entered {userId} as userId and {taskId} as taskId. Result: {getResult}")
-
-    #if POST method is selected, it executes here
-        if method == "POST":
-            postResult = post(method)
-            return func.HttpResponse(f"Temp results: {postResult}")
-
-    #if UPDATE method is selected, it executes here
-        if method == "UPDATE":
-            updateResult = update(userId, taskId)
-            return func.HttpResponse(f"This {method} method was called. You entered {userId} as userId and {taskId} as taskId. Result: {updateResult}")
+        if method == "GET":  
+            logging.debug('Passed GET method')      
+            return (get(userId, taskId))
 
     #if DELETE method is selected, it executes here
         if method == "DELETE":
-            deleteResult = delete(method)
-            return func.HttpResponse(f"Temp results: {deleteResult}") 
-    #displays erros encountered when API methods were called
+            logging.debug('Passed DELETE method')   
+            return (delete(userId, taskId))
+
+        #examines JSON passed by the client, required for PUT and PATCH execution
+        req_body = {}
+        try:
+            req_body = req.get_json()
+        #passes error if not
+        except ValueError:
+            logging.error('Empty req body or non-JSON file passed')
+            pass
+        task_fields = parse(req_body)
+
+        #if PUT method is selected, it executes here
+        if method == "PUT":
+            logging.debug('Passed PUT method')   
+            return (update(userId, taskId, task_fields))
+
+        #if PATCH method is selected, it executes here
+        elif method == "PATCH":
+            logging.debug('Passed PATCH method')   
+            return (patch(userId, taskId, task_fields))
+        else:
+            logging.warn(f"Request with method {method} is not allowed for this endpoint")
+            func.HttpResponse(status_code=405)
+
+    #displays other erros, if any, encountered when API methods were called
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500) 
-    #prompts clients to pass url parameters
-    else:
-        logging.info('Got only one of userId and taskId')
-        return func.HttpResponse(
-            "This HTTP triggered function executed successfully. Pass a method, userId and taskId for an appropriate response.",
-            status_code=200
-        ) 
-    logging.info('Finishing the function without error')
-    return func.HttpResponse("Nothing done")
