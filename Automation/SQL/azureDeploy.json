@@ -4,14 +4,21 @@
   "parameters": {
       "serverName": {
           "type": "string",
-          "defaultValue": "[uniqueString('sql', resourceGroup().id)]",
+          "defaultValue": "[uniqueString('nsc-sqlsrv-', resourceGroup().location, '-acbc')]",
           "metadata": {
               "description": "The name of the SQL logical server."
           }
       },
+        "resourceGroupName": {
+          "type": "string",
+          "defaultValue": "[uniqueString('nsc-rg-', resourceGroup().location, '-acbc')]",
+          "metadata": {
+              "description": "The name of the resource group."
+          }
+      },
       "location": {
           "type": "string",
-          "defaultValue": "[resourceGroup().location]",
+          "defaultValue": "westus2",
           "metadata": {
               "description": "Location for all resources."
           }
@@ -28,13 +35,6 @@
               "description": "The administrator password of the SQL logical server."
           }
       },
-      "enableADS": {
-          "defaultValue": true,
-          "type": "bool",
-          "metadata": {
-              "description": "Enable Advanced Data Security, the user deploying the template must have an administrator or owner permissions."
-          }
-      },
       "allowAzureIPs": {
           "defaultValue": true,
           "type": "bool",
@@ -42,120 +42,162 @@
               "description": "Allow Azure services to access server."
           }
       },
-      "connectionType": {
-          "defaultValue": "Default",
-          "allowedValues": [ "Default", "Redirect", "Proxy" ],
+        "startIp": {
+        "defaultValue": "",
           "type": "string",
           "metadata": {
-              "description": "SQL logical server connection type."
+              "description": "The start IP of user."
+          }
+      },
+          "endIp": {
+          "defaultValue": "",
+          "type": "string",
+          "metadata": {
+              "description": "The end IP of user."
           }
       }
   },
-  "variables": {
-      "serverResourceGroupName": "[resourceGroup().name]",
-      "subscriptionId": "[subscription().subscriptionId]",
-      "uniqueStorage": "[uniqueString(variables('subscriptionId'), variables('serverResourceGroupName'), parameters('location'))]",
-      "storageName": "[tolower(concat('sqlva', variables('uniqueStorage')))]",
-      "uniqueRoleGuid": "[guid(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), variables('storageBlobContributor'), resourceId('Microsoft.Sql/servers', parameters('serverName')))]",
-      "StorageBlobContributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]"
-  },
+  "variables": {},
   "resources": [
       {
           "type": "Microsoft.Sql/servers",
           "apiVersion": "2020-02-02-preview",
           "name": "[parameters('serverName')]",
           "location": "[parameters('location')]",
-          "identity": "[if(parameters('enableADS'), json('{\"type\":\"SystemAssigned\"}'), json('null'))]",
           "properties": {
               "administratorLogin": "[parameters('administratorLogin')]",
               "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
-              "version": "12.0"
-          },
-          "resources": [
-              {
-                  "condition": "[parameters('allowAzureIPs')]",
-                  "type": "firewallRules",
-                  "apiVersion": "2020-02-02-preview",
-                  "name": "AllowAllWindowsAzureIps",
-                  "location": "[parameters('location')]",
-                  "dependsOn": [
-                      "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-                  ],
-                  "properties": {
-                      "endIpAddress": "0.0.0.0",
-                      "startIpAddress": "0.0.0.0"
-                  }
-              },
-              {
-                  "condition": "[parameters('enableADS')]",
-                  "type": "securityAlertPolicies",
-                  "apiVersion": "2020-02-02-preview",
-                  "name": "Default",
-                  "dependsOn": [
-                      "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-                  ],
-                  "properties": {
-                      "state": "Enabled",
-                      "emailAccountAdmins": true
-                  }
-              },
-              {
-                  "condition": "[parameters('enableADS')]",
-                  "type": "vulnerabilityAssessments",
-                  "apiVersion": "2020-02-02-preview",
-                  "name": "Default",
-                  "dependsOn": [
-                      "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]",
-                      "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', parameters('serverName'), 'Default')]",
-                      "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-                  ],
-                  "properties": {
-                      "storageContainerPath": "[if(parameters('enableADS'), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))).primaryEndpoints.blob, 'vulnerability-assessment'), json('null'))]",
-                      "recurringScans": {
-                          "isEnabled": true,
-                          "emailSubscriptionAdmins": true
-                      }
-                  }
-              },
-              {
-                  "type": "connectionPolicies",
-                  "apiVersion": "2014-04-01",
-                  "name": "Default",
-                  "dependsOn": [
-                      "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-                  ],
-                  "properties": {
-                      "connectionType": "[parameters('connectionType')]"
-                  }
-              }
-          ]
-      },
-      {
-          "condition": "[parameters('enableADS')]",
-          "type": "Microsoft.Storage/storageAccounts",
-          "apiVersion": "2019-06-01",
-          "name": "[variables('storageName')]",
-          "location": "[parameters('location')]",
-          "sku": {
-              "name": "Standard_LRS"
-          },
-          "kind": "StorageV2"
-      },
-      {
-          "condition": "[parameters('enableADS')]",
-          "type": "Microsoft.Authorization/roleAssignments",
-          "apiVersion": "2020-04-01-preview",
-          "name": "[variables('uniqueRoleGuid')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]",
-              "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-          ],
-          "properties": {
-              "roleDefinitionId": "[variables('StorageBlobContributor')]",
-              "principalId": "[reference(resourceId('Microsoft.Sql/servers', parameters('serverName')), '2020-02-02-preview', 'Full').identity.principalId]",
-              "scope": "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
-              "principalType": "ServicePrincipal"
+              "version": "12.0",
+              "publicNetworkAccess": "Enabled"
           }
-      }
+      },
+      {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('serverName'), '/CreateIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('serverName'), '/DbParameterization')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('serverName'), '/DefragmentIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('serverName'), '/DropIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('serverName'), '/ForceLastGoodPlan')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('serverName'), '/Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/encryptionProtector",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('serverName'), '/current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "kind": "servicemanaged",
+            "properties": {
+                "serverKeyName": "ServiceManaged",
+                "serverKeyType": "ServiceManaged"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('serverName'), '/', parameters('administratorLogin'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]", "[resourceId('Microsoft.Sql/servers', parameters('administratorLogin'))]"
+            ],
+            "properties": {
+                "startIpAddress": "[parameters('startIp')]",
+                "endIpAddress": "[parameters('endIp')]"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "condition": "[parameters('allowAzureIPs')]",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('serverName'), '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/keys",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(parameters('serverName'), '/ServiceManaged')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "kind": "servicemanaged",
+            "properties": {
+                "serverKeyType": "ServiceManaged"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/securityAlertPolicies",
+            "apiVersion": "2020-02-02-preview",
+            "name": "[concat(parameters('serverName'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        }
   ]
 }
