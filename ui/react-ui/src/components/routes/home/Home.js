@@ -12,6 +12,7 @@ class Home extends React.Component {
     endpointsByMethods: {
       GET: [
         {key: '/users', params: []}, 
+        {key: '/users/{userId}', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]},
         {key: '/users/{userId}/tasks', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]}
       ]
     },
