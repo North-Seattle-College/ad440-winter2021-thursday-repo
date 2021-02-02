@@ -40,7 +40,6 @@ param (
     $location,
 
     [Parameter(Mandatory=$True)]
-    [string]
     $templateFilePath
 )
 
