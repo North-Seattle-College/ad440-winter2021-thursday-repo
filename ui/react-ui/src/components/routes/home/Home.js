@@ -1,16 +1,19 @@
 import React from 'react';
+import Container from 'react-bootstrap/esm/Container';
 
-var Home = () => {
-  var userTasksEndpoint = '/users/{userId}/tasks';
-  
+let Home = () => {
+  let usersEndpoint = '/users';
+  let userTasksEndpoint = '/users/{userId}/tasks';
   var userIdEndpoint = '/users/{userid}';
 
   return (
-    <div className='home-container'>
+    <Container className="text-center mt-5">
       <h2>Supported Endpoints:</h2>
-      <li>{userTasksEndpoint}</li>
-      <li>{userIdEndpoint}</li>
-    </div>
+      <hr/>
+      <p>{usersEndpoint}</p>
+      <p>{userIdEndpoint}</p>
+      <p>{userTasksEndpoint}</p>
+    </Container>
   )
 }
 
