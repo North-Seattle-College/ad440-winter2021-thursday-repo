@@ -1,0 +1,38 @@
+# Thank you for trying serverless-artillery!
+# This default script is intended to get you started quickly.
+# There is a lot more that Artillery can do.
+# You can find great documentation of the possibilities at:
+# https://artillery.io/docs/
+config:
+  # this hostname will be used as a prefix for each URI in the flow unless a complete URI is specified
+  target: "http://nsc.functionsapp-team1.azurewebsites.net/api/"
+  phases:
+
+     -duration: 200
+      arrivalRate: 1
+      rampTo: 10
+      variables:
+         - user:
+              - "1"
+              - "2"
+              - "3"
+
+              - "5"
+              - "6"
+         - userName:
+              - "Jorden"
+              - "Aidan"
+              - "Macaulay"
+              - "Leroy"
+              - "Naomi"
+scenarios:
+  -
+    flow:
+
+      - get:
+          url: "/users/{{user}}"
+
+          #      - update:
+          # url: "/users/{{user}}"
+          # json:
+          #    firstname: "{{userName}}"
