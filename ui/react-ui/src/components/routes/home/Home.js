@@ -30,7 +30,7 @@ class Home extends React.Component {
     if (value && param.type === 'number' && isNaN(parseInt(value))) {
       this.setState({badInputAlert: "wrong input!! pay attention to the param's type."});
 
-      var input = document.getElementById(paramKey);
+      var input = document.getElementById(endpointKey);
 
       input.value = '';
     }
@@ -93,7 +93,7 @@ class Home extends React.Component {
                       return (
                         <input 
                           className='param-input' 
-                          id={param.key} 
+                          id={endpoint.key} 
                           type='text' 
                           placeholder={param.key} 
                           key={index}

@@ -14,6 +14,8 @@ var User = () => {
       .then(response => response.json())
       .then(data => setUser(data))
       .catch((error) => console.error(error))
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
