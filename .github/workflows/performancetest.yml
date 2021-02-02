@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
-      STAGE_NAME: merge-perf-test
+      AWS_SLSART_REGION: "us-west-2"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -29,14 +29,8 @@ jobs:
       - name: Install serverless and serverless-artillery
         run: |
           npm install -g serverless@1.38.0 serverless-artillery
-      # once a folder with slsart script.yml and serverless.yml are created and in the repo
-      # we can copy them into the working dir to run those specific tests with those configurations
-      # - currently this just runs the defaults
-      # examples for future:
-      # - run: cp ./slsart/script.yml ./
-      # - run: cp ./slsart/serverless.yml ./
       - name: Deploy, invoke, remove functions
         run: |
-          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
-          ~/.npm-global/bin/slsart invoke --stage $STAGE_NAME
-          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+          ~/.npm-global/bin/slsart deploy --region $AWS_SLSART_REGION
+          ~/.npm-global/bin/slsart invoke --region $AWS_SLSART_REGION
+          ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
