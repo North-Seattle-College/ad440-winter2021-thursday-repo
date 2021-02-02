@@ -1,16 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import Container from 'react-bootstrap/esm/Container';
-import {useParams, useHistory} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import BootstrapTable from '../../bootstrapTable/BootstrapTable.js';
-import Button from 'react-bootstrap/Button';
-
-
+import BackButton from '../../bootstrapBackButton/BootstrapBackButton.js';
 
 var UserTasks = () => {
   var [userTasks, setUserTasks] = useState(['loading']);
-
   var {userId} = useParams();
-  const history = useHistory();
 
   useEffect(() => {
     setUserTasks(['loading']);
@@ -24,8 +20,6 @@ var UserTasks = () => {
   }, []);
 
   var tasks;
-  var backHomeButtonStyle = {marginLeft: '1rem', marginBottom: '2rem'};
-  var backIcon = '<====';
 
   if (userTasks[0] === 'loading') tasks = <Container>...loading</Container>;
   else {
@@ -37,7 +31,7 @@ var UserTasks = () => {
 
   return (
     <>
-      <Button variant="dark" style={backHomeButtonStyle} onClick={() => history.push('/')}>{backIcon}</Button>
+      <BackButton />
       <Container>
         <h3>All Tasks for user with userId {userId}</h3>
         {tasks}

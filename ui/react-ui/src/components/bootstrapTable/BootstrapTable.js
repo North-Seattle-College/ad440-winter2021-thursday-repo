@@ -1,6 +1,5 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
-import Container from 'react-bootstrap/Container';
 
 var BootstrapTable = (props) => {
   var {heatherItems, rows} = props;
