@@ -34,3 +34,4 @@ jobs:
           ~/.npm-global/bin/slsart deploy --region $AWS_SLSART_REGION
           ~/.npm-global/bin/slsart invoke --region $AWS_SLSART_REGION
           ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
+

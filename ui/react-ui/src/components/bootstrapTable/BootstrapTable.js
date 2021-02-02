@@ -6,11 +6,7 @@ var BootstrapTable = (props) => {
 
   return (
     <div className='table-container'>
-<<<<<<< HEAD
       <>
-=======
-      <div>
->>>>>>> development
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -23,11 +19,7 @@ var BootstrapTable = (props) => {
             </tbody>
           ))}
         </Table>
-<<<<<<< HEAD
       </>
-=======
-      </div>
->>>>>>> development
     </div>
 
   )

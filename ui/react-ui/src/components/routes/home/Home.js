@@ -5,7 +5,6 @@ import ReactTooltip from 'react-tooltip';
 import {withRouter} from "react-router-dom";
 import './Home.css';
 
-<<<<<<< HEAD
 class Home extends React.Component {
   state = {
     // to add new endpoints, the only thing you need to do is to add your endpoint into this object, 
@@ -110,22 +109,6 @@ class Home extends React.Component {
       </Container>
     )
   }
-=======
-let Home = () => {
-  let usersEndpoint = '/users';
-  let userTasksEndpoint = '/users/{userId}/tasks';
-  var userIdEndpoint = '/users/{userid}';
-
-  return (
-    <Container className="text-center mt-5">
-      <h2>Supported Endpoints:</h2>
-      <hr/>
-      <p>{usersEndpoint}</p>
-      <p>{userIdEndpoint}</p>
-      <p>{userTasksEndpoint}</p>
-    </Container>
-  )
->>>>>>> development
 }
 
 export default withRouter(Home);
