@@ -23,10 +23,7 @@ var User = () => {
       <BackButton />
       <Container className='user-tasks-container'>
           <h3> {user.firstname} {user.lastname} info</h3>
-          <BootstrapTable 
-          heatherItems={Object.keys(user)}
-          rows={[user]}
-          />
+          {user.userid ? <BootstrapTable heatherItems={Object.keys(user)} rows={[user]} /> : <Container>...loading</Container>}
       </Container>
     </>
   )

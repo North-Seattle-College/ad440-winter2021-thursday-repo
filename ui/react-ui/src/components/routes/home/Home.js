@@ -69,7 +69,8 @@ class Home extends React.Component {
   render() {
     var {endpointsByMethods, badInputAlert, emptyInputAlert} = this.state;
     var methods = Object.keys(endpointsByMethods);
-
+ 
+    // what happens here is basically mapping over endpointsByMethods and rendering a method title, endpoints, and params
     return (
       <Container className="text-center mt-5">
         <h2 className='main-header'>Supported Endpoints:</h2>
@@ -81,23 +82,22 @@ class Home extends React.Component {
             <div className='method-container' key={method}>
               <h4 className='method-header'>{method}</h4>
               {endpointsByMethods[method].map(endpoint => {
+                var triggerEndpointArgs = {method, endpointKey: endpoint.key};
+
                 return (
                   <div className='endpoints-container' key={endpoint.key}>
                     <ReactTooltip />
-                    <div 
-                      className='endpoint-title'
-                      data-tip='Click to Trigger'  
-                      onClick={() => this.triggerEndpoint({method, endpointKey: endpoint.key})}>{endpoint.key}
-                    </div>
+                    <div className='endpoint-title' data-tip='Click to Trigger' onClick={() => this.triggerEndpoint(triggerEndpointArgs)}>{endpoint.key}</div>
                     {endpoint.params.map((param, index) => {
+                      var handlePramInputChangeArgs = {method, endpointKey: endpoint.key, paramKey: param.key};
+
                       return (
                         <input 
                           className='param-input' 
-                          id={endpoint.key} 
-                          type='text' 
+                          id={endpoint.key} type='text' 
                           placeholder={param.key} 
                           key={index}
-                          onChange={(event) => this.handleParamInputChange({method, endpointKey: endpoint.key, paramKey: param.key, value: event.target.value})}
+                          onChange={(event) => this.handleParamInputChange({value: event.target.value, ...handlePramInputChangeArgs})}
                         ></input>
                       )
                     })}
