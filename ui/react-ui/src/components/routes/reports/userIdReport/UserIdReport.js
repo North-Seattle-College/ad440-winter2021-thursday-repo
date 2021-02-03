@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import { JsonToTable } from "react-json-to-table";
 
 function UserIdReport() {
