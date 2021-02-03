@@ -5,34 +5,18 @@
 # https://artillery.io/docs/
 config:
   # this hostname will be used as a prefix for each URI in the flow unless a complete URI is specified
-  target: "http://nsc.functionsapp-team1.azurewebsites.net/api/"
+  target: "https://nsc-functionsapp-team1.azurewebsites.net/api/users/2/tasks"
   phases:
 
      -duration: 200
       arrivalRate: 1
       rampTo: 10
-      variables:
-         - user:
-              - "1"
-              - "2"
-              - "3"
-
-              - "5"
-              - "6"
-         - userName:
-              - "Jorden"
-              - "Aidan"
-              - "Macaulay"
-              - "Leroy"
-              - "Naomi"
-scenarios:
+     
   -
     flow:
 
       - get:
-          url: "/users/{{user}}"
-
-          #      - update:
-          # url: "/users/{{user}}"
-          # json:
-          #    firstname: "{{userName}}"
+           url: "/"
+    capture:
+      json: "$.taskId"
+      as: "taskId"
