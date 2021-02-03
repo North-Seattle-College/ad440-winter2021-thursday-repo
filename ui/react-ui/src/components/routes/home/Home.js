@@ -15,6 +15,7 @@ let Home = () => {
       <p>{userIdEndpoint}</p>
       <p>{userTasksEndpoint}</p>
       <h2>Test Result Endpoints:</h2>
+      <hr/>
       <p>{reportUserId}</p>
     </Container>
   )
