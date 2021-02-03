@@ -1,14 +1,14 @@
 config:
-  target: "https://nsc-fun-dev-usw2-tsmtestfunction.azurewebsites.net"
+  target: "https://www.amazon.com"
   phases:
-    - duration: 600
+    - duration: 10
       arrivalRate: 1
       name: Warm up 1 request per second
-    - duration: 1200
+    - duration: 20
       arrivalRate: 2
       rampTo: 6
-      name: Ramp up load 2-6 requests / second
-    - duration: 1800
+      name: Ramp up load 2-6 requests per second
+    - duration: 30
       arrivalRate: 10
       name: Sustained load 10 Requests per second
   processor: "./artillery-functions.js"
@@ -22,7 +22,7 @@ scenarios:
   - name: "Load Test"
     flow:
       - get:
-          url: "/api/HttpTriggerLoadTest"
+          url: "/"
           afterResponse: "logResponse"
       #Query string both ways returning invalid url. Maybe this is because of the response document type of plain/text?
       # - get:
