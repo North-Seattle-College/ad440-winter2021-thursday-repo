@@ -4,6 +4,7 @@ import UserTasks from '../routes/userTasks/UserTasks.js';
 import Home from '../routes/home/Home.js';
 import User from '../routes/userid/userid.js';
 import Users from '../routes/users/Users';
+import usersUserIdTasksTaskIdReport from '../routes/reports/usersUserIdTasksTaskIdReport/users_userid_tasks_taskid_report';
  
 function App() {
   return (
