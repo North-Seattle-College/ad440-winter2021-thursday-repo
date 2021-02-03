@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { JsonToTable } from "react-json-to-table";
 
 function UserIdReport() {
-    const [jsonReport, setJsonReport] = useState('');
-    const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/nate_sample.json";
+    const [jsonReport, setJsonReport] = useState();
+    const [showJson, setshowJson] = useState(false);
+    const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/report_users_user_id_tasks_task_id.json";
     
     const getReport = async () => {
         const response = await fetch(jsonUrl)
         const json = await response.json();
         setJsonReport(json);
     }
+
+    const toggleJson = showJson ? 'Table' : 'JSON';
 
     useEffect(() => {
         if (!jsonReport) getReport();
@@ -18,7 +21,9 @@ function UserIdReport() {
     return (
         <div className="userIdRportTable">
             <h1>/users/{'{'}user_id{'}'} Serverless-Artillery Report</h1>
-            <JsonToTable json={jsonReport}/>
+            <button
+            onClick={() => setshowJson(!showJson)}>Show {toggleJson}</button>
+            {showJson ? <div><pre>{ JSON.stringify(jsonReport, null, 2) }</pre></div> : <JsonToTable json={jsonReport}/>}
         </div>
     );
 }
