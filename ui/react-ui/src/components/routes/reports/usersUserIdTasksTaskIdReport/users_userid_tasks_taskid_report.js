@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { JsonToTable } from "react-json-to-table";
 
-function usersUserIdTasksTaskIdReport() {
+function UsersUserIdTasksTaskIdReport() {
     const [jsonReport, setJsonReport] = useState('');
     const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/report_users_user_id_tasks_task_id.json";
     
@@ -23,4 +23,4 @@ function usersUserIdTasksTaskIdReport() {
     );
 }
 
-export default usersUserIdTasksTaskIdReport;
+export default UsersUserIdTasksTaskIdReport;
