@@ -7,8 +7,7 @@ let Home = () => {
   var userIdEndpoint = '/users/{userid}';
 
   //test results endpoints
-  var usersUserIdTasksTaskIdTestReport = 'reports/users/userid/tasks/tasksid' 
-
+  var TaskIdTestReport = 'reports/taskid';
   return (
     <Container className="text-center mt-5">
       <h2>Supported Endpoints:</h2>
@@ -19,7 +18,7 @@ let Home = () => {
 
       <h2>Test Results Supported Endpoints</h2>
       <hr/>
-      <p>{usersUserIdTasksTaskIdTestReport}</p>
+      <p>{TaskIdTestReport}</p>
 
     </Container>
 

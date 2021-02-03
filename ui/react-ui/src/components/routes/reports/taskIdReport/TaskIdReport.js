@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { JsonToTable } from "react-json-to-table";
 
-function UsersUserIdTasksTaskIdReport() {
+function TaskIdReport() {
     const [jsonReport, setJsonReport] = useState('');
-    const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/nate_sample.json";
+    const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/report_users_user_id_tasks_task_id.json";
     
     const getReport = async () => {
         const response = await fetch(jsonUrl)
@@ -16,11 +16,11 @@ function UsersUserIdTasksTaskIdReport() {
     }, [jsonReport])
 
     return (
-        <div className="usersUserIdTasksTaskIdReportTable">
+        <div className="TaskIdReportTable">
             <h1>/users/{'{'}user_id{'}'}/tasks/{'{'}task_id{'}'} Serverless-Artillery Report</h1>
             <JsonToTable json={jsonReport}/>
         </div>
     );
 }
 
-export default UsersUserIdTasksTaskIdReport;
+export default TaskIdReport;

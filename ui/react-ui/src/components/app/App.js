@@ -4,7 +4,7 @@ import UserTasks from '../routes/userTasks/UserTasks.js';
 import Home from '../routes/home/Home.js';
 import User from '../routes/userid/userid.js';
 import Users from '../routes/users/Users';
-import usersUserIdTasksTaskIdReport from '../routes/reports/UserIdTaskIdReport/UsersUserIdTasksTaskIdReport';
+import TaskIdReport from '../routes/reports/taskIdReport/TaskIdReport';
  
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         {/* Farhad */}
         <Route exact path='/users/:userId/tasks' component={UserTasks}/>
         {/* Test results routes */}
-        <Route exact path='/reports/users/userid/tasks/taskid' component={UsersUserIdTasksTaskIdReport}/>
+        <Route exact path='/reports/taskid' component={TaskIdReport}/>
       </Router>
     </div>
   );
