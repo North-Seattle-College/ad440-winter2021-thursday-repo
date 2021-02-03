@@ -1,22 +1,22 @@
-
 [CmdletBinding()]
 param (
     [Parameter(Mandatory=$True)]
     [string]
-    $SubscriptionId,
+    $subscriptionId,
 
     [Parameter(Mandatory=$True)]
     [string]
-    $TenantId,
+    $tenantId,
+    
 
     [Parameter(Mandatory=$True)]
     [string]
-    $ServicePrincipalId,
+    $servicePrincipalId,
 
    
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$ServicePrincipalPassword=$(Throw "Password required."),
+    [string]$servicePrincipalPassword=$(Throw "Password required."),
    
     
     [Parameter(Mandatory=$True)]
@@ -55,7 +55,7 @@ $securePassword = $servicePrincipalPassword | ConvertTo-SecureString -AsPlainTex
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalId, $securePassword);
 
 
-Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -Subscription $SubscriptionId;
+Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $tenantId -Subscription $subscriptionId;
 
 Set-AzContext $SubscriptionId
 New-AzResourceGroup -Name $resourceGroupName -Location $location
