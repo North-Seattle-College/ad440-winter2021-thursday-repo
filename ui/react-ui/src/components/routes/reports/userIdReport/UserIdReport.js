@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { JsonToTable } from "react-json-to-table";
 
 function UserIdReport() {
     const [jsonReport, setJsonReport] = useState('');
     const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/nate_sample.json";
     
-    (async function() {
+    const getReport = async () => {
         const response = await fetch(jsonUrl)
-        if (response.ok) {
-            const json = await response.json();
-            setJsonReport(json);
-        } else {
-            alert("HTTP-Error: " + response.status)
-        }
-    })();
+        const json = await response.json();
+        setJsonReport(json);
+    }
+
+    useEffect(() => {
+        if (!jsonReport) getReport();
+    }, [jsonReport])
 
     return (
         <div className="userIdRportTable">
