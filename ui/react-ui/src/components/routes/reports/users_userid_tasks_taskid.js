@@ -3,7 +3,7 @@ import { JsonToTable } from "react-json-to-table";
 
 function usersUserIdTasksTaskIdReport() {
     const [jsonReport, setJsonReport] = useState('');
-    const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/report users user_id tasks task_id.json";
+    const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/report_users_user_id_tasks_task_id.json";
     
     const getReport = async () => {
         const response = await fetch(jsonUrl)
@@ -17,10 +17,10 @@ function usersUserIdTasksTaskIdReport() {
 
     return (
         <div className="userIdRportTable">
-            <h1>/users/{'{'}user_id{'}'} Serverless-Artillery Report</h1>
+            <h1>/users/{'{'}user_id{'}'}/tasks/{'{'}task_id{'}'} Serverless-Artillery Report</h1>
             <JsonToTable json={jsonReport}/>
         </div>
     );
 }
 
-export default UserIdReport;
+export default usersUserIdTasksTaskIdReport;
