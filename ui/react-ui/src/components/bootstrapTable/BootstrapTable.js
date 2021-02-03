@@ -7,7 +7,7 @@ var BootstrapTable = (props) => {
 
   return (
     <div className='table-container'>
-      <Container>
+      <div>
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -20,7 +20,7 @@ var BootstrapTable = (props) => {
             </tbody>
           ))}
         </Table>
-      </Container>
+      </div>
     </div>
 
   )
