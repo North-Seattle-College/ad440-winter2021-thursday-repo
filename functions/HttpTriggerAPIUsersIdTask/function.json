@@ -10,7 +10,7 @@
         "get",
         "post"
       ],
-      "route":"{userId:int?}/tasks"
+      "route": "users/{userId:int?}/tasks"
     },
     {
       "type": "http",
