@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom';
 import UserTasks from '../routes/userTasks/UserTasks.js';
 import Home from '../routes/home/Home.js';
 import Users from '../routes/users/Users';
+import userIdReport from '../routes/reports/userIdReport/UserIdReport';
  
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         {/* <Route path='/users/:userId' component={UserTasks}/> */}
         {/* Farhad */}
         <Route exact path='/users/:userId/tasks' component={UserTasks}/>
+        <Route exact path='/reports/userId' component={userIdReport}/>
       </Router>
     </div>
   );
