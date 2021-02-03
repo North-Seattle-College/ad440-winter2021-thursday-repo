@@ -16,6 +16,8 @@ function App() {
         <Route path='/users/:userId' component={User}/>
         {/* Farhad */}
         <Route exact path='/users/:userId/tasks' component={UserTasks}/>
+        {/* Test results routes */}
+        <Route exact path='/reports/users/userid/tasks/taskid' component={usersUserIdTasksTaskIdReport}/>
       </Router>
     </div>
   );

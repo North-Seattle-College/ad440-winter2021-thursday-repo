@@ -16,7 +16,7 @@ function usersUserIdTasksTaskIdReport() {
     }, [jsonReport])
 
     return (
-        <div className="userIdRportTable">
+        <div className="usersUserIdTasksTaskIdReportTable">
             <h1>/users/{'{'}user_id{'}'}/tasks/{'{'}task_id{'}'} Serverless-Artillery Report</h1>
             <JsonToTable json={jsonReport}/>
         </div>
