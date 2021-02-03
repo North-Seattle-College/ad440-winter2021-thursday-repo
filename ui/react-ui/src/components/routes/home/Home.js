@@ -4,6 +4,7 @@ import Container from 'react-bootstrap/esm/Container';
 let Home = () => {
   let usersEndpoint = '/users';
   let userTasksEndpoint = '/users/{userId}/tasks';
+  let reportUserId = '/reports/userId';
   var userIdEndpoint = '/users/{userid}';
 
   return (
@@ -13,6 +14,9 @@ let Home = () => {
       <p>{usersEndpoint}</p>
       <p>{userIdEndpoint}</p>
       <p>{userTasksEndpoint}</p>
+      <h2>Test Result Endpoints:</h2>
+      <hr/>
+      <p>{reportUserId}</p>
     </Container>
   )
 }
