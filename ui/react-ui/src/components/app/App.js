@@ -5,6 +5,7 @@ import Home from '../routes/home/Home.js';
 import User from '../routes/userid/userid.js';
 import Users from '../routes/users/Users';
 import userIdReport from '../routes/reports/userIdReport/UserIdReport';
+import TasksReport from '../routes/reports/UserIdTasksReport.js';
  
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         {/* Farhad */}
         <Route exact path='/users/:userId/tasks' component={UserTasks}/>
         <Route exact path='/reports/userId' component={userIdReport}/>
+        <Route exact path='/report/users/{user_id}/tasks' component={TasksReport}/>
       </Router>
     </div>
   );
