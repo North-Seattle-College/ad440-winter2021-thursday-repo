@@ -1,5 +1,5 @@
 import logging
-import pypyodbc
+import pyodbc
 import os
 import azure.functions as func
 import json
@@ -24,7 +24,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         # Create a new connection
         logging.debug("Attempting DB connection!")
-        with pypyodbc.connect(connectionString) as conn:
+        with pyodbc.connect(connectionString) as conn:
             with conn.cursor() as cursor:
                 logging.debug("Connection to DB successful!")
 
