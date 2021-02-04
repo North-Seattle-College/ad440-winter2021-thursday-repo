@@ -1,5 +1,5 @@
 *.log
 
 # Personal files
-/IGNORE.*
+IGNORE_params.txt
 /OLD.*
