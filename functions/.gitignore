@@ -132,8 +132,12 @@ appsettings.json
 local.settings.json
 .python_packages
 
+.idea
+
+
 # Vscode
 .vscode
 vscode
 .DS_Store
 DS_Store
+
