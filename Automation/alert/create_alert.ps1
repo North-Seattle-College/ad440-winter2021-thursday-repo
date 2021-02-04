@@ -62,22 +62,6 @@ if (!$targetResourceGroupExists) {
             -ResourceGroupName $TargetResourceGroupName `
             -TemplateFile $pathToAlertTemplate `
             -TemplateParameterObject $templateParams
-        # New-AzResourceGroupDeployment `
-        #     -ResourceGroupName $TargetResourceGroupName `
-        #     -TemplateFile $pathToAlertTemplate `
-        #     -alertName $AlertName `
-        #     -alertDescription $AlertDescription `
-        #     -alertSeverity $AlertSeverity `
-        #     -targetResourceGroup $TargetResourceGroupName `
-        #     -targetResourceId $TargetResourceId `
-        #     -metricName $MetricName `
-        #     -operator $Operator `
-        #     -threshold $Threshold `
-        #     -timeAggregation $TimeAggregation `
-        #     -windowSize $WindowSize `
-        #     -evaluationFrequency $EvaluationFrequency `
-        #     -actionResourceGroup $ActionResourceGroupName `
-        #     -actionGroupId $ActionGroupId
     } else {
         Write-Host "Alert with name $AlertName already exists."
     }
