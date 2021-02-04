@@ -116,9 +116,8 @@ $templateParams = @{
     tags = @{
         "ownerEmail" = $OwnerEmail
     }
-    networkSecurityGroups_name = @{
-        "securityGroupName" = $SecurityGroupName
-    }
+    securityGroupName = $SecurityGroupName
+
     securityRules = @{
         "name" = $SecurityRuleName
         "protocol" = $Protocol    
