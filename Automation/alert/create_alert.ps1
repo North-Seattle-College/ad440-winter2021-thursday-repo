@@ -23,12 +23,30 @@ param(
 
 $pathToAlertTemplate = "./alert_template.json"   
 
-# Logs in and sets subscription      
-& "../login.ps1" $TenantId $SPApplicationId $SPSecret $SubscriptionId
+# Logs in and sets subscription   
+Import-Module ..\Login   
+Login $TenantId $SPApplicationId $SPSecret $SubscriptionId
 
 # Check Resource Groups
 $targetResourceGroupExists = (Get-AzResourceGroup $TargetResourceGroupName -ErrorAction SilentlyContinue).ResourceGroupName -eq $TargetResourceGroupName
 $actionResourceGroupExists = (Get-AzResourceGroup $ActionResourceGroupName -ErrorAction SilentlyContinue).ResourceGroupName -eq $ActionResourceGroupName
+
+# Create Parameter Hash Table
+$templateParams = @{
+        "alertName" = $AlertName
+        "alertDescription" = $AlertDescription
+        "alertSeverity" = $AlertSeverity
+        "targetResourceGroup" = $TargetResourceGroupName
+        "targetResourceId" = $TargetResourceId
+        "metricName" = $MetricName
+        "operator" = $Operator
+        "threshold" = $Threshold
+        "timeAggregation" = $TimeAggregation
+        "windowSize" = $WindowSize
+        "evaluationFrequency" = $EvaluationFrequency
+        "actionResourceGroup" = $ActionResourceGroupName
+        "actionGroupId" = $ActionGroupId
+}
 
 if (!$targetResourceGroupExists) {
     Write-Host "Resource Group $TargetResourceGroupName does not exist. Cannot create Alert."
@@ -43,19 +61,23 @@ if (!$targetResourceGroupExists) {
         New-AzResourceGroupDeployment `
             -ResourceGroupName $TargetResourceGroupName `
             -TemplateFile $pathToAlertTemplate `
-            -alertName $AlertName `
-            -alertDescription $AlertDescription `
-            -alertSeverity $AlertSeverity `
-            -targetResourceGroup $TargetResourceGroupName `
-            -targetResourceId $TargetResourceId `
-            -metricName $MetricName `
-            -operator $Operator `
-            -threshold $Threshold `
-            -timeAggregation $TimeAggregation `
-            -windowSize $WindowSize `
-            -evaluationFrequency $EvaluationFrequency `
-            -actionResourceGroup $ActionResourceGroupName `
-            -actionGroupId $ActionGroupId
+            -TemplateParameterObject $templateParams
+        # New-AzResourceGroupDeployment `
+        #     -ResourceGroupName $TargetResourceGroupName `
+        #     -TemplateFile $pathToAlertTemplate `
+        #     -alertName $AlertName `
+        #     -alertDescription $AlertDescription `
+        #     -alertSeverity $AlertSeverity `
+        #     -targetResourceGroup $TargetResourceGroupName `
+        #     -targetResourceId $TargetResourceId `
+        #     -metricName $MetricName `
+        #     -operator $Operator `
+        #     -threshold $Threshold `
+        #     -timeAggregation $TimeAggregation `
+        #     -windowSize $WindowSize `
+        #     -evaluationFrequency $EvaluationFrequency `
+        #     -actionResourceGroup $ActionResourceGroupName `
+        #     -actionGroupId $ActionGroupId
     } else {
         Write-Host "Alert with name $AlertName already exists."
     }
