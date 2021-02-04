@@ -15,7 +15,10 @@ param(
 $pathToVNetTemplate = "./vnet_template.json"   
 
 # Logs in and sets subscription      
-& "../login.ps1" $TenantId $SPApplicationId $SPSecret $SubscriptionId
+#& "../login.ps1" $tenantId $applicationId $secret $subscriptionId
+Import-Module ..\Login
+Login $tenantId $applicationId $secret $subscriptionId
+
 
 # Creates/Updates resource group
 New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Force
