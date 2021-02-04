@@ -13,7 +13,7 @@ param (
     [string] [Parameter(Mandatory)] $adminUsername, #Admin Username required
     [String] [Parameter(Mandatory)] $adminPassword, #Admin Password required
     [string] $location='West US2', #Default value for RG/VM Location
-    [string] $vnetName='myVnet',  #Default value for Virtual Network Name
+    [string] $vNetName='myVnet',  #Default value for Virtual Network Name
     [string] $nsgName='myNetworkSecurityGroup', #Default value for Network Security Group Name
     [string] $publicIpName='myPublicIpAddress' #Default value for Public IP Address Name
     )
@@ -87,7 +87,7 @@ if ($notPresent) {
     -adminUsername "$adminUsername" `
     -adminPassword $securePassword `
     -vmName "$vmName" `
-    -virtualNetworkName "$vnetName" `
+    -virtualNetworkName "$vNetName" `
     -networkSecurityGroupName "$nsgName" `
     -publicIpName "$publicIpName" 
 }

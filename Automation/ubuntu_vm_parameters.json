@@ -93,14 +93,14 @@
         "type": "string",
         "defaultValue": "defaultvNet",
         "metadata": {
-          "description": "Name."
+          "description": "Name of Vnet."
         }
       },
       "networkSecurityGroupName": {
         "type": "string",
         "defaultValue": "defaultvNet",
         "metadata": {
-          "description": "Name."
+          "description": "Name of NSG."
         }
       },
       "vmName": {
