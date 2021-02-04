@@ -25,8 +25,6 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-.venv
-.vscode
 MANIFEST
 
 # PyInstaller
@@ -105,7 +103,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.vscode
 
 # Spyder project settings
 .spyderproject
@@ -131,13 +128,3 @@ obj
 appsettings.json
 local.settings.json
 .python_packages
-
-.idea
-
-
-# Vscode
-.vscode
-vscode
-.DS_Store
-DS_Store
-
