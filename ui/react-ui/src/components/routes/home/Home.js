@@ -14,7 +14,13 @@ class Home extends React.Component {
         {key: '/users', params: []}, 
         {key: '/users/{userId}', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]},
         {key: '/users/{userId}/tasks', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]},
-        {key: '/users/{userId}/tasks/{taskId}', params: [{key: 'taskId', value: 0, type: 'number', regex: /{taskId}/g}]}
+        {
+          key: '/users/{userId}/tasks/{taskId}', 
+          params: [
+            {key: 'userId', value: 0, type: 'number', regex: /{userId}/g},
+            {key: 'taskId', value: 0, type: 'number', regex: /{taskId}/g},
+          ]
+        }
       ]
     },
     badInputAlert: '',
@@ -96,7 +102,7 @@ class Home extends React.Component {
                       return (
                         <input 
                           className='param-input' 
-                          id={endpoint.key} type='text' 
+                          id={`${endpoint.key}-${param.key}`} type='text' 
                           placeholder={param.key} 
                           key={index}
                           onChange={(event) => this.handleParamInputChange({value: event.target.value, ...handlePramInputChangeArgs})}
