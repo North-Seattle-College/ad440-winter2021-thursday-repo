@@ -5,7 +5,7 @@ let Home = () => {
   let usersEndpoint = '/users';
   let userTasksEndpoint = '/users/{userId}/tasks';
   let reportUserId = '/reports/userId';
-  let reportUser = '/reports/user';
+  let reportUser = '/reports/users';
   var userIdEndpoint = '/users/{userid}';
 
   return (
