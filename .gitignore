@@ -8,7 +8,6 @@ lerna-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
 # Runtime data
 pids
 *.pid
@@ -100,10 +99,15 @@ dist
 
 # DynamoDB Local files
 .dynamodb/
-
+ 
+ 
 # TernJS port file
 .tern-port
 
+.idea
+
+#artillery report output
+test/artillery/report.json
 # Vscode
 .vscode
 vscode
@@ -112,3 +116,4 @@ DS_Store
 
 # ignore .vscode
 .vscode/
+
