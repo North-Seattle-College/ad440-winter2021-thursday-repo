@@ -132,7 +132,7 @@ $templateParams = @{
         "sourcePortRanges" = $SourcePortRanges
         "destinationPortRanges" = $DestinationPortRanges     
         "sourceAddressPrefixes" = $SourceAddressPrefixes
-        "destinationAddressPrefixes" = $DestinationAddressPrefies
+        "destinationAddressPrefixes" = $DestinationAddressPrefixes
     }
 
 # Example SSH security rule
