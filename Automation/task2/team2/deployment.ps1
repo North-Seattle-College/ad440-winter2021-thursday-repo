@@ -21,7 +21,7 @@ param (
     $ServicePrincipalId,
 
     [Parameter(Mandatory=$true)]
-    [securestring]
+    [string]
     $ServicePrincipalPassword,
 
     [Parameter(Mandatory=$true)]
@@ -49,11 +49,13 @@ $prefix = "jin-templa-deployment"
 $stamp = (Get-Date).toString().Replace("/","-").Replace(":","-")
 Start-Transcript "./$prefix-$stamp.log"
 
-$credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword );
+# $credentials = New-Object -TypeName System.Management.Automation.PSCredential($ServicePrincipalId, $ServicePrincipalPassword );
+# Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -Subscription $SubscriptionId;
+# Set-AzContext $SubscriptionId
 
-Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $TenantId -Subscription $SubscriptionId;
-
-Set-AzContext $SubscriptionId
+# Use new Login Module to Log In
+Import-Module ..\..\Login
+Login $TenantId $ServicePrincipalId $ServicePrincipalPassword $SubscriptionId
 
 New-AzResourceGroup `
   -Name $rgName `
