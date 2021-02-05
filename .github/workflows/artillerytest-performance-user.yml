@@ -6,7 +6,7 @@ name: sls art performance test
 jobs:
   slsart-perf:
     name: artillery performance test
-    runs-on: ubuntu-latestgit 
+    runs-on: ubuntu-latest 
 
     steps:
     - name: Checkout

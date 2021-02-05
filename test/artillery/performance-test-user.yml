@@ -22,4 +22,3 @@ scenarios:
           capture:
             json: "$.user"
             as: "user"
-
