@@ -1,5 +1,5 @@
 config:
-  target: "https://www.amazon.com"
+  target: "https://nsc-functionsapp-team1.azurewebsites.net/api/users/1/tasks/1"
   phases:
     - duration: 10
       arrivalRate: 1
