@@ -1,4 +1,5 @@
-##TODO: add key vault entry
+# Creates resource group and Azure SQL logical server
+
 param(
         # Login parameters
         [string] [Parameter(Mandatory=$true)] $tenantId,          
@@ -13,14 +14,16 @@ param(
         [SecureString] [Parameter(Mandatory=$true)] $administratorLoginPassword
 )
 
+# Log in and set the SubscriptionId in which to create these objects
+Import-Module ..\Login
+Login $tenantId $applicationId $secret $subscriptionId
+
 $pathToAzSqlTemplate = "./azureDeploy.json"
 
-# Log in and set the SubscriptionId in which to create these objects
-& "../login.ps1" $tenantId $applicationId $secret $subscriptionId
-
-# Create a resource group
-$resourceGroupExists = (Get-AzResourceGroup -Name $resourceGroupName).ResourceGroupName `
--eq $resourceGroupName
+# Check for or create a resource group
+$resourceGroupExists = (Get-AzResourceGroup -Name $resourceGroupName `
+-ErrorVariable notPresent -ErrorAction SilentlyContinue).ResourceGroupName `
+-eq $resourceGroupName 
 
 if (!$resourceGroupExists) {
         New-AzResourceGroup -Name $resourceGroupName -Location "$location" -Force
@@ -34,6 +37,7 @@ Write-host "Creating primary server..."
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
 -TemplateFile $pathToAzSqlTemplate -administratorLogin $administratorLogin `
 -administratorLoginPassword $administratorLoginPassword
+
 
 # Clear deployment 
 # Remove-AzResourceGroup -ResourceGroupName $resourceGroupName

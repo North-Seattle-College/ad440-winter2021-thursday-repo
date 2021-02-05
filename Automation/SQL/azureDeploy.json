@@ -50,39 +50,6 @@
               "publicNetworkAccess": "Enabled"
           }
       },
-      {
-            "type": "Microsoft.Sql/servers/advisors",
-            "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('serverName'), '/CreateIndex')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-            ],
-            "properties": {
-                "autoExecuteValue": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/advisors",
-            "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('serverName'), '/DropIndex')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-            ],
-            "properties": {
-                "autoExecuteValue": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/advisors",
-            "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('serverName'), '/ForceLastGoodPlan')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-            ],
-            "properties": {
-                "autoExecuteValue": "Enabled"
-            }
-        },
         {
             "type": "Microsoft.Sql/servers/auditingPolicies",
             "apiVersion": "2014-04-01",
@@ -96,19 +63,6 @@
             }
         },
         {
-            "type": "Microsoft.Sql/servers/encryptionProtector",
-            "apiVersion": "2015-05-01-preview",
-            "name": "[concat(parameters('serverName'), '/current')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-            ],
-            "kind": "servicemanaged",
-            "properties": {
-                "serverKeyName": "ServiceManaged",
-                "serverKeyType": "ServiceManaged"
-            }
-        },
-        {
             "type": "Microsoft.Sql/servers/firewallRules",
             "condition": "[parameters('allowAzureIPs')]",
             "apiVersion": "2015-05-01-preview",
@@ -119,18 +73,6 @@
             "properties": {
                 "startIpAddress": "0.0.0.0",
                 "endIpAddress": "0.0.0.0"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/keys",
-            "apiVersion": "2015-05-01-preview",
-            "name": "[concat(parameters('serverName'), '/ServiceManaged')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-            ],
-            "kind": "servicemanaged",
-            "properties": {
-                "serverKeyType": "ServiceManaged"
             }
         },
         {
