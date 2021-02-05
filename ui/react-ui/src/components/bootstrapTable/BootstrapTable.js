@@ -1,13 +1,12 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
-import Container from 'react-bootstrap/Container';
 
 var BootstrapTable = (props) => {
   var {heatherItems, rows} = props;
 
   return (
     <div className='table-container'>
-      <Container>
+      <>
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -20,7 +19,7 @@ var BootstrapTable = (props) => {
             </tbody>
           ))}
         </Table>
-      </Container>
+      </>
     </div>
 
   )
