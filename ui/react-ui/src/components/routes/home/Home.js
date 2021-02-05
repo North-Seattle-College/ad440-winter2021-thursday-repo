@@ -69,10 +69,13 @@ class Home extends React.Component {
   render() {
     var {endpointsByMethods, badInputAlert, emptyInputAlert} = this.state;
     var methods = Object.keys(endpointsByMethods);
-
   //test results endpoints
   let reportUserId = '/reports/userId';
   let reportTaskId = '/reports/taskId';
+
+  let reportUserId = '/reports/userId';
+  let reportUsers = '/reports/users';
+
 
     // what happens here is basically mapping over endpointsByMethods and rendering a method title, endpoints, and params
     return (
@@ -117,6 +120,8 @@ class Home extends React.Component {
 <hr/>
         <p>{reportUserId}</p>
         <p>{reportTaskId}</p>
+        <p>{reportUsers}</p>
+
       </Container>
     )
   }
