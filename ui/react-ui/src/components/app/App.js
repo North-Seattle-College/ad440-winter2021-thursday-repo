@@ -6,6 +6,7 @@ import User from '../routes/userid/userid.js';
 import Users from '../routes/users/Users';
 import UserSingleTask from '../routes/userSingleTask/UserSingleTask';
 import userIdReport from '../routes/reports/userIdReport/UserIdReport';
+import usersReport from '../routes/reports/usersReport/UserReport';
  
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         {/* Allison */}
         <Route exact path='/users/:userId/tasks/:taskId' component={UserSingleTask}/>
         <Route exact path='/reports/userId' component={userIdReport}/>
+        <Route exact path='/reports/users' component={usersReport}/>
       </Router>
     </div>
   );
