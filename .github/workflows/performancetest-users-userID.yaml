@@ -38,7 +38,7 @@ jobs:
       - name: Deploy, invoke, remove functions
         run: |
           ~/.npm-global/bin/slsart deploy --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart invoke -s ../../test/artillery/performanceScript-users-userID.yaml --region $AWS_SLSART_REGION  > ../../test/results/performanceResults-users-userID.json
+          ~/.npm-global/bin/slsart invoke -s test/artillery/performanceScript-users-userID.yaml --region $AWS_SLSART_REGION  > test/results/performanceResults-users-userID.json
           ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
         env:
           AWS_SLSART_REGION: us-west-2  
