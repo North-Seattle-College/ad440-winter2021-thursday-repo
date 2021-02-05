@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "securityGroupName": {
+            "type": "string"
+        },
+        "tags": {
+            "type": "object"
+        },
+        "securityRules": {
+            "type": "object",
+            "defaultValue": {
+                "name": "SSH_Access",
+                "protocol": "TCP",
+                "sourcePortRange": "*",
+                "destinationPortRange": "22",
+                "sourceAddressPrefix": "97.113.101.80/32",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []                
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('securityGroupName')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "ownerEmail": "[parameters('tags').ownerEmail]"
+            },
+            "properties": {               
+                 "securityRules": [
+                     {
+                        "name": "[parameters('securityRules').name]",
+                        "properties": {
+                            "protocol": "[parameters('securityRules').protocol]",
+                            "sourcePortRange": "[parameters('securityRules').sourcePortRange]",
+                            "destinationPortRange": "[parameters('securityRules').destinationPortRange]",
+                            "sourceAddressPrefix": "[parameters('securityRules').sourceAddressPrefix]",
+                            "destinationAddressPrefix": "[parameters('securityRules').destinationAddressPrefix]",
+                            "access": "[parameters('securityRules').access]",
+                            "priority": "[parameters('securityRules').priority]",
+                            "direction": "[parameters('securityRules').direction]",
+                            "sourcePortRanges": "[parameters('securityRules').sourcePortRanges]",
+                            "destinationPortRanges": "[parameters('securityRules').destinationPortRanges]",
+                            "sourceAddressPrefixes": "[parameters('securityRules').sourceAddressPrefixes]",
+                            "destinationAddressPrefixes": "[parameters('securityRules').destinationAddressPrefixes]"
+                        }
+                    }
+                ]
+            }
+         }
+    ]
+}
