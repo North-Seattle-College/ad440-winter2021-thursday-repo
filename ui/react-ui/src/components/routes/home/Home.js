@@ -73,7 +73,7 @@ class Home extends React.Component {
   let reportUserId = '/reports/userId';
   let reportTaskId = '/reports/taskId';
 
-  let reportUserId = '/reports/userId';
+
   let reportUsers = '/reports/users';
 
 
@@ -117,7 +117,7 @@ class Home extends React.Component {
         
         <h2 style={{marginTop: '2rem'}}>Test Results Supported Endpoints</h2>
 
-<hr/>
+        <hr/>
         <p>{reportUserId}</p>
         <p>{reportTaskId}</p>
         <p>{reportUsers}</p>
