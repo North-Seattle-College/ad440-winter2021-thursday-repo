@@ -24,38 +24,10 @@ param (
 #template file for Virtual Machine ARM Template    
 $templateFile = "$PSScriptRoot\ubuntu_vm_parameters.json" 
 
-#Log user into Azure:
-# If the Subscription Id is NOT null, the user is logged in
-$loggedIn = ((Get-AzContext).Tenant.Id -eq $tenantId)
-
-# Checks to see if user is logged into Azure, and if not uses
-# Service Principal to log in
-if ($loggedIn) {
-  Write-Host("Already logged in")
-
-  # Check we're on the correct Subscription
-  $correctSub = (Get-AzContext).Subscription.Id -eq $subscriptionId
-  if ($correctSub) {
-    Write-Host("Correct subscription")
-  } else {
-    Write-Host("Wrong subscription. Logging out...")
-    Disconnect-AzAccount
-    $loggedIn = False
-  }
-
-} 
-if (!$loggedIn) {
-  # Log In
-  Write-Host("Logging in...")
-  [securestring]$secureSecret = ConvertTo-SecureString $secret -AsPlainText -Force      
-  [pscredential]$credObject = New-Object System.Management.Automation.PSCredential ($applicationId, $secureSecret)
-  Connect-AzAccount -ServicePrincipal -Credential $credObject -Tenant $tenantId      
-  Write-Host "Logged into the account $applicationId"
-
-  # Set Subscription
-  Set-AzContext -Subscription $subscriptionId
-  Write-Host "Set to subscription $subscriptionId"
-} 
+# Logs in and sets subscription      
+#& "../login.ps1" $tenantId $applicationId $secret $subscriptionId
+Import-Module ..\Login
+Login $tenantId $applicationId $secret $subscriptionId
 
 #Check to see if resource group name exists. If not it will create one by that name.
 #If Resource Group already exists, the script will proceed to the VM.
