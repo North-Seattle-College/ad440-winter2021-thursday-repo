@@ -8,14 +8,14 @@ param (
     [string] [Parameter(Mandatory=$true)] $applicationId, #App ID used to login to Azure with Service Principal
     [string] [Parameter(Mandatory=$true)] $secret, #Azure Secret used to login to Azure with Service Principal
     [string] [Parameter(Mandatory=$true)] $subscriptionId, #Subscr. ID used to login to Azure with Service Principal
-    [string] [Parameter(Mandatory)] $rgName, #Resource Group Name required
-    [string] [Parameter(Mandatory)] $vmName, #VM Name required
-    [string] [Parameter(Mandatory)] $adminUsername, #Admin Username required
-    [String] [Parameter(Mandatory)] $adminPassword, #Admin Password required
-    [string] $location='West US2', #Default value for RG/VM Location
-    [string] $vNetName='myVnet',  #Default value for Virtual Network Name
-    [string] $nsgName='myNetworkSecurityGroup', #Default value for Network Security Group Name
-    [string] $publicIpName='myPublicIpAddress' #Default value for Public IP Address Name
+    [string] [Parameter(Mandatory=$true)] $rgName, #Resource Group Name required
+    [string] [Parameter(Mandatory=$true)] $vmName, #VM Name required
+    [string] [Parameter(Mandatory=$true)] $adminUsername, #Admin Username required
+    [string] [Parameter(Mandatory=$true)] $adminPassword, #Admin Password required
+    [string] [Parameter(Mandatory=$false)] $location='West US2', #Default value for RG/VM Location
+    [string] [Parameter(Mandatory=$false)] $vNetName='myVnet',  #Default value for Virtual Network Name
+    [string] [Parameter(Mandatory=$false)] $nsgName='myNetworkSecurityGroup', #Default value for Network Security Group Name
+    [string] [Parameter(Mandatory=$false)] $publicIpName='myPublicIpAddress' #Default value for Public IP Address Name
     )
 
 #convert password to secure string
