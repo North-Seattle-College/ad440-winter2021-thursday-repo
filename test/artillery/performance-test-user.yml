@@ -7,15 +7,19 @@ config:
   # this hostname will be used as a prefix for each URI in the flow unless a complete URI is specified
   target: "https://nsc-functionsapp-team1.azurewebsites.net/api/users "
   phases:
-    -
-      duration: 5
+    - duration: 60
       arrivalRate: 2
+      name: warm up
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 60
+      name: ramp up stress test
 scenarios:
   -
     flow:
       -post:
           url: "/user"
-          json:
-            firstName: "{{ firstName }}"
-            lastName: "{{ lastName }}"
-            email: "{{ email }}"
+          capture:
+            json: "$.user"
+            as: "user"
+
