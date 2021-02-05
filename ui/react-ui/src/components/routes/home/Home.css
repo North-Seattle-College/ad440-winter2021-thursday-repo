@@ -1,0 +1,42 @@
+.main-header {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.main-horizontal-rule {
+  border: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.method-container {
+  display: flex;
+  flex-direction: column;
+  opacity: 0.9;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.method-header {
+  font-size: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.endpoints-container {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0.3rem;
+}
+
+.endpoint-title {
+  margin-right: 1rem;
+  margin-left: 5rem;
+  cursor: pointer;
+}
+
+.param-input {
+  max-width: 5rem;
+  outline: none;
+  border-radius: 0.2rem;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  margin-left: 0.2rem;
+  padding-left: 0.5rem;
+}
