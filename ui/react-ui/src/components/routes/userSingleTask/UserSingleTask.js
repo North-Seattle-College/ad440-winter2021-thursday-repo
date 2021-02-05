@@ -3,10 +3,10 @@ import Container from 'react-bootstrap/esm/Container';
 import { useParams } from "react-router-dom";
 import Table from 'react-bootstrap/Table';
 
-var UserSingleTask = () => {
-  const [userSingleTask, setUserSingleTask] = useState([]);
+let UserSingleTask = () => {
+  let [userSingleTask, setUserSingleTask] = useState([]);
 
-  var { userId, taskId } = useParams();
+  let { userId, taskId } = useParams();
   console.log(userId, taskId)
 
   useEffect(() => {

@@ -59,7 +59,7 @@ class Home extends React.Component {
 
     if (params.length > 0) {
       params.forEach(param => {
-        if (param.value) updatedEndpoint = endpoint.replace(param.regex, param.value);
+        if (param.value) updatedEndpoint = updatedEndpoint.replace(param.regex, param.value);
         else {
           readyToTrigger = false;
           this.setState({emptyInputAlert: 'make sure you fill in all required params!!'});
