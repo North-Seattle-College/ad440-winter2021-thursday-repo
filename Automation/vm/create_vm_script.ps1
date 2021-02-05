@@ -13,10 +13,15 @@ param (
     [string] [Parameter(Mandatory=$true)] $adminUsername, #Admin Username required
     [string] [Parameter(Mandatory=$true)] $adminPassword, #Admin Password required
     [string] [Parameter(Mandatory=$false)] $location='West US2', #Default value for RG/VM Location
-    [string] [Parameter(Mandatory=$false)] $vNetName='myVnet',  #Default value for Virtual Network Name
-    [string] [Parameter(Mandatory=$false)] $nsgName='myNetworkSecurityGroup', #Default value for Network Security Group Name
-    [string] [Parameter(Mandatory=$false)] $publicIpName='myPublicIpAddress' #Default value for Public IP Address Name
+    [string] [Parameter(Mandatory=$false)] $vNetName='-vnet',  #Default value for Virtual Network Name
+    [string] [Parameter(Mandatory=$false)] $nsgName='-nsg', #Default value for Network Security Group Name
+    [string] [Parameter(Mandatory=$false)] $publicIpName='-publicIpAddress' #Default value for Public IP Address Name
     )
+
+#Concat vnet, nsg, and public ip names with virtual machine names
+$vNetName = $vmName + $vNetName
+$nsgName = $vmName + $nsgName
+$publicIpName = $vmName + $publicIpName
 
 #convert password to secure string
 [securestring]$securePassword = ConvertTo-SecureString $adminPassword -AsPlainText -Force  
