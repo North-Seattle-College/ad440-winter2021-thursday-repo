@@ -4,16 +4,9 @@
   "parameters": {
       "serverName": {
           "type": "string",
-          "defaultValue": "[uniqueString('nsc-sqlsrv-', resourceGroup().location, '-acbc')]",
+          "defaultValue": "[concat('nsc-sqlsrv-', resourceGroup().location, '-acbc')]",
           "metadata": {
               "description": "The name of the SQL logical server."
-          }
-      },
-        "resourceGroupName": {
-          "type": "string",
-          "defaultValue": "[uniqueString('nsc-rg-', resourceGroup().location, '-acbc')]",
-          "metadata": {
-              "description": "The name of the resource group."
           }
       },
       "location": {
@@ -41,20 +34,6 @@
           "metadata": {
               "description": "Allow Azure services to access server."
           }
-      },
-        "startIp": {
-        "defaultValue": "",
-          "type": "string",
-          "metadata": {
-              "description": "The start IP of user."
-          }
-      },
-          "endIp": {
-          "defaultValue": "",
-          "type": "string",
-          "metadata": {
-              "description": "The end IP of user."
-          }
       }
   },
   "variables": {},
@@ -75,28 +54,6 @@
             "type": "Microsoft.Sql/servers/advisors",
             "apiVersion": "2014-04-01",
             "name": "[concat(parameters('serverName'), '/CreateIndex')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-            ],
-            "properties": {
-                "autoExecuteValue": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/advisors",
-            "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('serverName'), '/DbParameterization')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-            ],
-            "properties": {
-                "autoExecuteValue": "Disabled"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/advisors",
-            "apiVersion": "2014-04-01",
-            "name": "[concat(parameters('serverName'), '/DefragmentIndex')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
             ],
@@ -149,18 +106,6 @@
             "properties": {
                 "serverKeyName": "ServiceManaged",
                 "serverKeyType": "ServiceManaged"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers/firewallRules",
-            "apiVersion": "2015-05-01-preview",
-            "name": "[concat(parameters('serverName'), '/', parameters('administratorLogin'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]", "[resourceId('Microsoft.Sql/servers', parameters('administratorLogin'))]"
-            ],
-            "properties": {
-                "startIpAddress": "[parameters('startIp')]",
-                "endIpAddress": "[parameters('endIp')]"
             }
         },
         {

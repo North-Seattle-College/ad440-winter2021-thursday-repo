@@ -1,5 +1,3 @@
-# Connect-AzAccount
-
 ##TODO: add key vault entry
 param(
         # Login parameters
@@ -12,9 +10,7 @@ param(
         [string] [Parameter(Mandatory=$true)] $resourceGroupName,
         [string] [Parameter(Mandatory=$true)] $serverName,
         [string] [Parameter(Mandatory=$true)] $administratorLogin,
-        [SecureString] [Parameter(Mandatory=$true)] $administratorLoginPassword,
-        [string] [Parameter(Mandatory=$true)] $startIp,
-        [string] [Parameter(Mandatory=$true)] $endIp
+        [SecureString] [Parameter(Mandatory=$true)] $administratorLoginPassword
 )
 
 $pathToAzSqlTemplate = "./azureDeploy.json"
@@ -37,8 +33,7 @@ if (!$resourceGroupExists) {
 Write-host "Creating primary server..."
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
 -TemplateFile $pathToAzSqlTemplate -administratorLogin $administratorLogin `
--administratorLoginPassword $administratorLoginPassword `
- -StartIpAddress $startIp -EndIpAddress $endIp
+-administratorLoginPassword $administratorLoginPassword
 
 # Clear deployment 
 # Remove-AzResourceGroup -ResourceGroupName $resourceGroupName
