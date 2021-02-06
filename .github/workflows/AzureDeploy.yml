@@ -15,9 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@main
       - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: npm install, build
         run: |
           # Build the project, then deploy to Azure Web App.
