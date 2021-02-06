@@ -33,5 +33,3 @@ jobs:
       - name: logout
         run: |
           az logout
-
-          
