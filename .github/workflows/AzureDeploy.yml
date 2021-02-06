@@ -21,10 +21,10 @@ jobs:
       - name: npm install, build
         run: |
           # Build the project, then deploy to Azure Web App.
-          # cd ui/react-ui
+          cd ui/react-ui
           npm install
-          npm run build --if-present
-        working-directory: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+          npm run build
+        working-directory: 'ui/react-ui'
 
       - uses: azure/actions/login@v1
         with:
