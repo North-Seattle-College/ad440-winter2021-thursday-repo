@@ -10,7 +10,7 @@ jobs:
 
   env:
     NPM_CONFIG_PREFIX: "~/.npm-global"
-    STAGE_NAME: users-perf-test
+    AWS_REGION: "us-west-2"
 
     steps:
     - name: Checkout
@@ -32,9 +32,9 @@ jobs:
         npm install -g serverless-artillery
     - name: deploying invoking and removing functions
       run: |
-        ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
-        ~/.npm-global/bin/slsart invoke -s ../test/artillery/performance-test-user.yml --stage $STAGE_NAME
-        ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+        ~/.npm-global/bin/slsart deploy --region $AWS_REGION
+        ~/.npm-global/bin/slsart invoke -s ../test/artillery/performance-test-user.yml --region $AWS_REGION
+        ~/.npm-global/bin/slsart remove --region $AWS_REGION
     #I wasn't sure if I was supposed to leave the results.json blank or not, it looks like there was nothing in it
 
 
