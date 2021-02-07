@@ -12,7 +12,13 @@ var User = () => {
   useEffect(() => {
     fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}?`)
       .then(response => response.json())
-      .then(data => setUser(data))
+      .then(data => {
+        var updatedData = {};
+
+        if (Object.keys(data).length > 0) Object.keys(data).forEach(key => updatedData[key.toLowerCase()] = data[key]);
+        
+        setUser(updatedData);
+      })
       .catch((error) => console.error(error))
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
