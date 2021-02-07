@@ -4,11 +4,11 @@ import { JsonToTable } from "react-json-to-table";
 
 function TasksReport() {
     const [jsonReport, setJsonReport] = useState('');
-    const jsonUrl = "https://luca-artillery-report.s3-us-west-2.amazonaws.com/report__for_30req.json";
-    const proxy  = 'https://cors-anywhere.herokuapp.com/';
+    const jsonUrl = "https://nate-temp-bucket.s3-us-west-2.amazonaws.com/report_users_user_id_tasks_task_id.json";
+   // const proxy  = 'https://cors-anywhere.herokuapp.com/'; proxy +
 
     const grabReport = async () => {
-        const response = await fetch(proxy +jsonUrl)
+        const response = await fetch(jsonUrl)
         const json = await response.json();
         setJsonReport(json);
     }
