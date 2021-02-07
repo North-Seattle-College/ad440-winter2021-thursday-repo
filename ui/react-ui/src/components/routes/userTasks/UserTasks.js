@@ -18,7 +18,7 @@ var UserTasks = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-console.log('hgfhgfhgf', userTasks)
+
   var tasks;
 
   if (userTasks[0] === 'loading') tasks = <Container>...loading</Container>;
