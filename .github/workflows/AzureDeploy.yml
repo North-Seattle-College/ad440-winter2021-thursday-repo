@@ -63,6 +63,6 @@ jobs:
       - name: Upload To Azure Blob Storage
         uses: bacongobbler/azure-blob-storage-upload@v1.0.0
         with:
-          source_dir: build #gatsby build generates this file after build
+          source_dir: ui/react-ui/build #gatsby build generates this file after build
           container_name: $web
           connection_string: ${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}
