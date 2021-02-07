@@ -11,14 +11,14 @@ var UserTasks = () => {
   useEffect(() => {
     setUserTasks(['loading']);
 
-    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users`)
+    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}/tasks?`)
     .then(response => response.json())
     .then(data => setUserTasks(data))
     .catch((error) => console.error(error))
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+console.log('hgfhgfhgf', userTasks)
   var tasks;
 
   if (userTasks[0] === 'loading') tasks = <Container>...loading</Container>;
