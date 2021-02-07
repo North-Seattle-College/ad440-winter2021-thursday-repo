@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - development
-
 env:
   AZURE_WEBAPP_NAME: thursdayReactUIApp 
   AZURE_WEBAPP_PACKAGE_PATH: ui/react-ui
