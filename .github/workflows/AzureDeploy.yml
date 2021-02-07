@@ -1,37 +1,68 @@
-name: Deploy Web App to the Azure Storage
+# name: Deploy Web App to the Azure Storage
+# on:
+#   push:
+#     branches:
+#       - development
+# env:
+#   AZURE_WEBAPP_NAME: nsc-webapp-dev-usw2-thursday # set this to your application's name
+#   AZURE_WEBAPP_PACKAGE_PATH: ui/react-ui # set this to the path to your web app project
+#   NODE_VERSION: '10.x' # set this to the node version to use
+#              # set this to the node version to use
+# jobs:
+#   build-and-deploy:
+#     name: Build and Deploy
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@main
+#       - name: Use Node.js
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: ${{ env.NODE_VERSION }}
+#       - name: npm install, build
+#         run: |
+#           # Build the project, then deploy to Azure Web App.
+#           # cd ui/react-ui
+#           npm install
+#           npm run build
+#         working-directory: ui/react-ui
+
+#       # - uses: azure/actions/login@v1
+#       #   with:
+#       #     creds: ${{secrets.AZURE_CREDENTIALS}}
+#       - name: 'Deploy to Azure WebApp'
+#         uses: azure/webapps-deploy@v2
+#         with: 
+#           app-name: ${{env.AZURE_WEBAPP_NAME}}
+#           publish-profile: ${{secrets.AZURE_WEBAPP_PUBLISH_PROFILE}}
+#           package: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+
+
+name: Build and deploy the app to Azure Blob Storage
+
 on:
   push:
     branches:
       - development
-env:
-  AZURE_WEBAPP_NAME: nsc-webapp-dev-usw2-thursday # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: ui/react-ui # set this to the path to your web app project
-  NODE_VERSION: '10.x' # set this to the node version to use
-             # set this to the node version to use
+
 jobs:
   build-and-deploy:
-    name: Build and Deploy
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@main
-      - name: Use Node.js
+      - name: Set up Node.js version
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: npm install, build
+
+      - name: npm install and build
         run: |
-          # Build the project, then deploy to Azure Web App.
-          # cd ui/react-ui
+          cd ui/react-ui
           npm install
           npm run build
-        working-directory: ui/react-ui
-
-      # - uses: azure/actions/login@v1
-      #   with:
-      #     creds: ${{secrets.AZURE_CREDENTIALS}}
-      - name: 'Deploy to Azure WebApp'
-        uses: azure/webapps-deploy@v2
-        with: 
-          app-name: ${{env.AZURE_WEBAPP_NAME}}
-          publish-profile: ${{secrets.AZURE_WEBAPP_PUBLISH_PROFILE}}
-          package: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+      - name: Upload To Azure Blob Storage
+        uses: bacongobbler/azure-blob-storage-upload@v1.0.0
+        with:
+          source_dir: build #gatsby build generates this file after build
+          container_name: $web
+          connection_string: ${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}
