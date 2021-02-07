@@ -36,7 +36,7 @@ on:
       - development
 env:
   AZURE_WEBAPP_NAME: nsc-webapp-dev-usw2-thursday # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: ui/react-ui/build # set this to the path to your web app project
+  AZURE_WEBAPP_PACKAGE_PATH: ui/react-ui # set this to the path to your web app project
   NODE_VERSION: '10.x' # set this to the node version to use
              # set this to the node version to use
 jobs:
@@ -54,7 +54,7 @@ jobs:
           # Build the project, then deploy to Azure Web App.
           cd ui/react-ui
           npm install
-          npm run build
+          # npm run build
         # working-directory: ui/react-ui
 
       # - uses: azure/actions/login@v1
