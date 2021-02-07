@@ -21,7 +21,7 @@ jobs:
       - name: npm install, build
         run: |
           # Build the project, then deploy to Azure Web App.
-          cd ui/react-ui
+          # cd ui/react-ui
           npm install
           npm run build
         working-directory: './ui/react-ui'
