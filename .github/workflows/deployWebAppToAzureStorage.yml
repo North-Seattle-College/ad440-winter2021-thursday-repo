@@ -36,7 +36,7 @@ on:
       - development
 env:
   AZURE_WEBAPP_NAME: nsc-webapp-dev-usw2-thursday # set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: ui/react-ui # set this to the path to your web app project
+  AZURE_WEBAPP_PACKAGE_PATH: src # set this to the path to your web app project
   NODE_VERSION: '10.x' # set this to the node version to use
              # set this to the node version to use
 jobs:
