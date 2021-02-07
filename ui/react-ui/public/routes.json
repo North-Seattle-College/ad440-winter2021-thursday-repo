@@ -1,7 +1,12 @@
 {
   "routes": [
     {
-      "route": "/users"
+      "route": "/users",
+      "allowedRoles": []
+    },
+    {
+      "route": "/users/{userId:int?}",
+      "allowedRoles": ["administrator", "customers_contoso"]
     }
   ],
   "platformErrorOverrides": [
