@@ -114,7 +114,6 @@ test/artillery/report.json
 vscode
 .DS_Store
 DS_Store
-/DS_Store
 
 # ignore .vscode
 .vscode/
