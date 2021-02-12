@@ -11,8 +11,10 @@ param(
         [string] [Parameter(Mandatory=$true)] $resourceGroupName,
         [string] [Parameter(Mandatory=$true)] $serverName,
         [string] [Parameter(Mandatory=$true)] $administratorLogin,
-        [SecureString] [Parameter(Mandatory=$true)] $administratorLoginPassword
+        [string] [Parameter(Mandatory=$true)] $administratorLoginPassword
 )
+
+[securestring] $administratorLoginPassword = ConvertTo-SecureString $administratorLoginPassword -AsPlainText -Force
 
 # Log in and set the SubscriptionId in which to create these objects
 Import-Module ..\Login
