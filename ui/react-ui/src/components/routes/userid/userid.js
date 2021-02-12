@@ -10,7 +10,7 @@ var User = () => {
   var {userId} = useParams();
 
   useEffect(() => {
-    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}?`)
+    fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}?`)
       .then(response => response.json())
       .then(data => {
         var updatedData = {};

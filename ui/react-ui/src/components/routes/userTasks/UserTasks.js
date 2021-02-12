@@ -11,7 +11,7 @@ var UserTasks = () => {
   useEffect(() => {
     setUserTasks(['loading']);
 
-    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}/tasks?`)
+    fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}/tasks?`)
     .then(response => response.json())
     .then(data => setUserTasks(data))
     .catch((error) => console.error(error))
