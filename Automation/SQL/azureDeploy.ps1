@@ -13,7 +13,8 @@ param(
     [string] [Parameter(Mandatory=$true)] $administratorLogin,
     [string] [Parameter(Mandatory=$true)] $administratorLoginPassword,
     # Azure SQL db parameters
-    
+    [string] [Parameter(Mandatory=$false)] $storageAccountName,
+    [string] [Parameter(Mandatory=$false)] $sqlDBName,    
     # Tag parameters
     [string] [Parameter(Mandatory=$true)] $createdBy,
     [string] [Parameter(Mandatory=$true)] $creatorsEmail              
@@ -42,7 +43,9 @@ if (!$resourceGroupExists) {
 Write-host "Creating primary server..."
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
 -TemplateFile $pathToAzSqlTemplate -administratorLogin $administratorLogin `
--administratorLoginPassword $administratorLoginPassword -serverName $serverName -location $location -createdBy $createdBy -creatorsEmail $creatorsEmail
+-administratorLoginPassword $administratorLoginPassword -serverName $serverName `
+-sqlDBName $sqlDBName `
+-location $location -createdBy $createdBy -creatorsEmail $creatorsEmail
 
 
 # Clear deployment 

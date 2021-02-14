@@ -35,6 +35,20 @@
                 "description": "Allow Azure services to access server."
             }
         },
+        "storageAccountName": {
+            "defaultValue": "[concat('nssqlstorage','thursday')]",
+            "type": "String",
+            "metadata": {
+                "description": "The name of the storage account."
+            }
+        },
+        "sqlDBName": {
+            "type": "string",
+            "defaultValue": "[concat('nsc-sqldb-dev-', resourceGroup().location, '-thursday')]",
+            "metadata": {
+                "description": "The name of the SQL Database."
+            }
+        },
         "createdBy": {
             "type": "string",
             "metadata": {
@@ -72,19 +86,46 @@
                 "publicNetworkAccess": "Enabled"
             }
         },
-          {
-              "type": "Microsoft.Sql/servers/auditingPolicies",
-              "apiVersion": "2014-04-01",
-              "name": "[concat(parameters('serverName'), '/Default')]",
-              "location": "[parameters('location')]",
-              "dependsOn": [
-                  "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
-              ],
-              "tags": "[parameters('resourceTags')]",
-              "properties": {
-                  "auditingState": "Disabled"
-              }
-          },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('serverName'), '/', parameters('sqlDBName'))]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard"
+            },
+            "tags": "[parameters('resourceTags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "tags": "[parameters('resourceTags')]",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Sql/servers/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('serverName'), '/Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "tags": "[parameters('resourceTags')]",
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
           {
               "type": "Microsoft.Sql/servers/firewallRules",
               "condition": "[parameters('allowAzureIPs')]",
