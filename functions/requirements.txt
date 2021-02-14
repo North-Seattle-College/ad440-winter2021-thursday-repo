@@ -4,5 +4,3 @@
 
 azure-functions
 pyodbc
-
-

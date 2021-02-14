@@ -4,6 +4,7 @@ import logging
 import os
 import azure.functions as func
 
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
         'Python HTTP trigger for /users function is processing a request.')
@@ -22,7 +23,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.critical("Failed to connect to DB: " + e.args[0])
         logging.debug("Error: " + e.args[1])
         return func.HttpResponse(status_code=500)
-        
+
     logging.debug("Connection to DB successful!")
 
     try:
