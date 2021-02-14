@@ -2,7 +2,7 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "functionName": {
+        "functionAppName": {
             "type": "string"
         },
         "storageAccountName": {
@@ -18,19 +18,19 @@
             "type": "string" 
         }
     },
-    "variables": {},
+    "variables": {
+        "functionAppName": "[parameters('functionAppName')]",
+        "appServicePlanName": "[parameters('appServicePlanName')]",
+        "appInsightName": "[parameters('appInsightName')]",
+        "storageAccountName": "[parameters('storageAccountName')]",
+        "location":"[parameters('location')]"
+    },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "name": "[parameters('storageAccountName')]",
-            "location": "[parameters('location')]",
-            "tags": {
-                "NCSYear": "2021",
-                "NSCCohort": "Thursday",
-                "Owner": "Jenny Kunte",
-                "OwnerEmail": "Jenny.Kunte@Seattlecolleges.edu"
-            },
+            "name": "[variables('storageAccountName')]",
+            "location": "[variables('location')]",
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -58,30 +58,22 @@
         },
         {
             "type": "microsoft.insights/components",
-            "apiVersion": "2018-05-01-preview",
-            "name": "[parameters('appInsightName')]",
-            "location": "[parameters('location')]",
+            "apiVersion": "2020-02-02-preview",
+            "name": "[variables('appInsightName')]",
+            "location": "[variables('location')]", 
             "tags": {
-                "NCSYear": "2021",
-                "NSCCohort": "Thursday",
-                "Owner": "Jenny Kunte",
-                "OwnerEmail": "Jenny.Kunte@Seattlecolleges.edu"
-            }, 
-            "kind": "web",
+                "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('appInsightName')))]": "Resource"
+              },
             "properties": {
-                "Application_Type": "web",
-                "Flow_Type": "Redfield",
-                "Request_Source": "IbizaWebAppExtensionCreate",
-                "RetentionInDays": 90,
-                "publicNetworkAccessForIngestion": "Enabled",
-                "publicNetworkAccessForQuery": "Enabled"
-            }
+                "ApplicationId": "[variables('appInsightName')]",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+              }
         },
         {
             "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2018-02-01",
-            "name": "[parameters('appServicePlanName')]",
-            "location": "[parameters('location')]",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('appServicePlanName')]",
+            "location": "[variables('location')]",
             "tags": {
                 "NCSYear": "2021",
                 "NSCCohort": "Thursday",
@@ -109,19 +101,13 @@
         },
         {
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2018-11-01",
-            "name": "[parameters('functionName')]",
-            "location": "[parameters('location')]",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('functionAppName')]",
+            "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ],
-            "tags": {
-                "NCSYear": "2021",
-                "NSCCohort": "Thursday",
-                "Owner": "Jenny Kunte",
-                "OwnerEmail": "Jenny.Kunte@Seattlecolleges.edu"
-                
-            },
             "kind": "functionapp,linux",
             "identity": {
                 "principalId": null,
@@ -129,121 +115,40 @@
                 "type": "SystemAssigned"
             },
             "properties": {
-                "enabled": true,
-                "hostNameSslStates": [
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "siteConfig": {
+                  "appSettings": [
                     {
-                        "name": "[concat(parameters('functionName'), '.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Standard"
+                      "name": "AzureWebJobsStorage",
+                      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
                     },
                     {
-                        "name": "[concat(parameters('functionName'), '.scm.azurewebsites.net')]",
-                        "sslState": "Disabled",
-                        "hostType": "Repository"
-                    }
-                ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
-                "reserved": true,
-                "isXenon": false,
-                "hyperV": false,
-                "siteConfig": {},
-                "scmSiteAlsoStopped": false,
-                "clientAffinityEnabled": false,
-                "clientCertEnabled": false,
-                "hostNamesDisabled": false,
-                "containerSize": 1536,
-                "dailyMemoryTimeQuota": 0,
-                "httpsOnly": false,
-                "redundancyMode": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('functionName'), '/web')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('functionName'))]"
-            ],
-            "tags": {
-                "NCSYear": "2021",
-                "NSCCohort": "Thursday",
-                "Owner": "Jenny Kunte",
-                "OwnerEmail": "Jenny.Kunte@Seattlecolleges.edu"
-            },
-            "properties": {
-                "numberOfWorkers": 1,
-                "defaultDocuments": [
-                    "Default.htm",
-                    "Default.html",
-                    "Default.asp",
-                    "index.htm",
-                    "index.html",
-                    "iisstart.htm",
-                    "default.aspx",
-                    "index.php"
-                ],
-                "netFrameworkVersion": "v4.0",
-                "linuxFxVersion": "PYTHON|3.8",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
-                "remoteDebuggingVersion": "VS2019",
-                "httpLoggingEnabled": false,
-                "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$nsc-fun-dev-usw2-tsmtestfunction",
-                "azureStorageAccounts": {},
-                "scmType": "None",
-                "use32BitWorkerProcess": false,
-                "webSocketsEnabled": false,
-                "alwaysOn": false,
-                "managedPipelineMode": "Integrated",
-                "virtualNCSYears": [
+                      "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+                    },
                     {
-                        "virtualPath": "/",
-                        "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": false
-                    }
-                ],
-                "loadBalancing": "LeastRequests",
-                "experiments": {
-                    "rampUpRules": []
-                },
-                "autoHealEnabled": false,
-                "cors": {
-                    "allowedOrigins": [
-                        "https://functions.azure.com",
-                        "https://functions-staging.azure.com",
-                        "https://functions-next.azure.com"
-                    ],
-                    "supportCredentials": false
-                },
-                "localMySqlEnabled": false,
-                "managedServiceIdentityId": 6652,
-                "ipSecurityRestrictions": [
+                      "name": "WEBSITE_CONTENTSHARE",
+                      "value": "[toLower(variables('functionAppName'))]"
+                    },
                     {
-                        "ipAddress": "Any",
-                        "action": "Allow",
-                        "priority": 1,
-                        "name": "Allow all",
-                        "description": "Allow all access"
-                    }
-                ],
-                "scmIpSecurityRestrictions": [
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~2"
+                    },
                     {
-                        "ipAddress": "Any",
-                        "action": "Allow",
-                        "priority": 1,
-                        "name": "Allow all",
-                        "description": "Allow all access"
+                      "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                      "value": "~10"
+                    },
+                    {
+                      "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                      "value": "[reference(resourceId('microsoft.insights/components', variables('appInsightName')), '2020-02-02-preview').InstrumentationKey]"
+                    },
+                    {
+                      "name": "FUNCTIONS_WORKER_RUNTIME",
+                      "value": "python"
                     }
-                ],
-                "scmIpSecurityRestrictionsUseMain": false,
-                "http20Enabled": false,
-                "minTlsVersion": "1.2",
-                "ftpsState": "AllAllowed",
-                "reservedInstanceCount": 0
-            }
+                  ]
+                }
+              }
         }
-    ]
+       ]
 }

@@ -1,46 +1,46 @@
 #parameters required to run the script.
 param(
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $subscriptionId,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $tenantId,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $servicePrincipalId,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [String]
     $servicePrincipalPassword,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $resourceGroupName,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
-    $functionName,
+    $functionAppName,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $storageAccountName,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $appServicePlanName,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $appInsightName,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $location,
 
-    [Parameter(Mandatory=$True)]
+    [Parameter(Mandatory = $True)]
     [string]
     $templateFilePath
 )
@@ -54,10 +54,10 @@ Connect-AzAccount -Credential $credentials -ServicePrincipal -Tenant $tenantId -
 New-AzResourceGroup -Name $resourceGroupName -Location $location
 
 New-AzResourceGroupDeployment `
--ResourceGroupName $resourceGroupName `
--TemplateFile  $templateFilePath `
--FunctionName $functionName `
--StorageAccountName $storageAccountName `
--AppServicePlanName $appServicePlanName `
--AppInsightName $appInsightName `
--Location $location
+    -ResourceGroupName $resourceGroupName `
+    -TemplateFile  $templateFilePath `
+    -FunctionAppName $functionAppName `
+    -StorageAccountName $storageAccountName `
+    -AppServicePlanName $appServicePlanName `
+    -AppInsightName $appInsightName `
+    -Location $location
