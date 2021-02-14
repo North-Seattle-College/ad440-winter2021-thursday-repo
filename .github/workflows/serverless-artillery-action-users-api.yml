@@ -10,6 +10,7 @@ jobs:
 
   env:
     NPM_CONFIG_PREFIX: "~/.npm-global"
+    AWS_REGION: "us-west-2"
 
     steps:
     - name: Checkout
@@ -23,19 +24,14 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+        aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         aws-region: us-west-2
     - name: installing serverless-artillery
       run: |
         npm install -g serverless@1.38.0 serverless-artillery
     - name: deploying invoking and removing functions
       run: |
-        ~/.npm-global/bin/slsart deploy --region $AWS_REGION
-        ~/.npm-global/bin/slsart invoke -s ../test/artillery/performance-test-user.yml --region $AWS_REGION
-        ~/.npm-global/bin/slsart remove --region $AWS_REGION
-    #I wasn't sure if I was supposed to leave the results.json blank or not, it looks like there was nothing in it
-      env:
-        AWS_REGION: "us-west-2"
-
-
+        ~/.npm-global/bin/slsart deploy --region ${{env.AWS_REGION}}
+        ~/.npm-global/bin/slsart invoke -s ../test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME > ../../test/results/Artillery-test-users-user_id-tasks-Results.json
+        ~/.npm-global/bin/slsart remove --region ${{env.AWS_REGION}}
