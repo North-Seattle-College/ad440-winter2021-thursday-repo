@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "alertName": {
@@ -40,7 +40,7 @@
         "targetResourceGroup": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "nsc-functions-team1",
+            "defaultValue": "nsc-fun-dev-usw2-thursday",
             "metadata": {
                 "description": "Name of resource group for target function app"
             }
@@ -48,7 +48,7 @@
         "targetResourceId": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "nsc-functionsapp-team1",
+            "defaultValue": "nsc-fun-dev-usw2-thursday",
             "metadata": {
                 "description": "Resource ID of the resource emitting the metric that will be used for the comparison. For example /subscriptions/00000000-0000-0000-0000-0000-00000000/resourceGroups/ResourceGroupName/providers/Microsoft.compute/virtualMachines/VM_xyz"
             }
