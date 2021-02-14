@@ -99,12 +99,13 @@ dist
 
 # DynamoDB Local files
 .dynamodb/
-
+ 
+ 
 # TernJS port file
 .tern-port
 
-#VsCode Configs
-.vscode
+
+.idea
 
 #artillery report output
 test/artillery/report.json
