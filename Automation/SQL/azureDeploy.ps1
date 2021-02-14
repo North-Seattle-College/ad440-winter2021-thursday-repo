@@ -44,7 +44,7 @@ Write-host "Creating primary server..."
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
 -TemplateFile $pathToAzSqlTemplate -administratorLogin $administratorLogin `
 -administratorLoginPassword $administratorLoginPassword -serverName $serverName `
--sqlDBName $sqlDBName `
+-storageAccountName $storageAccountName -sqlDBName $sqlDBName `
 -location $location -createdBy $createdBy -creatorsEmail $creatorsEmail
 
 
