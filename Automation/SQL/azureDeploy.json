@@ -35,13 +35,6 @@
                 "description": "Allow Azure services to access server."
             }
         },
-        "storageAccountName": {
-            "defaultValue": "[concat('nssqlstorage','thursday')]",
-            "type": "String",
-            "metadata": {
-                "description": "The name of the storage account."
-            }
-        },
         "sqlDBName": {
             "type": "string",
             "defaultValue": "[concat('nsc-sqldb-dev-', resourceGroup().location, '-thursday')]",
@@ -99,19 +92,6 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
             ]
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[parameters('storageAccountName')]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "StorageV2",
-            "tags": "[parameters('resourceTags')]",
-            "properties": {}
         },
         {
             "type": "Microsoft.Sql/servers/auditingPolicies",

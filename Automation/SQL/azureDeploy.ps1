@@ -13,7 +13,6 @@ param(
     [string] [Parameter(Mandatory=$true)] $administratorLogin,
     [string] [Parameter(Mandatory=$true)] $administratorLoginPassword,
     # Azure SQL db parameters
-    [string] [Parameter(Mandatory=$false)] $storageAccountName,
     [string] [Parameter(Mandatory=$false)] $sqlDBName,    
     # Tag parameters
     [string] [Parameter(Mandatory=$true)] $createdBy,
@@ -40,12 +39,11 @@ if (!$resourceGroupExists) {
 }
 
 # Deploy template
-Write-host "Creating primary server..."
+Write-host "Creating primary server and db..."
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
 -TemplateFile $pathToAzSqlTemplate -administratorLogin $administratorLogin `
 -administratorLoginPassword $administratorLoginPassword -serverName $serverName `
--storageAccountName $storageAccountName -sqlDBName $sqlDBName `
--location $location -createdBy $createdBy -creatorsEmail $creatorsEmail
+-sqlDBName $sqlDBName -location $location -createdBy $createdBy -creatorsEmail $creatorsEmail
 
 
 # Clear deployment 
