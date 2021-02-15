@@ -6,7 +6,7 @@ on:
       - development
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './functions'   # relative to the root, where are you keeping the functions
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'functions'   # relative to the root, where are you keeping the functions
   PYTHON_VERSION: '3.8'                 # the version of python we are using
 
 jobs:
