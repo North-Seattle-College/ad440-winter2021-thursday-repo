@@ -6,6 +6,7 @@ import User from '../routes/userid/userid.js';
 import Users from '../routes/users/Users';
 import userIdReport from '../routes/reports/userIdReport/UserIdReport';
 import usersReport from '../routes/reports/usersReport/UserReport';
+import functionUserIdReport from '../routes/reports/functionReport/FunctionUserIdReport';
  
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
         <Route exact path='/users/:userId/tasks' component={UserTasks}/>
         <Route exact path='/reports/userId' component={userIdReport}/>
         <Route exact path='/reports/users' component={usersReport}/>
+        <Route exact path='/reports/functionUserIdReport' component={functionUserIdReport}/>
+        
       </Router>
     </div>
   );
