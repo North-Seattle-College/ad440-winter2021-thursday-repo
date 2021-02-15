@@ -20,7 +20,6 @@ steps:
     uses: actions/setup-node@v1
     with: 
       node-version: '14'
-      #according to node js website, version 15 was just released, not sure if this can be used too
       check-latest: true
 
   - name: Configure AWS credentials
