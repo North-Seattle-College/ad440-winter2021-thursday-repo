@@ -42,13 +42,17 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return new_user_id_http_response
 
         else:
-            logging.warn(f"Request with method {method} has been recieved, but that is not allowed for this endpoint")
+            logging.warn(f"""
+            Request with method {method} has been
+            recieved, but that is not allowed for this endpoint
+            """)
+
             return func.HttpResponse(status_code=405)
 
-    #displays erros encountered when API methods were called
+    # displays erros encountered when API methods were called
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500)
-    finally: 
+    finally:
         conn.close()
         logging.debug('Connection to DB closed')
 
@@ -64,10 +68,14 @@ def get_db_connection():
     driver = '{ODBC Driver 17 for SQL Server}'
 
     # Define the connection string
-    connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(
+    connection_string = """
+      Driver={};Server={};Database={};Uid={};
+      Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;
+    """.format(
         driver, server, database, username, password)
 
     return pyodbc.connect(connection_string)
+
 
 def get_users(conn):
     with conn.cursor() as cursor:
@@ -90,13 +98,18 @@ def get_users(conn):
             users.append(dict(zip(users_columns, user)))
 
         # users = dict(zip(columns, rows))
-        logging.debug(
-            "User data retrieved and processed, returning information from get_users function")
+        logging.debug("""
+          User data retrieved and processed,
+          returning information from get_users function
+        """)
         return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
+
 
 def add_user(conn, user_req_body):
     # First we want to ensure that the request has all the necessary fields
-    logging.debug("Testing the add new user request body for necessary fields...")
+    logging.debug("""
+      Testing the add new user request body for necessary fields...
+    """)
     try:
         assert "firstName" in user_req_body, "New user request body did not contain field: 'firstName'"
         assert "lastName" in user_req_body, "New user request body did not contain field: 'lastName'"
@@ -104,7 +117,7 @@ def add_user(conn, user_req_body):
     except AssertionError as user_req_body_content_error:
         logging.error("New user request body did not contain the necessary fields!")
         return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
-    
+
     logging.debug("New user request body contains all the necessary fields!")
     with conn.cursor() as cursor:
         # Unpack user data
@@ -127,12 +140,12 @@ def add_user(conn, user_req_body):
 
         logging.debug(
             "Using connection cursor to execute query (add a new user and get id)")
-        
+
         count = cursor.execute(add_user_query, user_params)
 
         # Get the user id from cursor
         user_id = cursor.fetchval()
-        
+
         logging.debug(
             "User added and new user id retrieved, returning information from add_user function")
         return func.HttpResponse(json.dumps({"userId": user_id}), status_code=200, mimetype="application/json")
