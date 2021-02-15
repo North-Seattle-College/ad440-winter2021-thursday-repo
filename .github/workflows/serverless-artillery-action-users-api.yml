@@ -1,8 +1,8 @@
 name: sls art performance test
 
-  on:
-    push:
-      -development 
+on:
+  push:
+    -development 
 
 jobs:
   slsart-perf:
