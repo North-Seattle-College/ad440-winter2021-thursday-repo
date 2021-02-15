@@ -5,25 +5,46 @@ import Container from 'react-bootstrap/esm/Container';
 import BackButton from '../../bootstrapBackButton/BootstrapBackButton.js';
 
 var User = () => {
-  const [user, setUser] = useState([]);
+  let [user, setUser] = useState(['loading']);
 
   var {userId} = useParams();
 
   useEffect(() => {
-    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}?`)
-      .then(response => response.json())
-      .then(data => setUser(data))
-      .catch((error) => console.error(error))
+    setUser('loading');
+
+    fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}?`)
+      .then((response) => {
+        if(response.ok) {
+          response = response.json();
+        }
+        return response
+      })
+      .then((data) => {
+        setUser([data]);
+      })
+      .catch((error) => {
+        console.error(error)
+      });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
+  let userTable;
+
+  if (user[0] === 'loading') userTable = <Container>...loading</Container>;
+  else {
+    if (user[0].userId) {
+      userTable = <BootstrapTable heatherItems={Object.keys(user[0])} rows={user} />;
+    }
+  }
+
   return (
     <>
       <BackButton />
-      <Container className='user-tasks-container'>
-          <h3> {user.firstname} {user.lastname} info</h3>
-          {user.userid ? <BootstrapTable heatherItems={Object.keys(user)} rows={[user]} /> : <Container>...loading</Container>}
+      <Container>
+        <h3> {user.firstname} {user.lastname} info</h3>
+        {userTable}
       </Container>
     </>
   )
