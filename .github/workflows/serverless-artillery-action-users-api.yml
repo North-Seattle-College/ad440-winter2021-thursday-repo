@@ -35,13 +35,20 @@ jobs:
       - name: installing serverless-artillery
         run: |
           npm install -g serverless@1.38.0 serverless-artillery
+      
+      - name: Sleep
+        run: sleep 10s
 
       # ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION > -p ../../test/results/results.json --region $AWS_SLSART_REGION
       # ~/.npm-global/bin/slsart invoke -o ../../test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region us-west-2
 
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+
       - name: deploying invoking and removing functions
         id: test
-        run: |
-          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION > -p ../../test/results/results.json --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
+        run: --output serverlessArtilleryTest_usersAPI_${{steps.date.outputs.date}}.json ./test/Serverless-Artillery/serverless-artillery-test-users-api.yaml
+
+      - name: Check Serverless Artillery Performance test file
+        run: ls -ltr serverlessArtilleryTest_usersAPI_${{steps.date.outputs.date}}.json
