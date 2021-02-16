@@ -10,6 +10,10 @@ jobs:
     name: slsart performance test
     runs-on: ubuntu-latest 
 
+    env:
+      NPM_CONFIG_PREFIX: "~/.npm-global"
+      AWS_SLSART_REGION: "us-west-2"
+      
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
@@ -42,4 +46,6 @@ jobs:
 
       - name: deploying invoking and removing functions
         run: |
-          slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage test/results
+          slsart deploy --region $AWS_SLSART_REGION
+          slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage test/results --region $AWS_SLSART_REGION
+          slsart remove --region $AWS_SLSART_REGION
