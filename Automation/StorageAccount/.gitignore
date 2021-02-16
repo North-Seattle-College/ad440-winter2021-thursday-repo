@@ -1,0 +1,6 @@
+*.log
+
+# Personal files
+IGNORE_params.txt
+Complete_template.json
+OLD_create_Azure_StorageAccount.ps1
