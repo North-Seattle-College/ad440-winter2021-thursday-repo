@@ -3,48 +3,56 @@ import {useParams} from "react-router-dom";
 import BootstrapTable from '../../bootstrapTable/BootstrapTable.js';
 import Container from 'react-bootstrap/esm/Container';
 import BackButton from '../../bootstrapBackButton/BootstrapBackButton.js';
+import PageTitle from '../../PageTitle/PageTitle.js'
+import {is404} from '../../../utils.js';
 
-var User = () => {
-  let [user, setUser] = useState(['loading']);
+const User = () => {
+  let state = [{
+    title: '...Loading', 
+    subtitle: ''
+  }];
 
-  var {userId} = useParams();
+  let [user, setUser] = useState(state);
+
+  let {userId} = useParams();
 
   useEffect(() => {
-    setUser('loading');
-
-    fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}?`)
-      .then((response) => {
-        if(response.ok) {
-          response = response.json();
-        }
-        return response
-      })
-      .then((data) => {
-        setUser([data]);
-      })
-      .catch((error) => {
-        console.error(error)
-      });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-
-  let userTable;
-
-  if (user[0] === 'loading') userTable = <Container>...loading</Container>;
-  else {
-    if (user[0].userId) {
-      userTable = <BootstrapTable heatherItems={Object.keys(user[0])} rows={user} />;
-    }
-  }
+    (async function getUser() {
+      const response = await fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}?`)
+      if(response.ok) {
+        const resJson = await response.clone().json();
+        setUser([
+          {
+          title: `User ${resJson.userId}`,
+          subtitle: `${resJson.firstName} ${resJson.lastName}`
+          },
+          response,
+          resJson
+        ])
+      } else {
+        setUser([
+          {
+          title: response.status,
+          subtitle: response.statusText
+          },
+          response
+        ])
+      }
+    })()
+    .catch((error) => {
+      console.error(error)
+    });
+  }, [userId]);
+  
 
   return (
     <>
       <BackButton />
+      <PageTitle title={user[0].title} subtitle={user[0].subtitle} />
       <Container>
-        <h3> {user.firstname} {user.lastname} info</h3>
-        {userTable}
+      {user.length > 2 
+        ? <BootstrapTable heatherItems={Object.keys(user[2])} rows={user} /> 
+        : <h3>User {userId} {user[0].subtitle}</h3>}
       </Container>
     </>
   )
