@@ -15,4 +15,6 @@ scenarios:
     flow:
       -
         get:
-          url: "/"
+          url: "/api/users/1"
+          json:
+            name: "name"
