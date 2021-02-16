@@ -48,5 +48,4 @@ jobs:
       - name: deploying invoking and removing functions
         run: |
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage test/results --region $AWS_SLSART_REGION
           ~/.npm-global/bin/slsart remove --region --stage $STAGE_NAME $AWS_SLSART_REGION
