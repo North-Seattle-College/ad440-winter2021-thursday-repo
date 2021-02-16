@@ -4,41 +4,20 @@ import BootstrapTable from '../../bootstrapTable/BootstrapTable.js';
 import Container from 'react-bootstrap/esm/Container';
 import BackButton from '../../bootstrapBackButton/BootstrapBackButton.js';
 import PageTitle from '../../PageTitle/PageTitle.js'
-import {is404} from '../../../utils.js';
+import {fetchSetTblState} from '../../../utils.js';
 
 const User = () => {
   let state = [{
     title: '...Loading', 
     subtitle: ''
   }];
-
+  
   let [user, setUser] = useState(state);
 
-  let {userId} = useParams();
+  const {userId} = useParams();
 
   useEffect(() => {
-    (async function getUser() {
-      const response = await fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}?`)
-      if(response.ok) {
-        const resJson = await response.clone().json();
-        setUser([
-          {
-          title: `User ${resJson.userId}`,
-          subtitle: `${resJson.firstName} ${resJson.lastName}`
-          },
-          response,
-          resJson
-        ])
-      } else {
-        setUser([
-          {
-          title: response.status,
-          subtitle: response.statusText
-          },
-          response
-        ])
-      }
-    })()
+    const response = fetchSetTblState('users', setUser, userId)
     .catch((error) => {
       console.error(error)
     });
@@ -51,8 +30,9 @@ const User = () => {
       <PageTitle title={user[0].title} subtitle={user[0].subtitle} />
       <Container>
       {user.length > 2 
-        ? <BootstrapTable heatherItems={Object.keys(user[2])} rows={user} /> 
-        : <h3>User {userId} {user[0].subtitle}</h3>}
+        ? <BootstrapTable heatherItems={Object.keys(user[2])} rows={[user[2]]} /> 
+        : <h3>User {userId} {user[0].subtitle}</h3>
+      }
       </Container>
     </>
   )
