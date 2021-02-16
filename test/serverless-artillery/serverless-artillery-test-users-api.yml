@@ -14,3 +14,6 @@ scenarios:
   - flow:
     - get:
         url: "/users"
+        # capture:
+        #   json: "$.users"
+        #   as: "users"
