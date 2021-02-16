@@ -18,11 +18,11 @@ config:
               - "5"
               - "6"
       
-    - duration: 200 #stress test
+    - duration: 200   #test
       arrivalRate: 1
       rampTo: 50
       variables:
-         - user:
+          - user:
               - "1"
               - "2"
               - "3"
@@ -30,8 +30,7 @@ config:
               - "6"
          
 scenarios:
-  -
-    flow:
+  - flow:
 
       - get:
           url: "/users/{{user}}"
