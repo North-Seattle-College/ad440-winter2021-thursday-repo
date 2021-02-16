@@ -38,7 +38,7 @@ jobs:
         id: load-test
         uses: kenju/github-actions-artillery@master
         with:
-          filepath: serverless-artillery-test-users-api.yml
+          filepath: ./serverless-artillery-test-users-api.yml
       # - name: deploying invoking and removing functions
       #   run: |
       #     ~/.npm-global/bin/slsart invoke -s test/serverless-artillery/serverless-artillery-test-users-api.yml
