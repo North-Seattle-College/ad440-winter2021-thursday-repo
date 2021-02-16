@@ -36,9 +36,6 @@ jobs:
         run: |
           npm install -g serverless@1.38.0 serverless-artillery
 
-      # ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION > -p ../../test/results/results.json --region $AWS_SLSART_REGION
-      # ~/.npm-global/bin/slsart invoke -o ../../test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region us-west-2
-
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
@@ -53,7 +50,7 @@ jobs:
         run: sleep 10s
 
       - name: Invoke functions
-        run: ~/.npm-global/bin/slsart invoke -o ../../test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION
+        run: ~/.npm-global/bin/slsart invoke -p ../../test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region us-west-2 > -p ../../testing/results/users-userid-tasks.json --region us-west-2
 
       - name: Sleep2
         run: sleep 10s
@@ -68,12 +65,4 @@ jobs:
           aws_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws_secret_access_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: "usersapitest"
-          source_dir: artilleryReport_${{steps.date.outputs.date}}.json
-
-
-      # - name: deploying invoking and removing functions
-      #   id: test
-      #   run: |
-      #     ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
-      #     ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION > -p ../../test/results/results.json --region $AWS_SLSART_REGION
-      #     ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
+          source_dir: ../../test/results/results.json
