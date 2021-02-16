@@ -42,4 +42,4 @@ jobs:
 
       - name: deploying invoking and removing functions
         run: |
-          ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage test/results
+          slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage test/results
