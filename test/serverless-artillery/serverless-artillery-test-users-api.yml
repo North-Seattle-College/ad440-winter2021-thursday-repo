@@ -15,10 +15,9 @@ config:
       rampTo: 60
       name: ramp up stress test
 scenarios:
-  -
-    flow:
-      -post:
-          url: "/"
-          capture:
-            json: "$.user"
-            as: "user"
+  - flow:
+    - get:
+      url: "/"
+      capture:
+        json: "$.user"
+        as: "users"
