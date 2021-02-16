@@ -50,3 +50,9 @@ jobs:
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
           ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml -o report.json --region $AWS_SLSART_REGION
           ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+
+      # - name: deploying invoking and removing functions
+      #   run: |
+      #     ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
+      #     ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME > /Users/farhadbahrehmand/Desktop/AD/myForked/ad440-winter2021-thursday-repo/test/results/results.json --region $AWS_SLSART_REGION
+      #     ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
