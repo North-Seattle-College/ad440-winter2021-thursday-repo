@@ -10,7 +10,7 @@ var User = () => {
   var {userId} = useParams();
 
   useEffect(() => {
-    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}?`)
+    fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}?`)
       .then(response => response.json())
       .then(data => {
         var updatedData = {};
@@ -29,11 +29,7 @@ var User = () => {
       <BackButton />
       <Container className='user-tasks-container'>
           <h3> {user.firstname} {user.lastname} info</h3>
-          {
-            user.userid ? 
-            <BootstrapTable heatherItems={Object.keys(user)} rows={[user]} /> : 
-            <Container>...loading</Container>
-          }
+          {user.userid ? <BootstrapTable heatherItems={Object.keys(user)} rows={[user]} /> : <Container>...loading</Container>}
       </Container>
     </>
   )
