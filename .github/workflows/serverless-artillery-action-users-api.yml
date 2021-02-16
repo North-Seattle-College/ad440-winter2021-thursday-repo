@@ -34,6 +34,11 @@ jobs:
       # - name: upload to s3
       #   run: bash scripts/pipeline/release.sh ${{secrets.AWS_S3_BUCKET}} '../test/serverless-artillery/serverless-artillery-test-users-api.yml' ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} serverless-artillery-test-users-api.json
 
-      - name: deploying invoking and removing functions
-        run: |
-          ~/.npm-global/bin/slsart invoke -s test/serverless-artillery/serverless-artillery-test-users-api.yml
+      - name: Load Test action step
+        id: load-test
+        uses: kenju/github-actions-artillery@master
+        with:
+          filepath: serverless-artillery-test-users-api.yml
+      # - name: deploying invoking and removing functions
+      #   run: |
+      #     ~/.npm-global/bin/slsart invoke -s test/serverless-artillery/serverless-artillery-test-users-api.yml
