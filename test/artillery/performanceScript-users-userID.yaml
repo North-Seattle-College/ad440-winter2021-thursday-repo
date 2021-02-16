@@ -19,9 +19,8 @@ config:
     
          
 scenarios:
-  - flow:
-
-      - get:
-          url: "/users/{{user}}"
+     - flow:
+        - get:
+            url: "/users/{{user}}"
 
      
