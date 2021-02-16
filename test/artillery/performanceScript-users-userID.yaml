@@ -21,6 +21,6 @@ config:
 scenarios:
      - flow:
         - get:
-            url: "/users/{{user}}"
+             url: "/users/{{user}}"
 
      
