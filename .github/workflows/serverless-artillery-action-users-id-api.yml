@@ -1,0 +1,48 @@
+name:Performance-tEST serverless-artillery-action-users-id-api
+
+on:
+  push:
+    branches:
+      - development
+      - feature/GitHub-action-for-serverless-artillery
+jobs:
+  
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+       uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+        check-latest: true
+        
+  
+    - name: serverless deploy
+      uses: serverless/github-action@feature/GitHub-action-for-serverless-artillery
+      with:
+        args: deploy
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+    - name: Install serverless and serverless-artillery
+      run: |
+        npm install -g serverless@1.38.0 serverless-artillery
+
+    - name: Deploy functions
+      run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region=us-west-2
+    
+    - name: invoke functions
+      run:  ~/.npm-global/bin/slsart invoke -s ../../test/serverless-artillery/serverless-artillery-test-users-id-api.yaml --stage $STAGE_NAME > ../../test/results/serverless-artillery-test-users-id-api-Results.json
+    
+    - name: remove functions
+      run:  ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+
+      
