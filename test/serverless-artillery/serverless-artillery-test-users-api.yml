@@ -12,6 +12,7 @@ config:
 
 scenarios:
   - flow:
+    - function: "getUsers"
     - get:
         url: "/users"
         # capture:
