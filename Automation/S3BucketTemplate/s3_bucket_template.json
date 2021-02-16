@@ -5,7 +5,7 @@
             "Type": "AWS::S3::Bucket",
             "Properties": {
                 "AccessControl": "PublicRead",
-		        "BucketName": "EnterBucketName",
+		        "BucketName": "enterbucketname",
 		        "WebsiteConfiguration": {
                     "IndexDocument": "index.html",
                     "ErrorDocument": "error.html"
