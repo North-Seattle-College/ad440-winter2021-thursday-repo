@@ -8,9 +8,9 @@ config:
   target: "http://nsc.functionsapp-team1.azurewebsites.net/api/"
   phases:
     
-     -duration: 10    #warmup
-      arrivalRate: 2
-      variables:
+     - duration: 50 #warmup
+       arrivalRate: 5
+       variables:
          - user:
               - "1"
               - "2"
@@ -18,9 +18,9 @@ config:
               - "5"
               - "6"
       
-     -duration: 200   #test
+    - duration: 200 #stress test
       arrivalRate: 1
-      rampTo: 10
+      rampTo: 50
       variables:
          - user:
               - "1"
@@ -28,13 +28,7 @@ config:
               - "3"
               - "5"
               - "6"
-              
-         - userName:
-              - "Jorden"
-              - "Aidan"
-              - "Macaulay"
-              - "Leroy"
-              - "Naomi"
+         
 scenarios:
   -
     flow:
@@ -42,7 +36,4 @@ scenarios:
       - get:
           url: "/users/{{user}}"
 
-          #      - update:
-          # url: "/users/{{user}}"
-          # json:
-          #    firstname: "{{userName}}"
+     

@@ -1,4 +1,4 @@
-name: Performance-Test-Users-UserID
+name: Performance-Test Artillery UserId Tasks
 
 on:  
   push:
@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
+      STAGE_NAME: merge-perf-test
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -33,16 +34,9 @@ jobs:
       # - currently this just runs the defaults
       # examples for future:
       # - run: cp ./slsart/script.yml ./
-      - name: Editing serverless yml
-        run: |
-          ~/.npm-global/bin/slsart configure
-          npm install yaml
-          node ./serverless/serverlessYamlEditor.js
-          
+      # - run: cp ./slsart/serverless.yml ./
       - name: Deploy, invoke, remove functions
         run: |
-          ~/.npm-global/bin/slsart deploy --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart invoke -p test/artillery/performanceScript-users-userID.yaml --region $AWS_SLSART_REGION  > test/results/performanceResults-users-userID.json
-          ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
-        env:
-          AWS_SLSART_REGION: us-west-2  
+          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region=us-west-2
+          ~/.npm-global/bin/slsart invoke -s ../../test/artillery/Artillery-test-users-user_id-tasks.yaml --stage $STAGE_NAME > ../../test/results/Artillery-test-users-user_id-tasks-Results.json
+          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
