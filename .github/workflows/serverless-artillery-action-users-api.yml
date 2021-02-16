@@ -13,7 +13,8 @@ jobs:
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
       AWS_SLSART_REGION: "us-west-2"
-      
+      STAGE_NAME: test-users-api
+
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
