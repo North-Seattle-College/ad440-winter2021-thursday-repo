@@ -39,20 +39,8 @@ jobs:
       # - name: upload to s3
       #   run: bash scripts/pipeline/release.sh ${{secrets.AWS_S3_BUCKET}} '../test/serverless-artillery/serverless-artillery-test-users-api.yml' ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} serverless-artillery-test-users-api.json
 
-      # - name: Load Test action step
-      #   id: load-test
-      #   uses: kenju/github-actions-artillery@master
-      #   with:
-      #     filepath: test/serverless-artillery/serverless-artillery-test-users-api.yml
-
-      # - name: deploying invoking and removing functions
-      #   run: |
-      #     ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
-      #     ~/.npm-global/bin/slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-api.yml --out /Users/farhadbahrehmand/Desktop/AD/myForked/ad440-winter2021-thursday-repo/test/results/report.json --region $AWS_SLSART_REGION
-      #     ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
-
       - name: deploying invoking and removing functions
         run: |
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart invoke -s test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME > rr.json --region $AWS_SLSART_REGION
+          ~/.npm-global/bin/slsart invoke --path test/serverless-artillery/serverless-artillery-test-users-api.yml rr.json --region $AWS_SLSART_REGION
           ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
