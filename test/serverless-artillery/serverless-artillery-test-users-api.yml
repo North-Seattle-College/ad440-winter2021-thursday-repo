@@ -5,11 +5,11 @@ config:
   phases:
     - duration: 5
       arrivalRate: 2
+      name: "users api test"
 
 scenarios:
   - flow:
     - get:
         url: "/users"
-        capture:
-          json: "$.users"
-          as: "users"
+        json:
+        afterResponse: "logResponse"
