@@ -48,7 +48,7 @@ jobs:
 
       - name: deploying invoking and removing functions
         id: test
-        run: --output serverlessArtilleryTest_usersAPI_${{steps.date.outputs.date}}.json ./test/Serverless-Artillery/serverless-artillery-test-users-api.yaml
+        run: ~/.npm-global/bin/slsart --output serverlessArtilleryTest_usersAPI_${{steps.date.outputs.date}}.json ./test/Serverless-Artillery/serverless-artillery-test-users-api.yaml
 
       - name: Check Serverless Artillery Performance test file
         run: ls -ltr serverlessArtilleryTest_usersAPI_${{steps.date.outputs.date}}.json
