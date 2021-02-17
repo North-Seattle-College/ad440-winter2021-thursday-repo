@@ -20,10 +20,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn = get_db_connection()
     except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
         logging.critical("Failed to connect to DB: " + e.args[0])
-        logging.debug("Error: " + e.args[1])
+        logging.critical("Error: " + e.args[1])
         return func.HttpResponse(status_code=500)
         
     logging.debug("Connection to DB successful!")
+
+    create_users_table(conn)
 
     try:
         # Return results according to the method
@@ -34,7 +36,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return all_users_http_response
 
         elif method == "POST":
-            logging.debug("Attempting to add user...")
+            logging.critical("Attempting to add user...")
             user_req_body = req.get_json()
             new_user_id_http_response = add_user(conn, user_req_body)
             logging.debug("User added successfully!")
@@ -54,17 +56,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 def get_db_connection():
     # Database credentials.
-    server = os.environ["ENV_DATABASE_SERVER"]
-    database = os.environ["ENV_DATABASE_NAME"]
-    username = os.environ["ENV_DATABASE_USERNAME"]
-    password = os.environ["ENV_DATABASE_PASSWORD"]
+    # server = os.environ["ENV_DATABASE_SERVER"]
+    # database = os.environ["ENV_DATABASE_NAME"]
+    # username = os.environ["ENV_DATABASE_USERNAME"]
+    # password = os.environ["ENV_DATABASE_PASSWORD"]
+    # connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
+    
 
     # Define driver
     driver = '{ODBC Driver 17 for SQL Server}'
 
     # Define the connection string
-    connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(
-        driver, server, database, username, password)
+    # connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(
+    #     driver, server, database, username, password)
+    connection_string = "Driver={ODBC Driver 17 for SQL Server};Server=tcp:yaholl-test-server.database.windows.net,1433;Database=yaholl-test-db;Uid=yaholl-test-login;Pwd=Password123A$!@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
 
     return pyodbc.connect(connection_string)
 
@@ -93,6 +98,32 @@ def get_users(conn):
             "User data retrieved and processed, returning information from get_users function")
         return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
 
+def create_users_table(conn):
+    # First check to see if the table already exists
+    cursor = conn.cursor()
+
+    tables = "tables: "
+    for row in cursor.tables(tableType="TABLE"):
+        tables += row.table_name
+        tables += " "
+    logging.critical(tables)
+
+    if "users" not in tables:
+        cursor.execute('''
+            CREATE TABLE users (
+                    userId INTEGER PRIMARY KEY IDENTITY,
+                    firstName TEXT NOT NULL,
+                    lastName  TEXT NOT NULL,
+                    email TEXT NULL,            
+            );
+               ''')
+
+    columns = "users columns: "
+    for column in cursor.columns(table="users"):
+        columns += column.column_name
+    logging.critical(columns)                      
+        
+
 def add_user(conn, user_req_body):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
@@ -101,7 +132,7 @@ def add_user(conn, user_req_body):
         assert "lastName" in user_req_body, "New user request body did not contain field: 'lastName'"
         assert "email" in user_req_body, "New user request body did not contain field: 'email'"
     except AssertionError as user_req_body_content_error:
-        logging.error("New user request body did not contain the necessary fields!")
+        logging.critical("New user request body did not contain the necessary fields!")
         return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
     
     logging.debug("New user request body contains all the necessary fields!")
