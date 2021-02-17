@@ -68,7 +68,6 @@ jobs:
       
       - name: upload
         run: |
-          cd aws 
           node aws-upload.js
       
       # - name: upload the report on s3
