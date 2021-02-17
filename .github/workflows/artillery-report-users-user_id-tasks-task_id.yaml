@@ -18,10 +18,11 @@ jobs:
     - name: 'Checkout Repository GitHub Action' # checks out the repository
       uses: actions/checkout@v2
 
-    - name: check files
-      run: |
-        cd ./scripts
-        ls -a
+    # - name: check files
+    #   run: |
+    #     cd ./scripts
+    #     ls -a
+
     - name: Setup Node ${{ env.NODE_VERSION }} Environment # this is the script that sets up node
       uses: actions/setup-node@v2
       with:
@@ -53,8 +54,8 @@ jobs:
     #     ls -a
     #     cat artilleryReport_test.json
 
-    - name: check python version
-      run: python -v
+    # - name: check python version
+    #   run: python -v
 
     - name: Setup Python ${{ env.PYTHON_VERSION }} Environment # this is the script that sets up python
       uses: actions/setup-python@v1 
