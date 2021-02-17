@@ -54,23 +54,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn.close()
         logging.debug('Connection to DB closed')
 
-def init_redis():
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-    # REDIS_KEY = os.environ['ENV_REDIS_KEY'] TODO: use env variable
-    REDIS_KEY = 'DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA='
-
-    return redis.StrictRedis(host=REDIS_HOST,
-        port=6380, db=0, password=REDIS_KEY, ssl=True)
-
-def cache_users(r, users):
-
-    r.set("users", users)    
-    print("GET users: " + str(r.get("users")).decode("utf-8"))
-
-def get_users_cache(r):
-    return r.get("users")
-        
-
 def get_db_connection():
     # Database credentials. TODO: use env variable
     # connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
@@ -112,34 +95,7 @@ def get_users(conn, r):
             # Not sure this works - redis is not importing    
             cache_users(r, json.dumps(users))
             return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
-
-def create_users_table(conn):
-    # First check to see if the table already exists
-    cursor = conn.cursor()
-
-    tables = "tables: "
-    for row in cursor.tables(tableType="TABLE"):
-        tables += row.table_name
-        tables += " "
-    logging.debug(tables)
-
-    if "users" not in tables:
-        cursor.execute('''
-            CREATE TABLE users (
-                    userId INTEGER PRIMARY KEY IDENTITY,
-                    firstName TEXT NOT NULL,
-                    lastName  TEXT NOT NULL,
-                    email TEXT NULL,            
-            );
-               ''')
-
-    columns = "users columns: "
-    for column in cursor.columns(table="users"):
-        columns += column.column_name
-        columns += " "
-    logging.debug(columns)                      
         
-
 def add_user(conn, user_req_body):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
@@ -182,3 +138,45 @@ def add_user(conn, user_req_body):
         logging.debug(
             "User added and new user id retrieved, returning information from add_user function")
         return func.HttpResponse(json.dumps({"userId": user_id}), status_code=200, mimetype="application/json")
+
+def init_redis():
+    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    # REDIS_KEY = os.environ['ENV_REDIS_KEY'] TODO: use env variable
+    REDIS_KEY = 'DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA='
+
+    return redis.StrictRedis(host=REDIS_HOST,
+        port=6380, db=0, password=REDIS_KEY, ssl=True)
+
+def cache_users(r, users):
+
+    r.set("users", users)    
+    print("GET users: " + str(r.get("users")).decode("utf-8"))
+
+def get_users_cache(r):
+    return r.get("users")
+
+def create_users_table(conn):
+    cursor = conn.cursor()
+    
+    # First check to see if the table already exists
+    tables = "tables: "
+    for row in cursor.tables(tableType="TABLE"):
+        tables += row.table_name
+        tables += " "
+    logging.debug(tables)
+
+    if "users" not in tables:
+        cursor.execute('''
+            CREATE TABLE users (
+                    userId INTEGER PRIMARY KEY IDENTITY,
+                    firstName TEXT NOT NULL,
+                    lastName  TEXT NOT NULL,
+                    email TEXT NULL,            
+            );
+               ''')
+
+    columns = "users columns: "
+    for column in cursor.columns(table="users"):
+        columns += column.column_name
+        columns += " "
+    logging.debug(columns)        
