@@ -1,13 +1,12 @@
 name: Performance-Test serverless-artillery-action-users-id-api
-
 on:
   push:
     branches:
       - development
-      - feature/GitHub-action-for-serverless-artillery
+    
 jobs:
   slsart-perf:
-    name: Performance testing
+    name: Serverless Artillery Users API Test Performance testing
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
@@ -19,8 +18,8 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v2
 
-    - name: Upload file to bucket  
-    - uses: yergu/ad440-winter2021-thursday-repo@feature/GitHub-action-for-serverless-artillery
+    #- name: Upload file to bucket  
+    #- uses: yergu/ad440-winter2021-thursday-repo@feature/GitHub-action-for-serverless-artillery
       with:
         node-version: '14'
         check-latest: true
@@ -29,9 +28,9 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET}}
+        #aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET}}
         aws-region: us-west-2
-        source_dir: '../../test/results'
+        #source_dir: '../../test/results'
 
     - name: Install serverless and serverless-artillery
       run: |
