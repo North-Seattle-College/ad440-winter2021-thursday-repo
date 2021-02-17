@@ -63,13 +63,25 @@ jobs:
       #     source_dir: "test"
       #     destination_dir: "test-result/serverless-artillery-test-users-api.json"
       
-      - name: upload the report on s3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read --follow-symlinks --delete
-        env:
-          AWS_S3_BUCKET: "usersapitest"
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_REGION: "us-west-2"
-          SOURCE_DIR: 'test'
+      # - name: upload the report on s3
+      #   uses: jakejarvis/s3-sync-action@master
+      #   with:
+      #     args: --acl public-read --follow-symlinks --delete
+      #   env:
+      #     AWS_S3_BUCKET: "usersapitest"
+      #     AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+      #     AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      #     AWS_REGION: "us-west-2"
+      #     SOURCE_DIR: 'test'
+
+      - name: Upload file to bucket
+      uses: zdurham/s3-upload-github-action@master
+      with:
+        args: --acl public-read
+      env:
+        FILE: ./test/results/serverless-artillery-test-users-api.json
+        AWS_REGION: 'us-west-2'
+        S3_BUCKET: 'usersapitest'
+        S3_KEY: 'arn:aws:kms:us-west-2:061431082068:alias/aws/s3'
+        AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
