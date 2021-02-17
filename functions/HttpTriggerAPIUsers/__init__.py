@@ -32,7 +32,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Return results according to the method
         if method == "GET":
             logging.debug("Attempting to retrieve users...")
-            all_users_http_response = get_users(conn)
+            all_users_http_response = get_users(conn, init_redis())
             logging.debug("Users retrieved successfully!")
             return all_users_http_response
 
@@ -54,50 +54,64 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn.close()
         logging.debug('Connection to DB closed')
 
-def cache_users(users):
+def init_redis():
     REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    # REDIS_KEY = os.environ['ENV_REDIS_KEY'] TODO: use env variable
     REDIS_KEY = 'DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA='
 
-    r = redis.StrictRedis(host=REDIS_HOST,
+    return redis.StrictRedis(host=REDIS_HOST,
         port=6380, db=0, password=REDIS_KEY, ssl=True)
+
+def cache_users(r, users):
 
     r.set("users", users)    
     print("GET users: " + str(r.get("users")).decode("utf-8"))
 
+def get_users_cache(r):
+    return r.get("users")
+        
+
 def get_db_connection():
-    # Database credentials.
+    # Database credentials. TODO: use env variable
     # connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
     
-    # Define the connection string
+    # Define the connection string 
     connection_string = "Driver={ODBC Driver 17 for SQL Server};Server=tcp:nsc-sqlsrv-dev-usw2-thursday.database.windows.net,1433;Database=nsc-sqldb-dev-usw-thursday;Uid=nsc-admin-dev-usw2-thursday;Pwd=Password123A$!@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
 
     return pyodbc.connect(connection_string)
 
-def get_users(conn):
-    with conn.cursor() as cursor:
-        logging.debug(
-            "Using connection cursor to execute query (select all from users)")
-        cursor.execute("SELECT * FROM users")
+def get_users(conn, r):
+    cache = get_users_cache(r)
+    if cache not null:
+        return cache
+    else: 
+        with conn.cursor() as cursor:
+            logging.debug(
+                "Using connection cursor to execute query (select all from users)")
+            cursor.execute("SELECT * FROM users")
 
-        # Get users
-        logging.debug("Fetching all queried information")
-        users_table = list(cursor.fetchall())
+            # Get users
+            logging.debug("Fetching all queried information")
+            users_table = list(cursor.fetchall())
 
-        # Clean up to put them in JSON.
-        users_data = [tuple(user) for user in users_table]
+            # Clean up to put them in JSON.
+            users_data = [tuple(user) for user in users_table]
 
-        # Empty data list
-        users = []
+            # Empty data list
+            users = []
 
-        users_columns = [column[0] for column in cursor.description]
-        for user in users_data:
-            users.append(dict(zip(users_columns, user)))
+            users_columns = [column[0] for column in cursor.description]
+            for user in users_data:
+                users.append(dict(zip(users_columns, user)))
 
-        # users = dict(zip(columns, rows))
-        logging.debug(
-            "User data retrieved and processed, returning information from get_users function")
-        cache_users(json.dumps(users))
-        return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
+            # users = dict(zip(columns, rows))
+            logging.debug(
+                "User data retrieved and processed, returning information from get_users function")
+
+            # Cache the results
+            # Not sure this works - redis is not importing    
+            cache_users(r, json.dumps(users))
+            return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
 
 def create_users_table(conn):
     # First check to see if the table already exists
