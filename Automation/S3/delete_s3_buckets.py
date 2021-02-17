@@ -1,15 +1,14 @@
-import logging
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
 from colorama import init, Fore, Back
 
 COL_SIZE = 15
-
-logging.basicConfig(filename='example.log', level=logging.DEBUG)
 init(autoreset=True)
 
-
 def main():
+    '''
+    The main function for the S3 bucket deletion script
+    '''
     print(Fore.GREEN + "Starting S3 bucket deletion script...")
     try:
         s3_client = boto3.client('s3')
@@ -78,6 +77,16 @@ def main():
     
 
 def get_owner_email(s3_client, bucket_name):
+    '''
+    Gets the owner's email of an S3 bucket if that information is included in the bucket tags as OwnerEmail
+
+        Parameters:
+            s3_client (S3Client): the client necessary to execute S3 commands
+            bucket_name (str): the name of the bucket you would like the owner of
+        
+        Returns:
+            bucket_owner_email (str): Either the email of the owner of the bucket or No Owner if the no such email exists
+    '''
     try:
         get_bucket_tags_response = s3_client.get_bucket_tagging(
             Bucket=bucket_name
@@ -100,6 +109,16 @@ def get_owner_email(s3_client, bucket_name):
         print(Fore.YELLOW + "Bucket does not have any tags!")
 
 def get_bucket_object_list(s3_client, bucket_name):
+    '''
+    Gets the names of the objects in an S3 bucket returns them as a list
+
+        Parameters:
+            s3_client (S3Client): the client necessary to execute S3 commands
+            bucket_name (str): the name of the bucket you would like the objects of
+        
+        Returns:
+            bucket_object_list (list): The list of object names
+    '''
     try:
         get_bucket_object_list_response = s3_client.list_objects_v2(
             Bucket=bucket_name
@@ -123,6 +142,13 @@ def get_bucket_object_list(s3_client, bucket_name):
     
 
 def delete_buckets(s3_client, buckets_to_delete_list):
+    '''
+    Deletes the S3 buckets and their objects
+
+        Parameters:
+            s3_client (S3Client): the client necessary to execute S3 commands
+            buckets_to_delete_list (list): a list of bucket names and bucket objects of the form [{ 'BucketName': 'string', 'Objects': [{'Key': 'string'}] }]
+    '''
     try:
         for bucket_to_delete in buckets_to_delete_list:
             print(f'Attempting to delete bucket: {bucket_to_delete["BucketName"]}...')
