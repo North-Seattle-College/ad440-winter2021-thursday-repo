@@ -2,8 +2,8 @@ name: serverless artillery test users
 
 on:
   push:
-      branches:
-        - development
+    branches:
+      - development
 
 jobs:
   slsart-perf:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest 
 
     env:
-      NPM_CONFIG_PREFIX: "~/.npm-global"
+      # NPM_CONFIG_PREFIX: "~/.npm-global"
       AWS_SLSART_REGION: "us-west-2"
       STAGE_NAME: usersapi
 
@@ -25,34 +25,34 @@ jobs:
           node-version: '14'
           check-latest: true
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          aws-region: us-west-2
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+      #     aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      #     aws-region: us-west-2
 
-      - name: installing serverless-artillery
-        run: |
-          npm install -g serverless@1.38.0 serverless-artillery
+      # - name: installing serverless-artillery
+      #   run: |
+      #     npm install -g serverless@1.38.0 serverless-artillery
 
-      - name: Sleep
-        run: sleep 10s
+      # - name: Sleep
+      #   run: sleep 10s
 
-      - name: Deploy functions
-        run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
+      # - name: Deploy functions
+      #   run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
 
-      - name: Sleep1
-        run: sleep 10s
+      # - name: Sleep1
+      #   run: sleep 10s
 
-      - name: Invoke functions
-        run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --region $AWS_SLSART_REGION > test/results/serverless-artillery-test-users-api.json
+      # - name: Invoke functions
+      #   run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION > test/results/serverless-artillery-test-users-api.json
 
-      - name: Sleep2
-        run: sleep 10s
+      # - name: Sleep2
+      #   run: sleep 10s
 
-      - name: Remove functions
-        run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
+      # - name: Remove functions
+      #   run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
 
       # - uses: shallwefootball/s3-upload-action@master
       #   name: Upload S3
@@ -62,13 +62,15 @@ jobs:
       #     aws_bucket: "usersapitest"
       #     source_dir: "test"
       #     destination_dir: "test-result/serverless-artillery-test-users-api.json"
-      - uses: jakejarvis/s3-sync-action@master
+      
+      - name: upload the report on s3
+        uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
         env:
           AWS_S3_BUCKET: "usersapitest"
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_REGION: 'us-west-2'
+          AWS_REGION: $AWS_SLSART_REGION
           SOURCE_DIR: '/test/results/serverless-artillery-test-users-api.json'
 
