@@ -55,8 +55,8 @@ jobs:
       - name: Sleep2
         run: sleep 10s
 
-      - name: Remove functions
-        run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
+      # - name: Remove functions
+      #   run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
       
       - name: upload
         uses: shallwefootball/s3-upload-action@master
