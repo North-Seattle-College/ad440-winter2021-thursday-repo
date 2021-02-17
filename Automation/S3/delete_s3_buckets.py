@@ -13,7 +13,10 @@ def main():
     print(Fore.GREEN + "Starting S3 bucket deletion script...")
     try:
         s3_client = boto3.client('s3')
-        
+
+        create_bucket(s3_client, "aaaabuckets3deletescripttest")
+        create_bucket(s3_client, "aaaabuckets3deletescripttest2")
+
         print("Retrieving S3 bucket list...")
         list_buckets_response = s3_client.list_buckets()
         print(Fore.GREEN + "Bucket list retrieved! Cycling through list...\n")
@@ -40,23 +43,37 @@ def main():
                     print(bucket_object)
             
             # Prompt user for response
-            received_delete_bucket_response = False
-            while not received_delete_bucket_response:
-                deletion_prompt_response = input(Fore.YELLOW + "Delete bucket: (y/N)")
-                if (deletion_prompt_response == "y"):
-                    deletion_information = {
-                        'Bucket': bucket_name,
-                        'Objects': bucket_object_list_prepared_for_deletion
-                    }
-                    buckets_to_delete.append(deletion_information)
-                    print(Fore.GREEN + "Object scheduled for deletion!")
-                    received_delete_bucket_response = True
-                elif (deletion_prompt_response == "N"):
-                    received_delete_bucket_response = True
+            delete_bucket_response = ""
+            while delete_bucket_response == "":
+                deletion_prompt_response = input(Fore.YELLOW + "Delete bucket: (y/N/exit)")
+                if deletion_prompt_response == "y":
+                    delete_bucket_response = "True"
+                elif deletion_prompt_response == "N":
+                    delete_bucket_response = "False"
+                elif deletion_prompt_response == "exit":
+                    delete_bucket_response = "Exit"
+
+            
+            if delete_bucket_response == "True":
+                deletion_information = {
+                    'BucketName': bucket_name,
+                    'Objects': bucket_object_list_prepared_for_deletion
+                }
+                buckets_to_delete.append(deletion_information)
+                print(Fore.GREEN + "Object scheduled for deletion!")
+            elif delete_bucket_response == "Exit":
+                break
 
             print()
         
-        print(buckets_to_delete)
+        print()
+        if len(buckets_to_delete) > 0:
+            print("Attempting to delete buckets scheduled for deletion...")
+            delete_buckets(s3_client, buckets_to_delete)
+            print(Fore.GREEN + "Buckets deleted! Exiting script.")
+        else:
+            print(Fore.GREEN + "No buckets scheduled for deletion. Exciting script")
+        
 
     except (ClientError, NoCredentialsError)  as e:
         print(Fore.RED + f'Error connecting to S3! {e}')
@@ -107,6 +124,27 @@ def get_bucket_object_list(s3_client, bucket_name):
         print(Fore.RED + "Bucket does not exist!")
     
 
+def delete_buckets(s3_client, buckets_to_delete_list):
+    try:
+        for bucket_to_delete in buckets_to_delete_list:
+            print(f'Attempting to delete bucket: {bucket_to_delete["BucketName"]}...')
+
+            if len(bucket_to_delete['Objects']) > 0:
+                print("Bucket has objects, attempting to delete them...")
+                objects_deletion_response = s3_client.delete_objects(
+                    Bucket=bucket_to_delete['BucketName'],
+                    Objects=bucket_to_delete['Objects']
+                )
+                print(Fore.GREEN + "Objects deleted!")
+            
+            bucket_deletion_response = s3_client.delete_bucket(
+                Bucket=bucket_to_delete['BucketName']
+            )
+
+            print(Fore.GREEN + "Bucket deleted! \n")
+
+    except Exception as e:
+        print(Fore.RED + f'Error while deleting buckets:  {e}')
 
 def create_bucket(bucket_name):
     """Create an S3 bucket in a specified region
