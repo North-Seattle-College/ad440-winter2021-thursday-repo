@@ -1,0 +1,84 @@
+
+	Invoking test Lambda
+
+{
+    "timestamp": "2021-02-17T00:52:40.465Z",
+    "scenariosCreated": 5,
+    "scenariosCompleted": 5,
+    "requestsCompleted": 5,
+    "latency": {
+        "min": 32.7,
+        "max": 63.3,
+        "median": 38.1,
+        "p95": 63.3,
+        "p99": 63.3
+    },
+    "rps": {
+        "count": 5,
+        "mean": 1.11
+    },
+    "scenarioDuration": {
+        "min": 48.5,
+        "max": 87.7,
+        "median": 54.8,
+        "p95": 87.7,
+        "p99": 87.7
+    },
+    "scenarioCounts": {
+        "0": 5
+    },
+    "errors": {},
+    "codes": {
+        "200": 5
+    },
+    "matches": 0,
+    "customStats": {},
+    "phases": [
+        {
+            "duration": 5,
+            "arrivalRate": 1
+        }
+    ]
+}
+
+	Your function invocation has completed.
+
+{
+  "timestamp": "2021-02-17T00:52:40.465Z",
+  "scenariosCreated": 5,
+  "scenariosCompleted": 5,
+  "requestsCompleted": 5,
+  "latency": {
+    "min": 32.7,
+    "max": 63.3,
+    "median": 38.1,
+    "p95": 63.3,
+    "p99": 63.3
+  },
+  "rps": {
+    "count": 5,
+    "mean": 1.11
+  },
+  "scenarioDuration": {
+    "min": 48.5,
+    "max": 87.7,
+    "median": 54.8,
+    "p95": 87.7,
+    "p99": 87.7
+  },
+  "scenarioCounts": {
+    "0": 5
+  },
+  "errors": {},
+  "codes": {
+    "200": 5
+  },
+  "matches": 0,
+  "customStats": {},
+  "phases": [
+    {
+      "duration": 5,
+      "arrivalRate": 1
+    }
+  ]
+}

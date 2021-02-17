@@ -50,7 +50,7 @@ jobs:
         run: sleep 10s
 
       - name: Invoke functions
-        run: ~/.npm-global/bin/slsart invoke -p ../../test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION > -p ../../test/results/results.json --region $AWS_SLSART_REGION
+        run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml > test/results/serverless-artillery-test-users-api.json
 
       - name: Sleep2
         run: sleep 10s
@@ -65,4 +65,4 @@ jobs:
           aws_key_id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws_secret_access_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: "usersapitest"
-          source_dir: ../../test/results/results.json
+          source_dir: ../../test/results/serverless-artillery-test-users-api.json

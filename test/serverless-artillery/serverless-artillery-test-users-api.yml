@@ -10,6 +10,6 @@ config:
 scenarios:
   - flow:
     - get:
-        url: "/users"
-        json:
-        afterResponse: "logResponse"
+      url: "/users"
+      json:
+      afterResponse: "logResponse"
