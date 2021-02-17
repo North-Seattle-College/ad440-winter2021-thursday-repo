@@ -46,7 +46,7 @@ jobs:
         run: sleep 10s
 
       - name: Invoke functions
-        run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml > test/results/serverless-artillery-test-users-api.json
+        run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml > serverless-artillery-test-users-api.json
 
       - name: Sleep2
         run: sleep 10s
@@ -55,4 +55,4 @@ jobs:
         run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
 
       - name: Release to S3
-        run: bash scripts/pipeline/release.sh "usersapitest" "folder1/myapp.zip" ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} "../../test/results/serverless-artillery-test-users-api.json"
+        run: bash scripts/pipeline/release.sh "usersapitest" "folder1/myapp.zip" ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} "serverless-artillery-test-users-api.json"
