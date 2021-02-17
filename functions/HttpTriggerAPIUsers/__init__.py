@@ -2,6 +2,7 @@ import json
 import pyodbc
 import logging
 import os
+import redis
 import azure.functions as func
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -53,23 +54,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn.close()
         logging.debug('Connection to DB closed')
 
+def cache_users(users):
+    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    REDIS_KEY = 'DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA='
+
+    r = redis.StrictRedis(host=REDIS_HOST,
+        port=6380, db=0, password=REDIS_KEY, ssl=True)
+
+    r.set("users", users)    
+    print("GET users: " + str(r.get("users")).decode("utf-8"))
 
 def get_db_connection():
     # Database credentials.
-    # server = os.environ["ENV_DATABASE_SERVER"]
-    # database = os.environ["ENV_DATABASE_NAME"]
-    # username = os.environ["ENV_DATABASE_USERNAME"]
-    # password = os.environ["ENV_DATABASE_PASSWORD"]
     # connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
     
-
-    # Define driver
-    driver = '{ODBC Driver 17 for SQL Server}'
-
     # Define the connection string
-    # connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(
-    #     driver, server, database, username, password)
-    connection_string = "Driver={ODBC Driver 17 for SQL Server};Server=tcp:yaholl-test-server.database.windows.net,1433;Database=yaholl-test-db;Uid=yaholl-test-login;Pwd=Password123A$!@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    connection_string = "Driver={ODBC Driver 17 for SQL Server};Server=tcp:nsc-sqlsrv-dev-usw2-thursday.database.windows.net,1433;Database=nsc-sqldb-dev-usw-thursday;Uid=nsc-admin-dev-usw2-thursday;Pwd=Password123A$!@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
 
     return pyodbc.connect(connection_string)
 
@@ -96,6 +96,7 @@ def get_users(conn):
         # users = dict(zip(columns, rows))
         logging.debug(
             "User data retrieved and processed, returning information from get_users function")
+        cache_users(json.dumps(users))
         return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
 
 def create_users_table(conn):
@@ -106,7 +107,7 @@ def create_users_table(conn):
     for row in cursor.tables(tableType="TABLE"):
         tables += row.table_name
         tables += " "
-    logging.critical(tables)
+    logging.debug(tables)
 
     if "users" not in tables:
         cursor.execute('''
@@ -121,7 +122,8 @@ def create_users_table(conn):
     columns = "users columns: "
     for column in cursor.columns(table="users"):
         columns += column.column_name
-    logging.critical(columns)                      
+        columns += " "
+    logging.debug(columns)                      
         
 
 def add_user(conn, user_req_body):
