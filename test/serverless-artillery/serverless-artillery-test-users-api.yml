@@ -3,8 +3,8 @@
 config:
   target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api"
   phases:
-    - duration: 5
-      arrivalRate: 2
+    - duration: 100
+      arrivalRate: 20
       name: "users api test"
 
 scenarios:
