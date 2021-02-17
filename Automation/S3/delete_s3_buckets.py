@@ -10,7 +10,7 @@ init(autoreset=True)
 parser = argparse.ArgumentParser(description="Deletes S3 buckets.")
 parser.add_argument('--AccessKeyId', dest='aws_access_key_id', required=True)
 parser.add_argument('--SecretAccessKey', dest='aws_secret_access_key', required=True)
-parser.add_argument('--RegionName', dest='region_name', default='us-west-2')
+parser.add_argument('--RegionName', dest='region_name', default='us-west-2', help='Region Name (default: us-west-2)')
 
 args = parser.parse_args()
 
