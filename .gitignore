@@ -104,6 +104,7 @@ dist
 # TernJS port file
 .tern-port
 
+
 .idea
 
 #artillery report output
@@ -116,4 +117,6 @@ DS_Store
 
 # ignore .vscode
 .vscode/
+
+package-lock.json
 
