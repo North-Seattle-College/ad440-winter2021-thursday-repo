@@ -68,7 +68,9 @@ jobs:
       
       - name: upload
         run: |
-          node aws-upload.js
+          cd ~
+          cd aws
+          node aws-deploy.js
       
       # - name: upload the report on s3
       #   uses: jakejarvis/s3-sync-action@master
