@@ -68,6 +68,7 @@ def get_users(conn, r):
     if cache not null:
         return cache
     else: 
+        logging.critical("Cache is empty, querying database...")
         with conn.cursor() as cursor:
             logging.debug(
                 "Using connection cursor to execute query (select all from users)")
@@ -90,6 +91,7 @@ def get_users(conn, r):
             # users = dict(zip(columns, rows))
             logging.debug(
                 "User data retrieved and processed, returning information from get_users function")
+            logging.critical("Caching results...")
 
             # Cache the results
             # Not sure this works - redis is not importing    
@@ -151,8 +153,10 @@ def cache_users(r, users):
 
     r.set("users", users)    
     print("GET users: " + str(r.get("users")).decode("utf-8"))
+    logging.critical("Caching complete")
 
 def get_users_cache(r):
+    logging.critical("Querying cache...")
     return r.get("users")
 
 def create_users_table(conn):
