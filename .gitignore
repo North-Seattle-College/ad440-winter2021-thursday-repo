@@ -115,5 +115,12 @@ test/artillery/report.json
 DS_Store
 
 # ignore .vscode
+<<<<<<< HEAD
 
 package-lock.json
+=======
+.vscode/
+
+package-lock.json
+
+>>>>>>> nsc/development
