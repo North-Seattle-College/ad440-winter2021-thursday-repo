@@ -14,9 +14,6 @@ def main():
     try:
         s3_client = boto3.client('s3')
 
-        create_bucket(s3_client, "aaaabuckets3deletescripttest")
-        create_bucket(s3_client, "aaaabuckets3deletescripttest2")
-
         print("Retrieving S3 bucket list...")
         list_buckets_response = s3_client.list_buckets()
         print(Fore.GREEN + "Bucket list retrieved! Cycling through list...\n")
@@ -37,8 +34,9 @@ def main():
             if len(bucket_object_list) != 0:
                 print(Fore.GREEN + "Bucket Objects:")
                 for bucket_object in bucket_object_list:
+                    # Prepare just in case we want to delete the bucket
                     bucket_object_list_prepared_for_deletion.append({
-                        'KEY': bucket_object
+                        'Key': bucket_object
                     })
                     print(bucket_object)
             
@@ -133,7 +131,9 @@ def delete_buckets(s3_client, buckets_to_delete_list):
                 print("Bucket has objects, attempting to delete them...")
                 objects_deletion_response = s3_client.delete_objects(
                     Bucket=bucket_to_delete['BucketName'],
-                    Objects=bucket_to_delete['Objects']
+                    Delete={
+                        'Objects': bucket_to_delete['Objects']
+                    }
                 )
                 print(Fore.GREEN + "Objects deleted!")
             
@@ -145,33 +145,5 @@ def delete_buckets(s3_client, buckets_to_delete_list):
 
     except Exception as e:
         print(Fore.RED + f'Error while deleting buckets:  {e}')
-
-def create_bucket(bucket_name):
-    """Create an S3 bucket in a specified region
-
-    If a region is not specified, the bucket is created in the us-west-2.
-
-    :param bucket_name: Bucket to create
-    :return: True if bucket created, else False
-    """
-    
-    region = 'us-west-2'
-
-    # Create bucket
-    try:
-        s3_client = boto3.client('s3', region_name=region)
-        location = {'LocationConstraint': region}
-        acl = 'private'
-
-        s3_client.create_bucket(
-            Bucket=bucket_name,
-            ACL=acl,
-            CreateBucketConfiguration=location
-        )
-    
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
 
 main()
