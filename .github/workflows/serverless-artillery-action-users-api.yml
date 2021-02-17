@@ -70,5 +70,5 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_REGION: 'us-west-2'
-          SOURCE_DIR: '/Users/farhadbahrehmand/Desktop/AD/myForked/ad440-winter2021-thursday-repo/test/results/serverless-artillery-test-users-api.json'
+          SOURCE_DIR: './test/results/serverless-artillery-test-users-api.json'
 
