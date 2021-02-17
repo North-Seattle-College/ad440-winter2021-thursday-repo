@@ -1,17 +1,28 @@
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
-from colorama import init, Fore, Back
+from colorama import init, Fore
+import argparse
 
 COL_SIZE = 15
 init(autoreset=True)
 
-def main():
+parser = argparse.ArgumentParser(description="Deletes S3 buckets.")
+parser.add_argument('--AccessKeyId', dest='aws_access_key_id', required=True)
+parser.add_argument('--SecretAccessKey', dest='aws_secret_access_key', required=True)
+args = parser.parse_args()
+
+def main(aws_access_key_id, aws_secret_access_key):
     '''
     The main function for the S3 bucket deletion script
     '''
+
     print(Fore.GREEN + "Starting S3 bucket deletion script...")
     try:
-        s3_client = boto3.client('s3')
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key
+        )
 
         print("Retrieving S3 bucket list...")
         list_buckets_response = s3_client.list_buckets()
@@ -172,4 +183,4 @@ def delete_buckets(s3_client, buckets_to_delete_list):
     except Exception as e:
         print(Fore.RED + f'Error while deleting buckets:  {e}')
 
-main()
+main(args.aws_access_key_id, args.aws_secret_access_key)
