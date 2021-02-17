@@ -117,3 +117,5 @@ DS_Store
 
 # ignore .vscode
 .vscode/
+
+package-lock.json

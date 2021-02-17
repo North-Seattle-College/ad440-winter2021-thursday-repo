@@ -10,7 +10,7 @@ let UserSingleTask = () => {
   console.log(userId, taskId)
 
   useEffect(() => {
-    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}/tasks/${taskId}`)
+    fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}/tasks/${taskId}`)
     .then(response => response.json())
     .then(data => setUserSingleTask(data))
     .catch((error) => console.error(error))
