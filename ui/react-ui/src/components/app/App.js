@@ -30,7 +30,7 @@ function App() {
         <Route exact path='/reports/userId' component={userIdReport}/>
         <Route exact path='/reports/users' component={usersReport}/>
         <Route exact path='/reports/tasks' component={TasksReport}/>
-        <Route exact path='/reports/functionUserIdReport' component={functionUserIdReport}/>
+        <Route exact path='/reports/functionUserIdReport/:userId' component={functionUserIdReport}/>
       </Router>
     </div>
   );

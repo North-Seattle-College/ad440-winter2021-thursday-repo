@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { JsonToTable } from "react-json-to-table";
+import {useParams} from "react-router-dom";
 
 function FunctionUserIdReport() {
     const [jsonReport, setJsonReport] = useState();
     const [showJson, setshowJson] = useState(false);
-    const jsonUrl = "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users";
+    var {userId} = useParams();
+    const jsonUrl = `https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userId}?`;
+    
+    
     
     const getReport = async () => {
         const response = await fetch(jsonUrl)

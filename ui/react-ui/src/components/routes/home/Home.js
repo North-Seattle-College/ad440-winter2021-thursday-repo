@@ -83,7 +83,7 @@ class Home extends React.Component {
 
   let reportUsers = '/reports/users';
   let reportTasks = '/reports/tasks';
-  let functionReportUserId = '/reports/functionUserIdReport'
+  let functionReportUserId = '/reports/functionUserIdReport/{userId}'
 
 
     // what happens here is basically mapping over endpointsByMethods and rendering a method title, endpoints, and params
