@@ -68,7 +68,6 @@ jobs:
       
       - name: upload
         run: |
-          cd ~
           cd aws
           node aws-deploy.js
       
