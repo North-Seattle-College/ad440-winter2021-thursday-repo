@@ -21,15 +21,13 @@ jobs:
       with:
         node-version: '14'
         check-latest: true
-        
-  
-     - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET}}
-          aws-region: us-west-2
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET}}
+        aws-region: us-west-2
     - name: Install serverless and serverless-artillery
       run: |
         npm install -g serverless@1.38.0 serverless-artillery
