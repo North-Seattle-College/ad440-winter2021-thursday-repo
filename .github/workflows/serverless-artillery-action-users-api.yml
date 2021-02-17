@@ -71,5 +71,5 @@ jobs:
           AWS_S3_BUCKET: "usersapitest"
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          AWS_REGION: $AWS_SLSART_REGION
+          AWS_REGION: "us-west-2"
           SOURCE_DIR: '/test/results/serverless-artillery-test-users-api.json'
