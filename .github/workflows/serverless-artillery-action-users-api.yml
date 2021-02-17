@@ -36,10 +36,6 @@ jobs:
         run: |
           npm install -g serverless@1.38.0 serverless-artillery
 
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
-
       - name: Sleep
         run: sleep 10s
 
@@ -50,7 +46,7 @@ jobs:
         run: sleep 10s
 
       - name: Invoke functions
-        run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml > test/results/serverless-artillery-test-users-api.json
+        run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml > test/results/serverless-artillery-test-users-api.json
 
       - name: Sleep2
         run: sleep 10s
