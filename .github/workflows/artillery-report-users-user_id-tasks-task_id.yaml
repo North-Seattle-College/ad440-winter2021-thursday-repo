@@ -1,0 +1,80 @@
+name: Artillery Action to test endpoint function users-userId-tasks-taskId
+
+on:
+  push:
+    branches:
+      - development # On merge with master, call this action
+
+env:
+  NODE_VERSION: '14'  # the version of node we are using
+  NPM_CONFIG_PREFIX: "~/.npm-global" # Required to set path for artillery call
+  PYTHON_VERSION: '3.8' # the version of python we are using
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest # tells GH actions what we'll be running everything on
+
+    steps:
+    - name: 'Checkout Repository GitHub Action' # checks out the repository
+      uses: actions/checkout@v2
+
+    - name: check files
+      run: |
+        cd ./scripts
+        ls -a
+    - name: Setup Node ${{ env.NODE_VERSION }} Environment # this is the script that sets up node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        check-latest: true
+    
+    - name: 'Run npm init'
+      run: npm init -y
+
+    - name: Run npm install artillery  
+      run: npm install -g artillery
+
+    # - name: Check global npm location
+    #   run: npm list -g
+
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+
+    - name: Sleep
+      run: sleep 10s
+
+    # Call artillery
+    - name: Run Artillery Test
+      run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output artillery_${{ steps.date.outputs.date }}.json ./test/artillery/artillery-users-user_id-tasks-task_id.yaml
+
+    # - name: Check Artillery Performance test file
+    #   run: | 
+    #     ls -a
+    #     cat artilleryReport_test.json
+
+    - name: check python version
+      run: python -v
+
+    - name: Setup Python ${{ env.PYTHON_VERSION }} Environment # this is the script that sets up python
+      uses: actions/setup-python@v1 
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    # Upload to S3 with shell script + py
+    - name: Upload to S3
+      run: bash ./scripts/artillery-shell-users-user_id-tasks-task_id.sh ${{secrets.AWS_BUCKET_NAME_ARTILLERY}} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} "artillery_${{ steps.date.outputs.date }}.json"
+
+
+# https://github.com/zdurham/s3-upload-github-action
+  #  - name: Upload file to bucket alternative way
+  #  uses: zdurham/s3-upload-github-action@master
+  #  with:
+  #    args: --acl public-read
+  #  env:
+  #   FILE: artillery_${{ steps.date.outputs.date }}.json
+  #   AWS_REGION: 'us-west-2'
+  #   S3_BUCKET: artillery # TODO: Change once s3 secret is created 
+  #   S3_KEY: artillery_${{ steps.date.outputs.date }}.json
+  #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
