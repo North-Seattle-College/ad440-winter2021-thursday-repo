@@ -13,7 +13,7 @@ const s3Config = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 }
 const s3 = new AWS.S3(s3Config);
-console.log('sdasdasdasdasdasdasdasdasdsad', fs.readFileSync(config.filePath))
+console.log('sdasdasdasdasdasdasdasdasdsad', s3)
 s3.putObject({
   Bucket: 'usersapitest',
   Key: 'serverless-artillery-test-users-api.json',
