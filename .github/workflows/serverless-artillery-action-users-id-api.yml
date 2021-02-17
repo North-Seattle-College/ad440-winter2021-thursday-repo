@@ -6,7 +6,7 @@ on:
       - development
       - feature/GitHub-action-for-serverless-artillery
 jobs:
-    slsart-perf:
+  slsart-perf:
     name: Performance testing
     runs-on: ubuntu-latest
     env:
