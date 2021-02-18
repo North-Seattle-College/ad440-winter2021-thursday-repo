@@ -64,7 +64,7 @@ def get_users(conn, r):
     try:
         cache = get_users_cache(r)
     except TypeError as e:
-        logging.info(e.args[0])
+        logging.info(e.args[0])    
 
     if cache:
         logging.info("Returned data from cache")
@@ -152,14 +152,14 @@ def init_redis():
 
 def cache_users(r, users):
     try: 
-        r.set('users', users, ex=1200)   
+        r.set('users', json.dumps(users), ex=1200)   
         logging.info("GET users: " + (r.get('users').decode('utf-8')))
         logging.info("Caching complete")
     except TypeError as e:
         logging.info("Caching failed")
         logging.info(e.args[0])
 
-def get_users_cache(r):
+def get_users_cache(r):  
     logging.info("Querying cache...")
     try:
         cache = r.get(b'users')
