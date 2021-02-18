@@ -27,15 +27,15 @@ param (
 
     [Parameter(Mandatory=$true)]
     [string]
-    $frontendPorts
+    $frontendPorts,
     
     [Parameter(Mandatory=$true)]
     [string]
-    $httpListeners
+    $httpListeners,
     
     [Parameter(Mandatory=$true)]
     [string]
-    $requestRoutingRules
+    $requestRoutingRules,
     
     [Parameter(Mandatory=$true)]
     [string]
@@ -43,11 +43,16 @@ param (
     
 )
 
+
+Import-Module ..\Login
+Login $tenantId $applicationId $secret $subscriptionId
+
+
 $templateFilePath = "./template.json"
 
 New-AzResourceGroup 
   -Name myResourceGroupAG `
-  -Location West US 2 `
+  -Location location `
   
 New-AzApplicationGateway `
   -Name $applicationGatewayName `
