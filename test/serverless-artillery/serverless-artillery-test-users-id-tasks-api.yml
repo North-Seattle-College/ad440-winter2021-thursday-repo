@@ -9,15 +9,16 @@
 config:
   target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks?"
   phases:
-    -duration: 200
-     arrivalRate: 1
-     rampTo: 10
-  
-  -
-    flow:
+    -
+      duration: 200
+      arrivalRate: 1
+      rampTo: 10
 
+  scenarios:
+    -
+      flow:
         - get:
             url: "/"
-    capture:
-      json: "$.taskId"
-      as: "taskId"
+      capture:
+        json: "$.taskId"
+        as: "taskId"
