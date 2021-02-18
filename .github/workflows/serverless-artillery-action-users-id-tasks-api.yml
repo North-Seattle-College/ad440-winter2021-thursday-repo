@@ -46,6 +46,16 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%F_%T')"
       # Rename the results
-      - name: Rename results json
-        run: |
-          cp test/results/slsart-users-uid-tasks-results.json "test/results/serverless-artillery_${{ steps.date.outputs.date }}.json"
+      #- name: Rename results json
+      #  run: |
+      #    cp test/results/slsart-users-uid-tasks-results.json "test/results/serverless-artillery_${{ steps.date.outputs.date }}.json"
+      #Upload the results to S3 bucket
+      - name: AWS CLI CP S3
+        uses: qoqa/action-s3-cp@v1.1
+        env:
+          AWS_S3_BUCKET: ${{ secrets.SLSART_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-west-2'
+          AWS_S3_PATH: 'serverless-artillery_${{ steps.date.outputs.date }}.json'
+          FILE: 'test/results/slsart-users-uid-taks-results.json'
