@@ -30,7 +30,7 @@ jobs:
       # Install serverless-artillery
       - name: Install serverless and serverless-artillery
         run: |
-          npm install -g serverless
+          npm install -g serverless@1.38.0
           npm install -g serverless-artillery
       # Run serverless-artillery test
       - name: deploy, invoke, remove slsart
