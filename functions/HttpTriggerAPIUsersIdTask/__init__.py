@@ -27,6 +27,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     method = req.method
     user_id = req.route_params.get('userId')
 
+    
+
 
 
     try:
@@ -39,7 +41,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     #Redis Sever
     try:
-        rDB = redis.Redis(host='localhost',port=5000,db=0) 
+        REDIS_HOST = os.environ['ENV_REDIS_HOST']
+        REDIS_KEY = os.environ['ENV_REDIS_KEY']
+        REDIS_PORT = os.environ['ENV_REDIS_PORT']
+        rDB = redis.Redis(host='ENV_REDIS_HOST', port='ENV_REDIS_KEY', db=0, password='ENV_REDIS_KEY', ssl=True) 
         rDB.ping()
         logging.debug("Connected to Redis!")
     except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
