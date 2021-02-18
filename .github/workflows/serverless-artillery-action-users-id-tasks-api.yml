@@ -20,3 +20,5 @@ jobs:
       # Install bats and check version
       - run: npm install -g bats
       - run: bats -v
+      # Test reading secrets
+      - run: echo ${{ secrets.TEST_SECRET }}
