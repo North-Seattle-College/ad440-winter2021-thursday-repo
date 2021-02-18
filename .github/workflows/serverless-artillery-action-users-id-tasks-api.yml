@@ -37,6 +37,6 @@ jobs:
         run: slsart deploy --stage $STAGE_NAME --region us-west-2
       - name: invoke
         run: |
-          slsart invoke -p "../../test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml" --stage $STAGE_NAME > test/results/slsart-users-uid-tasks-results.json
+          slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml --stage $STAGE_NAME > test/results/slsart-users-uid-tasks-results.json
       - name: remove
         run: slsart remove --stage $STAGE_NAME
