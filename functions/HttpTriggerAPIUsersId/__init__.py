@@ -58,6 +58,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 #This method calls the get user ID cache method
 #param: conn- connection string where the database is
 #r- Redis cache
+#This might have to be combined with the get(cursor,row) method?
 def get_user_id(conn, r):
     try:
         cache = get_user_id_cache(r)
@@ -198,6 +199,7 @@ def get_user_id_cache(r):
 
 #This method creates the table containing User IDs
 #param: conn- the connection string for the database
+#Note: This might not be necessary?
 def create_user_id_table(conn):
     table_cursor = conn.cursor()
 
