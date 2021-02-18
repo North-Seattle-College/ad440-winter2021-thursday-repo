@@ -1,0 +1,53 @@
+name: Artillery action to test function users
+
+on: 
+  push:
+    branches:
+      -development
+
+env:
+  NODE_VERSION: '14'
+  NPM_CONFIG_PREFIX: '~/.npm-global'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout Repository GitHub Action'
+      uses: actions/checkout@v2
+
+    - name: check files
+      run: |
+        cd ./scripts
+        ls -a
+    - name: Setup Node ${{ env.NODE_VERSION }} Environment
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        check-latest: true
+    
+    - name: 'Run npm init'
+      run: npm init -y
+
+    - name: Install artillery globally
+      run: npm install -g artillery
+
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+
+    - name: Sleep
+      run: sleep 10s
+
+
+    - name: Run Artillery Test
+      run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output artillery_${{ steps.date.outputs.date }}.json ./test/artillery/artillery-test-users-api.yml
+
+    - name: S3 Uploader
+      uses: shallwefootball/s3-upload-action@master
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-bucket: ${{ secrets.AWS_BUCKET_NAME_ARTILLERY }}
+        source_dir: "artillery_${{ steps.date.outputs.date }}.json"
