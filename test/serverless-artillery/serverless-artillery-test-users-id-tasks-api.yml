@@ -1,0 +1,9 @@
+# Test api endpoint /users/{user_id}/tasks
+#
+# Initial testing setup:
+#   duration: 200
+#   arrivalRate: 1
+#   rampTo: 10
+#
+# See: https://github.com/Nordstrom/serverless-artillery
+config:
