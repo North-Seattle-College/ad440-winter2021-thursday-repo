@@ -7,7 +7,6 @@ import json
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
 
-
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
         'Python HTTP trigger for users/userId is processing a request ')
