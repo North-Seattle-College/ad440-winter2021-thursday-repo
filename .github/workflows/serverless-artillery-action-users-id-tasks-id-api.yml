@@ -27,10 +27,13 @@ jobs:
       #set up node js
       - uses: actions/setup-node@v2.1.4
         with:
-          node-version: '12'
+          node-version: '14'
           check-latest: true
       - run: npm install
-      - run: npm test
+      
+      - name: Install serverless and serverless-artillery
+        run: |
+          npm install -g serverless@1.38.0 serverless-artiller
 #jobs:
   #upload:
     #runs-on: ubuntu-latest
