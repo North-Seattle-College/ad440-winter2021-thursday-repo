@@ -13,3 +13,6 @@ scenarios:
       url: "/users"
       json:
       afterResponse: "logResponse"
+      capture:
+        json: "$.users"
+        as: "users"
