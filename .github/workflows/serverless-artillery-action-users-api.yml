@@ -7,13 +7,13 @@ on:
 
 jobs:
   slsart-perf:
-    name: slsart performance test
+    name: serverless artillery test users
     runs-on: ubuntu-latest 
 
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
       AWS_SLSART_REGION: "us-west-2"
-      STAGE_NAME: usersapi
+      STAGE_NAME: users
 
     steps:
       - name: Checkout the code
@@ -33,26 +33,25 @@ jobs:
         with:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-          aws-region: us-west-2
+          aws-region: $AWS_SLSART_REGION
 
       - name: installing serverless-artillery
-        run: |
-          npm install -g serverless@1.38.0 serverless-artillery
+        run: npm install -g serverless@1.38.0 serverless-artillery
 
-      - name: Sleep
-        run: sleep 10s
+      # - name: Sleep
+      #   run: sleep 10s
 
       - name: Deploy functions
         run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
 
-      - name: Sleep1
-        run: sleep 10s
+      # - name: Sleep1
+      #   run: sleep 10s
 
       - name: Invoke functions
         run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION > test/results/serverless-artillery-test-users-api.json
 
-      - name: Sleep2
-        run: sleep 10s
+      # - name: Sleep2
+      #   run: sleep 10s
 
       - name: Remove functions
         run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
