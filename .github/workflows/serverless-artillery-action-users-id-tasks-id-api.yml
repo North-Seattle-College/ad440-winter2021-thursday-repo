@@ -35,8 +35,8 @@ jobs:
 
       
 
-  upload:    
-    runs-on: ubuntu-latest
-      steps:
-        - name: Upload S3
-          uses: shallwefootball/upload-s3-action@v1.1.3
+  #upload:    
+    #runs-on: ubuntu-latest
+      #steps:
+        #- name: Upload S3
+          #uses: shallwefootball/upload-s3-action@v1.1.3
