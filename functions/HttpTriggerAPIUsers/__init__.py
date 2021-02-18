@@ -152,7 +152,7 @@ def init_redis():
 
 def cache_users(r, users):
     try: 
-        r.set('users', users, ex=120)   
+        r.set('users', users, ex=1200)   
         logging.info("GET users: " + (r.get('users').decode('utf-8')))
         logging.info("Caching complete")
     except TypeError as e:
@@ -192,4 +192,4 @@ def create_users_table(conn):
     for column in cursor.columns(table="users"):
         columns += column.column_name
         columns += " "
-    logging.debug(columns)        
+    logging.debug(columns)
