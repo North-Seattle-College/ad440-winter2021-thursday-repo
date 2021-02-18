@@ -41,14 +41,12 @@ jobs:
       - name: remove
         run: slsart remove --stage $STAGE_NAME --region us-west-2
       # Get current date and time
-      # Outputs time and formattedTime
+      # Outputs date
       - name: Get current date and time
-        uses: srfrnk/current-time@master
-        id: timestamp
-        with: 
-          format: /YYYY/MM/DD/HH-mm-ss.SSS
-      - name: Output current time test
-        env:
-          TIME: "${{ steps.timestamp.outputs.time }}"
-          F_TIME: "${{ steps.current-time.outputs.formattedTime }}"
-        run: echo $F_TIME
+        id: date
+        run: echo "::set-output name=date::$(date +'%F %T')"
+      # Rename the results
+      - name: Rename results json
+        run: |
+          mkdir test/results/upload
+          cp test/results/slart-users-uid-tasks-results.json "/test/results/upload/serverless-artillery ${{ steps.date.outputs.date }}.json"
