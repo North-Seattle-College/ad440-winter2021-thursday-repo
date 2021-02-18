@@ -1,19 +1,23 @@
 # Creates resource group and Azure SQL logical server
 
 param(
-        # Login parameters
-        [string] [Parameter(Mandatory=$true)] $tenantId,          
-        [string] [Parameter(Mandatory=$true)] $applicationId,
-        [string] [Parameter(Mandatory=$true)] $secret,
-        [string] [Parameter(Mandatory=$true)] $subscriptionId,
-        # Azure SQL server parameters
-        [string] [Parameter(Mandatory=$true)] $location,
-        [string] [Parameter(Mandatory=$true)] $resourceGroupName,
-        [string] [Parameter(Mandatory=$true)] $serverName,
-        [string] [Parameter(Mandatory=$true)] $administratorLogin,
-        [string] [Parameter(Mandatory=$true)] $administratorLoginPassword
+    # Login parameters
+    [string] [Parameter(Mandatory=$true)] $tenantId,          
+    [string] [Parameter(Mandatory=$true)] $applicationId,
+    [string] [Parameter(Mandatory=$true)] $secret,
+    [string] [Parameter(Mandatory=$true)] $subscriptionId,
+    # Azure SQL server parameters
+    [string] [Parameter(Mandatory=$true)] $location,
+    [string] [Parameter(Mandatory=$true)] $resourceGroupName,
+    [string] [Parameter(Mandatory=$true)] $serverName,
+    [string] [Parameter(Mandatory=$true)] $administratorLogin,
+    [string] [Parameter(Mandatory=$true)] $administratorLoginPassword,
+    # Azure SQL db parameters
+    [string] [Parameter(Mandatory=$false)] $sqlDBName,    
+    # Tag parameters
+    [string] [Parameter(Mandatory=$true)] $createdBy,
+    [string] [Parameter(Mandatory=$true)] $creatorsEmail              
 )
-
 [securestring] $administratorLoginPassword = ConvertTo-SecureString $administratorLoginPassword -AsPlainText -Force
 
 # Log in and set the SubscriptionId in which to create these objects
@@ -31,14 +35,15 @@ if (!$resourceGroupExists) {
         New-AzResourceGroup -Name $resourceGroupName -Location "$location" -Force
         Write-Host "Created resource group $resourceGroupName"
 } else {
-        Write-Host "Resource group already exists."
+        Write-Host "Resource group $resourceGroupName already exists."
 }
 
 # Deploy template
-Write-host "Creating primary server..."
+Write-host "Creating primary server and db..."
 New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName `
 -TemplateFile $pathToAzSqlTemplate -administratorLogin $administratorLogin `
--administratorLoginPassword $administratorLoginPassword
+-administratorLoginPassword $administratorLoginPassword -serverName $serverName `
+-sqlDBName $sqlDBName -location $location -createdBy $createdBy -creatorsEmail $creatorsEmail
 
 
 # Clear deployment 
