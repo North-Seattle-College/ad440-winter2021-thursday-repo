@@ -33,11 +33,7 @@ jobs:
       # - currently this just runs the defaults
       # examples for future:
       # - run: cp ./slsart/script.yml ./
-      - name: Editing serverless yml
-        run: |
-          ~/.npm-global/bin/slsart configure
-          npm install yaml
-          node ./serverless/serverlessYamlEditor.js
+  
           
       - name: Deploy, invoke, remove functions
         run: |
