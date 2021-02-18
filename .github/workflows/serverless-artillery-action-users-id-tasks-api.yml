@@ -9,7 +9,7 @@ jobs:
     name: slsart performance test users-userid-tasks
     runs-on: ubuntu-latest
     env:
-      STAGE_NAME: users-userid-tasks-test
+      STAGE_NAME: u-uid-t
     steps:
       # Checkout a copy of the code
       - name: Checkout code
@@ -34,7 +34,7 @@ jobs:
           npm install -g serverless-artillery
       # Run serverless-artillery test
       - name: deploy
-        run: slsart deploy --stage $STAGE_NAME --region us-west2
+        run: slsart deploy --stage $STAGE_NAME --region us-west-2
       - name: invoke
         run: slsart invoke -p "../../test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml" --stage $STAGE_NAME > ../../test/results/serverless-artillery-users-id-tasks-results.json
       - name: remove
