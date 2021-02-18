@@ -19,6 +19,9 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_PREFIX: "~/.npm-global"
+      STAGE_NAME: merge-perf-test
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,7 +33,7 @@ jobs:
           node-version: '14'
           check-latest: true
       - run: npm install
-      
+
       - name: Install serverless and serverless-artillery
         run: |
           npm install -g serverless@1.38.0 serverless-artiller
