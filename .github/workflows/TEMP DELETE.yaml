@@ -1,0 +1,15 @@
+name: Temporary see file structure
+
+on: [push]
+
+jobs:
+  show-filestructure:
+    name: show me the money
+    runs-on: ubuntu-latest
+    steps:
+      - name: ll
+        run: ll
+      - name: dir
+        run: dir
+      - name: ls
+        run: ls
