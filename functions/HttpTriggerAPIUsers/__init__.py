@@ -153,7 +153,6 @@ def init_redis():
 def cache_users(r, users):
     try: 
         r.set('users', json.dumps(users), ex=1200)   
-        logging.info("GET users: " + (r.get('users').decode('utf-8')))
         logging.info("Caching complete")
     except TypeError as e:
         logging.info("Caching failed")
