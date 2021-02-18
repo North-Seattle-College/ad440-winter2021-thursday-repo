@@ -44,8 +44,8 @@ jobs:
       # Outputs date
       - name: Get current date and time
         id: date
-        run: echo "::set-output name=date::$(date +'%F %T')"
+        run: echo "::set-output name=date::$(date +'%F_%T')"
       # Rename the results
       - name: Rename results json
         run: |
-          cp test/results/slsart-users-uid-tasks-results.json "/test/results/serverless-artillery ${{ steps.date.outputs.date }}.json"
+          cp test/results/slsart-users-uid-tasks-results.json "/test/results/serverless-artillery_${{ steps.date.outputs.date }}.json"
