@@ -3,6 +3,7 @@ import pyodbc
 import os
 import azure.functions as func
 import json
+import redis
 
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
@@ -19,6 +20,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     driver = '{ODBC Driver 17 for SQL Server}'
     connectionString = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
         driver, db_server, db_name, db_username, db_password)
+
 
     try:
         # Create a new connection
@@ -53,6 +55,43 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500
         )
 
+#This method calls the get user ID cache method
+#param: conn- connection string where the database is
+#r- Redis cache
+def get_user_id(conn, r):
+    try:
+        cache = get_user_id_cache(r)
+    except TypeError as e:
+        logging.info(e.args[0])
+    
+    if cache:
+        logging.info("Data returned from cache")
+        return func.HttpResponse(cache.decode('utf-8'), status_code =200, mimetype="application/json")
+    else:
+        logging.info("Empty cache, querying...")
+        with conn.cursor() as cursor:
+            logging.debug("Using connection cursor to perform query (select all from user_id)")
+            cursor.execute("SELECT * FROM user_id")
+    
+    #get User IDs
+    logging.debug("Fetching all queries for User IDs")
+    user_id_table = list(cursor.fetchall())
+
+    #Cleans User ID data to put into table
+    user_id_data = [tuple(user_id) for user_id in user_id_table]
+
+    #Empty User ID list
+    user_id_list = []
+
+    user_id_columns = [column[0] for column in cursor.description]
+
+    for user_id in user_id_data:
+        user_id_list.append(dict(zip(user_id_columns, user_id)))
+    
+    logging.debug("User ID data processed and retrieved")
+
+    #Caches the User ID data
+    cache(r, user_id)
 
 def get(cursor, row):
     logging.debug("Attempting to retrieve user by ID...")
@@ -128,3 +167,60 @@ def get_user_row(cursor, user_id):
         "SELECT * FROM dbo.users WHERE userId= ?", (user_id,))
 
     return cursor.fetchone()
+
+#This method initates REDIS cache
+def start_redis():
+    REDIS_HOST = os.environ['ENV_REDIS_HOST']
+    REDIS_KEY = os.environ['ENV_REDIS_KEY']
+    REDIS_PORT = os.environ['ENV_REDIS_PORT']
+
+    return redis.Redis(host= REDIS_HOST, port= REDIS_PORT, db= 0, password= REDIS_KEY, ssl= True)
+
+#This method caches user_id
+#param: r- redis cache
+#       user_id: User IDs that need to cached
+def cache_user_id(r, user_id):
+    try:
+        r.set('user_ids', user_id, ex= 2400) #set the expiration to 40 minutes to account for going thru /user endpoint
+        logging.info("GET User IDs: " + (r.get('user_id').decode('utf')))
+        logging.info("Caching complete!")
+
+#This method retrieves the user_id cache
+#param: r- Redis Cache that it the user_id cache residing in
+def get_user_id_cache(r):
+    logging.info("Querying for User ID cache...")
+    try:
+        cache = r.get(b'user_id')
+        return cache
+    except TypeError as e:
+        logging.critical("Failed to fetch from cache: " + e.args[1])
+        return None
+
+#This method creates the table containing User IDs
+#param: conn- the connection string for the database
+def create_user_id_table(conn):
+    table_cursor = conn.cursor()
+
+    #Checks if the table exists in the database
+    tables = "tables: "
+    for row in table_cursor.tables(tableType = "TABLE"):
+        #goes through list of each table
+        tables += row.table_name
+        tables += ""
+    logging.debug(tables)
+
+    if "user_id" not in tables:
+        table_cursor.execute('''
+            CREATE TABLE user_id(
+                userId INTEGER PRIMARY KEY IDENTITY
+            );
+            ''')
+    
+    #list columns for user_id table
+    columns = "user_id columns: "
+    for column in table_cursor.columns(table = "user_id"):
+        columns += column.column_name
+        columns += ""
+    logging.debug(columns)
+
+
