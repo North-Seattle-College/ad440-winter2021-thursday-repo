@@ -14,11 +14,11 @@ config:
       arrivalRate: 1
       rampTo: 10
 
-  scenarios:
-    -
-      flow:
-        - get:
-            url: "/"
-      capture:
-        json: "$.taskId"
-        as: "taskId"
+scenarios:
+   -
+    flow:
+      - get:
+          url: "/"
+    capture:
+      json: "$.taskId"
+      as: "taskId"
