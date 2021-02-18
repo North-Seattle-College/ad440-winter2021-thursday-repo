@@ -21,7 +21,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn = get_db_connection()
     except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
         logging.critical("Failed to connect to DB: " + e.args[0])
-        logging.critical("Error: " + e.args[1])
+        logging.info("Error: " + e.args[1])
         return func.HttpResponse(status_code=500)
         
     logging.debug("Connection to DB successful!")
@@ -55,20 +55,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.debug('Connection to DB closed')
 
 def get_db_connection():
-    # Database credentials. TODO: use env variable
-    # connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
+    # Connection String
+    connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
     
-    # Define the connection string 
-    connection_string = "Driver={ODBC Driver 17 for SQL Server};Server=tcp:nsc-sqlsrv-dev-usw2-thursday.database.windows.net,1433;Database=nsc-sqldb-dev-usw-thursday;Uid=nsc-admin-dev-usw2-thursday;Pwd=Password123A$!@;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
-
     return pyodbc.connect(connection_string)
 
 def get_users(conn, r):
-    cache = get_users_cache(r)
-    if cache not null:
-        return cache
+    try:
+        cache = get_users_cache(r)
+    except TypeError as e:
+        logging.info(e.args[0])
+
+    if cache:
+        logging.info("Returned data from cache")
+        return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
     else: 
-        logging.critical("Cache is empty, querying database...")
+        logging.info("Cache is empty, querying database...")
         with conn.cursor() as cursor:
             logging.debug(
                 "Using connection cursor to execute query (select all from users)")
@@ -91,11 +93,11 @@ def get_users(conn, r):
             # users = dict(zip(columns, rows))
             logging.debug(
                 "User data retrieved and processed, returning information from get_users function")
-            logging.critical("Caching results...")
+            logging.info("Caching results...")
 
-            # Cache the results
-            # Not sure this works - redis is not importing    
-            cache_users(r, json.dumps(users))
+            # Cache the results 
+            cache_users(r, users)
+
             return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
         
 def add_user(conn, user_req_body):
@@ -143,21 +145,28 @@ def add_user(conn, user_req_body):
 
 def init_redis():
     REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-    # REDIS_KEY = os.environ['ENV_REDIS_KEY'] TODO: use env variable
-    REDIS_KEY = 'DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA='
+    REDIS_KEY = os.environ['ENV_REDIS_KEY']
 
     return redis.StrictRedis(host=REDIS_HOST,
         port=6380, db=0, password=REDIS_KEY, ssl=True)
 
 def cache_users(r, users):
-
-    r.set("users", users)    
-    print("GET users: " + str(r.get("users")).decode("utf-8"))
-    logging.critical("Caching complete")
+    try: 
+        r.set('users', users, ex=120)   
+        logging.info("GET users: " + (r.get('users').decode('utf-8')))
+        logging.info("Caching complete")
+    except TypeError as e:
+        logging.info("Caching failed")
+        logging.info(e.args[0])
 
 def get_users_cache(r):
-    logging.critical("Querying cache...")
-    return r.get("users")
+    logging.info("Querying cache...")
+    try:
+        cache = r.get(b'users')
+        return cache
+    except TypeError as e:
+        logging.critical("Failed to fetch from cache: " + e.args[1])
+        return None
 
 def create_users_table(conn):
     cursor = conn.cursor()
