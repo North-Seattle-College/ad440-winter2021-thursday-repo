@@ -35,7 +35,7 @@ jobs:
       # Run serverless-artillery test
       - name: deploy, invoke, remove slsart
         run: |
-          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME
-          ~/.npm-global/bin/slsart invoke -p ../../test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml --stage $STAGE_NAME > ../../test/results/serverless-artillery-users-id-tasks-results.json
-          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+          slsart deploy --stage $STAGE_NAME
+          slsart invoke -p "../../test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml" --stage $STAGE_NAME > ../../test/results/serverless-artillery-users-id-tasks-results.json
+          slsart remove --stage $STAGE_NAME
           
