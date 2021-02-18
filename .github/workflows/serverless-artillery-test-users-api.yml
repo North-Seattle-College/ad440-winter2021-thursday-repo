@@ -29,8 +29,7 @@ jobs:
           aws-region: "us-west-2"
       - name: installing serverless-artillery
         run: npm install -g serverless@1.38.0 serverless-artillery
-      - name: Sleep
-        run: sleep 10s
+      
       - name: Deploy, invoke, remove
         run: |
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
