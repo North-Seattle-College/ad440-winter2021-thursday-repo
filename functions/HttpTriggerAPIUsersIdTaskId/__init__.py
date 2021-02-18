@@ -6,10 +6,19 @@ import logging
 import os
 import pyodbc
 import azure.functions as func
+import redis 
+
+# Connect to the Redis Server
+r = redis.StrictRedis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port=6380, db=0, password='DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA=', ssl=True)
+
+# Set Message in the Redis Server for testing
+r.set("Message01", "Hello World")
+
 
 #GET API method function
 def get(userId, taskId):
     #connects to db
+
     try:
         logging.debug('Attempting a db connection')
         cnxn = connect()
@@ -39,6 +48,44 @@ def get(userId, taskId):
         cursor.close()
         cnxn.close()
         logging.debug('Closed the db connection')   
+
+def get_users(conn, r):
+    try:
+        cache = get_users_cache(r)
+    except TypeError as e:
+        logging.info(e.args[0])
+
+    if cache:
+        logging.info("Returned data from cache")
+        return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
+    else: 
+        logging.info("Cache is empty, querying database...")
+        with conn.cursor() as cursor:
+            logging.debug(
+                "Using connection cursor to execute query (select all from users)")
+            cursor.execute("SELECT * FROM users")
+
+            # Get users
+            logging.debug("Fetching all queried information")
+            users_table = list(cursor.fetchall())
+
+            # Clean up to put them in JSON.
+            users_data = [tuple(user) for user in users_table]
+
+            # Empty data list
+            users = []
+
+            users_columns = [column[0] for column in cursor.description]
+            for user in users_data:
+                users.append(dict(zip(users_columns, user)))
+
+            # users = dict(zip(columns, rows))
+            logging.debug(
+                "User data retrieved and processed, returning information from get_users function")
+            logging.info("Caching results...")
+
+            # Cache the results 
+            cache_users(r, users)
 
 #PUT API method function
 def update(userId, taskId, task_fields):
@@ -281,3 +328,54 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     #displays other erros, if any, encountered when API methods were called
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500) 
+
+def get_taskID_cache(r):
+    logging.info("Querying cache...")
+    try:
+        cache = r.get(b'taskId')
+        return cache
+    except TypeError as e:
+        logging.critical("Failed to fetch from cache: " + e.args[1])
+        return None
+
+# Get method for task id 
+
+def get_taskId(conn, r):
+    try:
+        cache = get_taskID_cache(r)
+    except TypeError as e:
+        logging.info(e.args[0])
+
+    if cache:
+        logging.info("Returned data from cache")
+        return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
+    else: 
+        logging.info("Cache is empty, querying database...")
+        with conn.cursor() as cursor:
+            logging.debug(
+                "Using connection cursor to execute query (select all from users)")
+            cursor.execute("SELECT * FROM users")
+
+            # Get TaskID
+            logging.debug("Fetching all queried information")
+            users_table = list(cursor.fetchall())
+
+            # Clean up to put them in JSON.
+            task_Id = [tuple(taskId) for taskId in users_table]
+
+            # Empty data list
+            users = []
+
+            users_columns = [column[0] for column in cursor.description]
+            for taskId in task_Id:
+                taskId.append(dict(zip(users_columns, taskId)))
+
+            # users = dict(zip(columns, rows))
+            logging.debug(
+                "User TaskID data retrieved and processed, returning information from get_users function")
+            logging.info("Caching results...")
+
+            # Cache the results 
+            get_taskID_cache(r, taskId)
+
+            return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
