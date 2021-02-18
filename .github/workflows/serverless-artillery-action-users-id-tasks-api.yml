@@ -1,42 +1,22 @@
-name: Performance-Test Artillery UserId Tasks
+name: Serverless-Artillery performance test users-userid-tasks
 
-on:  
-  push:
-    branches:
-      - development
+# Run every time a new commit is pushed to development branch
+on: [push]
 
 jobs:
-  slsart-perf:
-    name: slsart Performance Test
+  check-bats-version:
+    name: Check bats version
     runs-on: ubuntu-latest
-    env:
-      NPM_CONFIG_PREFIX: "~/.npm-global"
-      STAGE_NAME: merge-perf-test
     steps:
+      # Checkout a copy of the code
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Setup Node.js
+      # Set up Node.js
+      - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: '14'
           check-latest: true
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
-      - name: Install serverless and serverless-artillery
-        run: |
-          npm install -g serverless@1.38.0 serverless-artillery
-      # once a folder with slsart script.yml and serverless.yml are created and in the repo
-      # we can copy them into the working dir to run those specific tests with those configurations
-      # - currently this just runs the defaults
-      # examples for future:
-      # - run: cp ./slsart/script.yml ./
-      # - run: cp ./slsart/serverless.yml ./
-      - name: Deploy, invoke, remove functions
-        run: |
-          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region=us-west-2
-          ~/.npm-global/bin/slsart invoke -s ../../test/artillery/Artillery-test-users-user_id-tasks.yaml --stage $STAGE_NAME > ../../test/results/Artillery-test-users-user_id-tasks-Results.json
-          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+      # Install bats and check version
+      - run: npm install -g bats
+      - run: bats -v
