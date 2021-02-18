@@ -48,7 +48,7 @@ jobs:
       #   run: sleep 10s
 
       - name: Invoke functions
-        run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage users-api-test --region us-west-2 > test/results/serverless-artillery-test-users-api.json
+        run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage users-api-test --region us-west-2 > -o test/results/serverless-artillery-test-users-api.json
 
       # - name: Sleep2
       #   run: sleep 10s
