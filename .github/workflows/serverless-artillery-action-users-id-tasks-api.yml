@@ -21,4 +21,7 @@ jobs:
       - run: npm install -g bats
       - run: bats -v
       # Test reading secrets
-      - run: echo ${{ secrets.TEST_SECRET }}
+      - name: get test secret
+        env:
+          TEST_SECRET: ${{ secrets.TEST_SECRET }}
+        run: echo "$TEST_SECRET"
