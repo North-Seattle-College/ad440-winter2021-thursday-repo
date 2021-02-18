@@ -1,62 +1,39 @@
-#Creates Azure Application Gateway 
+param(
+    [string] [Parameter(Mandatory=$true)] $resourceGroup, # Name of resource group
 
-param (
-    [Parameter(Mandatory=$true)]
-    [string]
-    $applicationGatewayName,
+    [string] [Parameter(Mandatory=$true)] $location, # westus2
 
-    [Parameter(Mandatory=$true)]
-    [string]
-    $location,
+    [string] [Parameter(Mandatory=$true)] $applicationGatewayName, # Name of application gateway
 
-    [Parameter(Mandatory=$true)]
-    [string]
-    $backendAddressPools,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $backendHttpSettingsCollection,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $frontendIPConfigurations,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $gatewayIPConfigurations,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $frontendPorts,
-    
-    [Parameter(Mandatory=$true)]
-    [string]
-    $httpListeners,
-    
-    [Parameter(Mandatory=$true)]
-    [string]
-    $requestRoutingRules,
-    
-    [Parameter(Mandatory=$true)]
-    [string]
-    $sku
-    
+    # Login parameters
+    [string] [Parameter(Mandatory=$true)] $tenantId,
+    [string] [Parameter(Mandatory=$true)] $applicationId,
+    [string] [Parameter(Mandatory=$true)] $secret,
+    [string] [Parameter(Mandatory=$true)] $subscriptionId
 )
 
-
+# Imports Login Module
 Import-Module ..\Login
-Login $tenantId $applicationId $secret $subscriptionId
-
-
+# Path to Template File
 $templateFilePath = "./template.json"
 
-New-AzResourceGroup 
-  -Name myResourceGroupAG `
-  -Location location `
-  
+# Login Inputs
+Login $tenantId $applicationId $secret $subscriptionId
+
+# Checks for resource group
+Get-AzResourceGroup -Name $resourceGroup -ErrorVariable noRG -ErrorAction SilentlyContinue
+if($noRG){
+    Write-Host "Creating a New Resource Group $resourceGroup"
+    New-AzResourceGroup 
+      -Name $resourceGroup 
+      -Location $location
+} else {
+    Write-Host "Resource Group $resourceGroup already exits"
+}
+#Creates New Application Gateway
 New-AzApplicationGateway `
   -Name $applicationGatewayName `
-  -ResourceGroupName myResourceGroupAG `
+  -ResourceGroupName $myResourceGroupAG `
   -TemplateFile  $templateFilePath `
   -Location $location `
   -BackendAddressPools $backendAddressPools `
