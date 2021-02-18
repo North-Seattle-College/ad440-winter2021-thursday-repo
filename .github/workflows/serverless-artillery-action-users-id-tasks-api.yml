@@ -49,4 +49,4 @@ jobs:
       - name: Rename results json
         run: |
           mkdir test/results/upload
-          cp test/results/slart-users-uid-tasks-results.json "/test/results/upload/serverless-artillery ${{ steps.date.outputs.date }}.json"
+          cp test/results/slsart-users-uid-tasks-results.json "/test/results/upload/serverless-artillery ${{ steps.date.outputs.date }}.json"
