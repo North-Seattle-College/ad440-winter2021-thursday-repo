@@ -1,0 +1,31 @@
+name: Serverless-Artillery performance test users-userid-tasks
+
+# Run every time a new commit is pushed to the developemtn branch
+# TODO: Actually change this to not be on every push
+on: [push]
+
+jobs:
+  slsart-perf:
+    name: slsart performance test users-userid-tasks
+    runs-on: ubuntu-latest
+    env:
+      # Get access key ID and secret from repo secrets
+      AWS_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_secret: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      # Checkout a copy of the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+      # Install node on the VM
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          check-latest: true
+      # Configure the AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: $AWS_id
+          aws-secret-access-key: $AWS_secret
+          aws-region: us-west-2

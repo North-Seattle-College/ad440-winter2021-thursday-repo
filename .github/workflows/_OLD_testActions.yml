@@ -1,4 +1,4 @@
-name: Serverless-Artillery performance test users-userid-tasks
+name: Testing out GitHub Actions --Dylan
 
 # Run every time a new commit is pushed to development branch
 on: [push]
