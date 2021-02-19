@@ -4,6 +4,7 @@ import logging
 from botocore.exceptions import ClientError
 
 # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-uploading-files.html 
+# S3 Upload python script for users/id/tasks/id
 
 def main():
     """Upload a file to an S3 bucket
