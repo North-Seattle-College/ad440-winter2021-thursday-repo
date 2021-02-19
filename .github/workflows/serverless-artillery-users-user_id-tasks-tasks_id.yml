@@ -61,11 +61,17 @@ jobs:
         with:
           timeZone: 8
           format: 'YYYY/MM/DD_HH-mm-ss'
+      - name: Usage
+        env:
+          TIME: "${{ steps.time.outputs.time }}"
+        run: |
+          echo $TIME
             # Rename the results
+
       - name: Rename results json
         run: |
-          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.time.outputs.time }}.json"
+          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_$TIME.json"
       # Upload the results to S3 bucket
-      - name: AWS CLI S3
+      - name: AWS upload S3
         run: |
           aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
