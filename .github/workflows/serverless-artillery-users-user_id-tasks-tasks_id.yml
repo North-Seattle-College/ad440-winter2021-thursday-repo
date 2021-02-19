@@ -1,7 +1,5 @@
 name: Serverless-Artillery performance test users-userid-tasks-taskid
 
-# Run every time a new commit is pushed to the developemtn branch
-# TODO: Actually change this to not be on every push
 # Controls when the action will run. 
 on:
   # Triggers the workflow on push or pull request events but only for the development branch
@@ -14,22 +12,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  slsart-perf:
+  serverless-artillery-test-upload:
     name: serverless artillery test and upload json object to aws s3
     runs-on: ubuntu-latest
     env:
-      STAGE_NAME: users-id-tasks-id
+      STAGE_NAME: users-uid-tasks-tid
 
     steps:
       # Checkout a copy of the code
       - name: Checkout code
         uses: actions/checkout@v2
-      # Install node on the VM
+
+      # Install node js on githubactions runner
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: '14'
           check-latest: true
+
       # Configure the AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
