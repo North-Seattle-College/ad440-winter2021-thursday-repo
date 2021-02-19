@@ -1,8 +1,17 @@
-name: Serverless-Artillery performance test users-userid-tasks
+name: Serverless-Artillery performance test users-userid-tasks-taskid
 
 # Run every time a new commit is pushed to the developemtn branch
 # TODO: Actually change this to not be on every push
-on: [push]
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the development branch
+  push:
+    branches: [ development ]
+  pull_request:
+    branches: [ development ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   slsart-perf:
@@ -10,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       STAGE_NAME: u-uid-t
+
     steps:
       # Checkout a copy of the code
       - name: Checkout code
