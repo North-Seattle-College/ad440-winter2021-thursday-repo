@@ -1,26 +1,20 @@
-# action workflow name
-name: serverless artillery test and upload users-user_id-tasks-task_id
-#Control when the action will run
-on:
-  # Triggers the workflow on push or pull request events but only for the development branch
-  push:
-    branches: [ development ]
-  pull_request:
-    branches: [ development ]
-  # Allows you ti run this workflow manually from the actions tab
-  workflow_dispatch:
+name: Node.js CI
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
 jobs:
-  test_upload_slsart:
-    # The type of runner that the job will run on
+  build:
+
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x, 15.x]
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
