@@ -70,7 +70,7 @@ jobs:
 
       - name: Rename results json
         run: |
-          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_$(TIME).json"
+          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${TIME}.json"
       # Upload the results to S3 bucket
       - name: AWS upload S3
         run: |
