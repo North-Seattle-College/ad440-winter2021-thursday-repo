@@ -43,7 +43,7 @@ jobs:
     - name: S3 Uploader
       uses: shallwefootball/s3-upload-action@master
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-bucket: ${{ secrets.AWS_BUCKET_NAME_ARTILLERY }}
+        aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws_bucket: ${{ secrets.AWS_BUCKET_NAME_ARTILLERY }}
         source_dir: "artillery_${{ steps.date.outputs.date }}.json"
