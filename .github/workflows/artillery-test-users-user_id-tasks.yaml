@@ -58,7 +58,7 @@ jobs:
       env:
         FILE: artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json
         AWS_REGION: 'us-west-2'
-        S3_BUCKET: artillery  
+        S3_BUCKET: ${{ secrets.AWS_BUCKET_NAME_ARTILLERY }} 
         S3_KEY: artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
