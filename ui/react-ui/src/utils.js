@@ -44,11 +44,19 @@ export const getTitleFromUrl = (str) => {
  * @param {string} urlParam - the parameter passed to url string e.g api/users/[1]
  * @return {Response} - Fetch API Response Object
  */
-export const fetchSetTblState = async (endPoint, setStateFunc, urlParam = null) => {
+export const fetchSetTblState = async (endPoint, setStateFunc, urlParam = '') => {
     let title = getTitleFromUrl(endPoint);
     let depluralTitle = dePluralize(title);
     let subtitleStr = `All ${title}`;
-    const response = await fetch(`https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/${endPoint}/${urlParam}`)
+    let apiURL;
+
+    if(!urlParam) {
+      apiURL = `https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/${endPoint}/`
+    } else {
+      apiURL = `https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/${endPoint}/${urlParam}`
+    }
+
+    const response = await fetch(apiURL);
     if(urlParam !== null) {
         subtitleStr = `Single ${depluralTitle}`;
     };

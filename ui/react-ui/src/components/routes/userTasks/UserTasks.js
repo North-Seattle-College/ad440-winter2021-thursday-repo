@@ -25,7 +25,7 @@ const UserTasks = () => {
       <PageTitle title={userTasks[0].title} subtitle={userTasks[0].subtitle} />
       <Container>
       {userTasks.length > 2 
-        ? <BootstrapTable heatherItems={Object.keys(userTasks[2])} rows={[userTasks[2]]} /> 
+        ? <BootstrapTable heatherItems={Object.keys(userTasks[2][0])} rows={userTasks[2]} /> 
         : <h3>User {userId} Tasks Not Found</h3>
       }
       </Container>
