@@ -47,7 +47,7 @@ jobs:
       - name: deploy
         run: slsart deploy --stage $STAGE_NAME --region us-west-2
       - name: invoke
-        run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-users-uid-tasks-results.json
+        run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-tasks-id-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-users-id-tasks-id-results.json
       - name: remove
         run: slsart remove --stage $STAGE_NAME --region us-west-2
       # Get current date and time
