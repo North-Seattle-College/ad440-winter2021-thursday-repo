@@ -58,11 +58,11 @@ jobs:
       # Outputs date
       - name: Get current date and time
         id: date
-        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+        run: echo "::set-output name=date::$(date +'%Y/%m/%d_%H-%M-%S')"
       # Rename the results
       - name: Rename results json
         run: |
-          cp test/results/slsart-users-uid-tasks-results.json "test/results/serverless-artillery_${{ steps.date.outputs.date }}.json"
+          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.date.outputs.date }}.json"
       # Upload the results to S3 bucket
       - name: AWS CLI S3
         run: |
