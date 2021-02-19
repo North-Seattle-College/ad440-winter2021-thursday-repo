@@ -1,0 +1,17 @@
+# You can find great documentation of the possibilities at:
+# https://artillery.io/docs/
+config:
+  target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api"
+  phases:
+    - duration: 150
+      arrivalRate: 50
+      name: "users api test"
+scenarios:
+  - flow:
+    - get:
+      url: "/users"
+      json:
+      afterResponse: "logResponse"
+      capture:
+        json: "$.users"
+        as: "users"
