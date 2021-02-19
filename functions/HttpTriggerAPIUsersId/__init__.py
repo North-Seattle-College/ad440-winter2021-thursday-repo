@@ -171,58 +171,30 @@ def get_user_row(cursor, user_id):
 
 #This method initates REDIS cache
 def start_redis():
-    REDIS_HOST = os.environ['ENV_REDIS_HOST']
+    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
     REDIS_KEY = os.environ['ENV_REDIS_KEY']
-    REDIS_PORT = os.environ['ENV_REDIS_PORT']
 
-    return redis.Redis(host= REDIS_HOST, port= REDIS_PORT, db= 0, password= REDIS_KEY, ssl= True)
+    return redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= REDIS_KEY, ssl= True)
 
 #This method caches user_id
 #param: r- redis cache
-#       user_id: User IDs that need to cached
+#user_id: User IDs that need to cached
 def cache_user_id(r, user_id):
+    key = "users:" + userId
     try:
-        r.set('user_ids', user_id, ex= 2400) #set the expiration to 40 minutes to account for going thru /user endpoint
-        logging.info("GET User IDs: " + (r.get('user_id').decode('utf')))
+        r.set(key, json.dumps(users), ex= 1200) 
         logging.info("Caching complete!")
+    except TypeError as e:
+        logging.info("Caching failed")
+        logging.info(e.args[0])
 
 #This method retrieves the user_id cache
 #param: r- Redis Cache that it the user_id cache residing in
-def get_user_id_cache(r):
-    logging.info("Querying for User ID cache...")
-    try:
-        cache = r.get(b'user_id')
-        return cache
-    except TypeError as e:
-        logging.critical("Failed to fetch from cache: " + e.args[1])
-        return None
-
-#This method creates the table containing User IDs
-#param: conn- the connection string for the database
-#Note: This might not be necessary?
-def create_user_id_table(conn):
-    table_cursor = conn.cursor()
-
-    #Checks if the table exists in the database
-    tables = "tables: "
-    for row in table_cursor.tables(tableType = "TABLE"):
-        #goes through list of each table
-        tables += row.table_name
-        tables += ""
-    logging.debug(tables)
-
-    if "user_id" not in tables:
-        table_cursor.execute('''
-            CREATE TABLE user_id(
-                userId INTEGER PRIMARY KEY IDENTITY
-            );
-            ''')
-    
-    #list columns for user_id table
-    columns = "user_id columns: "
-    for column in table_cursor.columns(table = "user_id"):
-        columns += column.column_name
-        columns += ""
-    logging.debug(columns)
-
-
+#def get_user_id_cache(r):
+    #logging.info("Querying for User ID cache...")
+    #try:
+       # cache = r.get(b'user_id')
+       # return cache
+    #except TypeError as e:
+        #logging.critical("Failed to fetch from cache: " + e.args[1])
+        #return None
