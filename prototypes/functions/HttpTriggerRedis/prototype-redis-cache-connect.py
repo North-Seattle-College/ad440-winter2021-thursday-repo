@@ -13,7 +13,7 @@ cache = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
 # Azure cache for Redis access - PRODUCTION
 # REDIS_PORT = 6380
 # REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-# REDIS_KEY = 'DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA='
+# REDIS_KEY = ''
 # cache = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_KEY, ssl=True)
 
 # Get and set data from cache object
