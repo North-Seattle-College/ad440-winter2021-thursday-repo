@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 const fs = require("fs");
 const config = {
   s3BucketName: process.env.BUCKET_NAME,
-  filePath: '../test/results/serverless-artillery-test-users-api.json'
+  filePath: '../results/serverless-artillery-test-users-api.json'
 };
 const s3Config = {
     signatureVersion: 'v4',
