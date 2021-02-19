@@ -37,14 +37,14 @@ jobs:
         run: slsart deploy --stage $STAGE_NAME --region us-west-2
       - name: invoke
         run: |
-          slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml --region us-west-2 --stage $STAGE_NAME > test/results/slsart-users-uid-tasks-results.json
+          slsart invoke -p test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml --region us-west-2 --stage $STAGE_NAME | tee test/results/slsart-users-uid-tasks-results.json
       - name: remove
         run: slsart remove --stage $STAGE_NAME --region us-west-2
       # Get current date and time
       # Outputs date
       - name: Get current date and time
         id: date
-        run: echo "::set-output name=date::$(date +'%F_%T')"
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
       # Rename the results
       - name: Rename results json
         run: |
