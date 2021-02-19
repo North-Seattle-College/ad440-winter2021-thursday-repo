@@ -1,62 +1,43 @@
-#Creates Azure Application Gateway 
+param(
 
-param (
-    [Parameter(Mandatory=$true)]
-    [string]
-    $applicationGatewayName,
+    # Login parameters
+    [string] [Parameter(Mandatory=$true)] $tenantId,
+    [string] [Parameter(Mandatory=$true)] $applicationId,
+    [string] [Parameter(Mandatory=$true)] $secret,
+    [string] [Parameter(Mandatory=$true)] $subscriptionId,
 
-    [Parameter(Mandatory=$true)]
-    [string]
-    $location,
+    # parameters
+    [string] [Parameter(Mandatory=$true)] $resourceGroupName,
+    [string] [Parameter(Mandatory=$true)] $location,
+    [string] [Parameter(Mandatory=$true)] $applicationGatewayName
 
-    [Parameter(Mandatory=$true)]
-    [string]
-    $backendAddressPools,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $backendHttpSettingsCollection,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $frontendIPConfigurations,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $gatewayIPConfigurations,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $frontendPorts,
-    
-    [Parameter(Mandatory=$true)]
-    [string]
-    $httpListeners,
-    
-    [Parameter(Mandatory=$true)]
-    [string]
-    $requestRoutingRules,
-    
-    [Parameter(Mandatory=$true)]
-    [string]
-    $sku
-    
 )
 
+Start-Transcript -Path "$PSScriptRoot\create_Azure_log.log"
+Write-Host "Logging to $PSScriptRoot\create_Azure_log.log"
 
+
+# Imports Login Module
 Import-Module ..\Login
+# Path to Template File
+$templateFilePath = "./template.json"
+
+# Login Inputs
 Login $tenantId $applicationId $secret $subscriptionId
 
 
-$templateFilePath = "./template.json"
+# Creates/Updates resource group
+New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Force
 
-New-AzResourceGroup 
-  -Name myResourceGroupAG `
-  -Location location `
-  
+
+#Creates New Application Gateway
+$sku = New-AzApplicationGatewaySku `
+  -Name Standard_v2 `
+  -Tier Standard_v2 `
+  -Capacity 2
 New-AzApplicationGateway `
   -Name $applicationGatewayName `
-  -ResourceGroupName myResourceGroupAG `
+  -ResourceGroupName $resourceGroupName `
   -TemplateFile  $templateFilePath `
   -Location $location `
   -BackendAddressPools $backendAddressPools `
