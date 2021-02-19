@@ -4,6 +4,8 @@ import logging
 import os
 import azure.functions as func
 import datetime
+import redis 
+
 
 
 # to handle datetime with JSON
@@ -25,6 +27,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     method = req.method
     user_id = req.route_params.get('userId')
 
+    
+
+
+
     try:
         conn = connect_to_db()
     except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
@@ -32,6 +38,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.debug("Error: " + e.args[1])
         return func.HttpResponse(status_code=500)
     logging.debug("Connected to DB successfuly!")
+
+    #Redis Sever
+    try:
+        
+        rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password='${{ secrets.ENV_REDIS_KEY }}', ssl=True) 
+        rDB.ping()
+        logging.debug("Connected to Redis!")
+    except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
+            logging.error("Redis connection error!" + e.arge[0])
+            
 
     try:
         if method == "GET":
@@ -58,6 +74,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn.close()
         logging.debug('Connection to DB closed')
 
+        
+
+
 
 def connect_to_db():
     # Database credentials.
@@ -72,7 +91,7 @@ def connect_to_db():
     return pyodbc.connect(connection_string)
 
 
-def get_user_tasks(conn, userId):
+def get_user_tasks(conn, userId, rDB):
     with conn.cursor() as cursor:
         logging.debug("execute query")
         cursor.execute("SELECT * FROM tasks WHERE userId=?", userId)
@@ -86,10 +105,23 @@ def get_user_tasks(conn, userId):
         tasks = []
         columns = [column[0] for column in cursor.description]
 
+    if(rDB.get('UsersIdTasks')):
+        unpacked_tasks = json.loads(rDB.get('tasks'))
+        tasks = unpacked_tasks
+        logging.debug('Tasks loaded from Redis')
+
+    else:
+        logging.debug('No tasks in Redis')
+
         for task in task_data:
             tasks.append(dict(zip(columns, task)))
 
         logging.debug("tasks received!!")
+
+        #RedisLoad
+        json_tasks = json.dumps(tasks);   
+        rDB.set('UsersIdTasks', json_tasks)
+        rDB.expire('tasks', 20)
 
         return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
 
