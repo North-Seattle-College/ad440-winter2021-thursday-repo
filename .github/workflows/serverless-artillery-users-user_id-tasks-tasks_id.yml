@@ -54,15 +54,18 @@ jobs:
         run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-uid-tasks-tid-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-users-uid-tasks-tid-results.json
       - name: remove
         run: slsart remove --stage $STAGE_NAME --region us-west-2
-      # Get current date and time
-      # Outputs date
-      - name: Get current date and time
-        id: date
-        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+      # Get current time
+      - name: Get Current Time
+        uses: 1466587594/get-current-time@v2.0.0
+        id: current-time
+        with:
+          format: YYYYMMDD-HH
+          utcOffset: "+08:00"
+        run: echo "::set-output name=time::$(time +'%F_%H-%M-%S')"
       # Rename the results
       - name: Rename results json
         run: |
-          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.date.outputs.date }}.json"
+          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.current-time.outputs.time }}.json"
       # Upload the results to S3 bucket
       - name: AWS CLI S3
         run: |
