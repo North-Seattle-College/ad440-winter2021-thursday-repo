@@ -31,16 +31,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         # Return results according to the method
         if method == "GET":
-            logging.debug("Attempting to retrieve users...")
+            logging.info("Attempting to retrieve users...")
             all_users_http_response = get_users(conn, init_redis())
-            logging.debug("Users retrieved successfully!")
+            logging.info("Users retrieved successfully!")
             return all_users_http_response
 
         elif method == "POST":
-            logging.critical("Attempting to add user...")
+            logging.info("Attempting to add user...")
             user_req_body = req.get_json()
             new_user_id_http_response = add_user(conn, user_req_body)
-            logging.debug("User added successfully!")
+            logging.info("User added successfully!")
             return new_user_id_http_response
 
         else:
