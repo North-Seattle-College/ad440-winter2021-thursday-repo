@@ -46,7 +46,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         rDB.ping()
         logging.debug("Connected to Redis!")
     except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
-            logging.error("Redis connection error!" + e.arge[0])
+            logging.error("Redis connection error!" + e.args[0])
             
 
     try:
