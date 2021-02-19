@@ -18,4 +18,3 @@ scenarios:
       url: "/users/1/tasks"
       capture:
         json: "$.taskId"
-        as: "taskId"
