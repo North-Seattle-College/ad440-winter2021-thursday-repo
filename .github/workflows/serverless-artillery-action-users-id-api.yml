@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-node@v2
 
     - name: Upload file to bucket  
-    - uses: yergu/ad440-winter2021-thursday-repo@feature/GitHub-action-for-serverless-artillery
+    - uses: aws-actions/configure-aws-credentials@v1
       with:
         node-version: '14'
         check-latest: true
