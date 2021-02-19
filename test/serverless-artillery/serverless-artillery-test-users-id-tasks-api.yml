@@ -16,7 +16,6 @@ scenarios:
   - flow:
     - get:
       url: "/users/1/tasks"
-      afterResponse: "logResponse"
       capture:
         json: "$.taskId"
         as: "taskId"
