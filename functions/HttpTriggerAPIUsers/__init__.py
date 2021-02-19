@@ -26,20 +26,24 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         
     logging.debug("Connection to DB successful!")
 
+    # If DB doesn't already have a users table, create it
     create_users_table(conn)
+
+    # Initiate connection to Redis Cache
+    r = init_redis()
 
     try:
         # Return results according to the method
         if method == "GET":
             logging.info("Attempting to retrieve users...")
-            all_users_http_response = get_users(conn, init_redis())
+            all_users_http_response = get_users(conn, r)
             logging.info("Users retrieved successfully!")
             return all_users_http_response
 
         elif method == "POST":
             logging.info("Attempting to add user...")
             user_req_body = req.get_json()
-            new_user_id_http_response = add_user(conn, user_req_body)
+            new_user_id_http_response = add_user(conn, user_req_body, r)
             logging.info("User added successfully!")
             return new_user_id_http_response
 
@@ -100,7 +104,7 @@ def get_users(conn, r):
 
             return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
         
-def add_user(conn, user_req_body):
+def add_user(conn, user_req_body, r):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
     try:
@@ -138,6 +142,9 @@ def add_user(conn, user_req_body):
 
         # Get the user id from cursor
         user_id = cursor.fetchval()
+
+        # clear cache
+        clear = r.delete('users:all')
         
         logging.debug(
             "User added and new user id retrieved, returning information from add_user function")
@@ -152,7 +159,7 @@ def init_redis():
 
 def cache_users(r, users):
     try: 
-        r.set('users', json.dumps(users), ex=1200)   
+        r.set('users:all', json.dumps(users), ex=1200)   
         logging.info("Caching complete")
     except TypeError as e:
         logging.info("Caching failed")
