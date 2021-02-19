@@ -13,7 +13,7 @@ jobs:
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
       AWS_SLSART_REGION: "us-west-2"
-      STAGE_NAME: users-api-test
+      STAGE_NAME: users-api-test1
 
     steps:
       - name: Checkout the code
@@ -38,13 +38,15 @@ jobs:
       - name: installing serverless-artillery
         run: npm install -g serverless@1.38.0 serverless-artillery
 
-      - name: deploy, Invoke, remove
+      - name: deploy, invoke, remove
         run: |
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
           ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage users-api-test --region us-west-2 | tee test/results/serverless-artillery-test-users-api.json
           ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
       
       - name: upload to s3
-        run: |
-          cd aws
-          BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} node aws-deploy.js
+        run: bash scripts/pipeline/release.sh 'usersapitest' "serverless-artillery-test-users-api.json" ${{secrets.AWS_ACCESS_KEY_ID}} ${{secrets.AWS_SECRET_ACCESS_KEY}} "test/results/serverless-artillery-test-users-api.json"
+
+        # run: |
+        #   cd aws
+        #   BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} node aws-deploy.js
