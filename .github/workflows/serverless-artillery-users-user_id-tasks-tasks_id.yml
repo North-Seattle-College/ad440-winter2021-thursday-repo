@@ -15,10 +15,10 @@ on:
 
 jobs:
   slsart-perf:
-    name: slsart performance test users-userid-tasks
+    name: serverless artillery test and upload json object to aws s3
     runs-on: ubuntu-latest
     env:
-      STAGE_NAME: u-uid-t
+      STAGE_NAME: users-id-tasks-id
 
     steps:
       # Checkout a copy of the code
