@@ -42,7 +42,7 @@ jobs:
       # Install serverless-artillery
       - name: Installing serverless-artillery
         run: |
-          npm install -g serverless
+          npm install -g serverless@1.38.0
           npm install -g serverless-artillery
           echo "version of slsart"
           slsart --version
