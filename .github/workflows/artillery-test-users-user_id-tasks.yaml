@@ -46,5 +46,19 @@ jobs:
     # Call artillery test located at ./test/artillery/artillery-users-user_id-tasks.yaml
     # Return results to json
     - name: Run Artillery Test
-      run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output artillery_${{ steps.date.outputs.date }}.json ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
+      run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
 
+    # Use preexisting action to upload to S3
+    # This will be changed to my own python script
+    # https://github.com/zdurham/s3-upload-github-action
+    - name: Upload file to S3 using zdurham s3-upload-github-action
+      uses: zdurham/s3-upload-github-action@master
+      with:
+        args: --acl public-read
+      env:
+        FILE: artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json
+        AWS_REGION: 'us-west-2'
+        S3_BUCKET: artillery  
+        S3_KEY: artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
