@@ -3,7 +3,7 @@ name: Artillery action to test function users
 on: 
   push:
     branches:
-      -development
+      - development
 
 env:
   NODE_VERSION: '14'
@@ -17,10 +17,6 @@ jobs:
     - name: 'Checkout Repository GitHub Action'
       uses: actions/checkout@v2
 
-    - name: check files
-      run: |
-        cd ./scripts
-        ls -a
     - name: Setup Node ${{ env.NODE_VERSION }} Environment
       uses: actions/setup-node@v2
       with:
