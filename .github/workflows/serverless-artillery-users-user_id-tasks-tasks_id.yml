@@ -58,7 +58,7 @@ jobs:
       # Outputs date
       - name: Get current date and time
         id: date
-        run: echo "::set-output name=date::$(date +'%Y/%m/%d_%H-%M-%S')"
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
       # Rename the results
       - name: Rename results json
         run: |
