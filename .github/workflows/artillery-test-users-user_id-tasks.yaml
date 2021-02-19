@@ -1,17 +1,16 @@
 name: Artillery Action to test endpoint function users-userId-tasks
 
-on:
-  push:
-    # Action is called when a branch is merged with development
-    branches:
-      - development  
+on: [push]
+  # push:
+  #   # Action is called when a branch is merged with development
+  #   branches:
+  #     - development  
 
 # Set up env variables for Node and Python
 # Note: there is no Python functionality yet, but there will be eventually for uploadiing results to S3
 env:
   NODE_VERSION: '14'  # the version of node we are using
   NPM_CONFIG_PREFIX: "~/.npm-global" # Required to set path for artillery call
-  PYTHON_VERSION: '3.8' # the version of python we are using
 
 jobs:
   artillery-test-users-user_id-tasks:
@@ -33,6 +32,13 @@ jobs:
     #Setup node package manager
     - name: 'Run npm init'
       run: npm init -y
+  
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
 
     #install artillery
     - name: Run npm install artillery  
@@ -43,22 +49,22 @@ jobs:
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
 
-    # Call artillery test located at ./test/artillery/artillery-users-user_id-tasks.yaml
-    # Return results to json
+    # Call artillery test located at ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
+    # Return temp results to test/results/artillery-test-users-user_id-tasks-results.json
     - name: Run Artillery Test
-      run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
+      run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output test/results/artillery-test-users-user_id-tasks-results.json ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
+      
+    - name: Rename results json
+      run: |
+        cp test/results/artillery-test-users-user_id-tasks-results.json "test/results/artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json"
+    # Upload the results to S3 bucket
+    - name: AWS CLI S3
+      run: |
+        aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
 
-    # Use preexisting action to upload to S3
-    # This will be changed to my own python script
-    # https://github.com/zdurham/s3-upload-github-action
-    - name: Upload file to S3 using zdurham s3-upload-github-action
-      uses: zdurham/s3-upload-github-action@master
-      with:
-        args: --acl public-read
-      env:
-        FILE: artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json
-        AWS_REGION: 'us-west-2'
-        S3_BUCKET: ${{ secrets.AWS_BUCKET_NAME_ARTILLERY }} 
-        S3_KEY: artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      
+      
+      
+      
+
+   
