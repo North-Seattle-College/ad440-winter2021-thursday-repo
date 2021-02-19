@@ -1,5 +1,5 @@
 config:
-  target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net"
+  target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api"
   phases:
     - duration: 10
       arrivalRate: 4
