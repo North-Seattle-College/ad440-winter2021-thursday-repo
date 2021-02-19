@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: serverless artillery test and upload S3 users-user_id-tasks-task_id
 
 # Controls when the action will run. 
 on:
