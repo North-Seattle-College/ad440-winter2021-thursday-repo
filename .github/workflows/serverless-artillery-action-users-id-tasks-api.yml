@@ -51,4 +51,4 @@ jobs:
       # Upload the results to S3 bucket
       - name: AWS CLI S3
         run: |
-          aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*" --acl public-read
+          aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
