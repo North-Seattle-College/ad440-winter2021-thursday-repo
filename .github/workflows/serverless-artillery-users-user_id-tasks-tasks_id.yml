@@ -38,9 +38,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
       # Install serverless-artillery
-      - name: Install serverless and serverless-artillery
+      - name: Installing serverless-artillery
         run: |
-          npm install -g serverless@1.38.0
+          npm install -g serverless
           npm install -g serverless-artillery
           slsart --version
       # Run serverless-artillery test
