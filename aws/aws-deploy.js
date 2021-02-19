@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const config = {
   s3BucketName: process.env.BUCKET_NAME,
-  filePath: `../test/results/serverless-artillery-test-users-api.json`
+  filePath: process.env.FILE_PATH
 };
 
 const s3Config = {
@@ -15,8 +15,8 @@ const s3Config = {
 const s3 = new AWS.S3(s3Config);
 
 s3.putObject({
-  Bucket: 'usersapitest',
-  Key: 'serverless-artillery-test-users-api.json',
+  Bucket: process.env.BUCKET_NAME,
+  Key: process.env.FILE_KEY,
   Body: fs.readFileSync(config.filePath)
 }, (err, res) => {
   if (err) {

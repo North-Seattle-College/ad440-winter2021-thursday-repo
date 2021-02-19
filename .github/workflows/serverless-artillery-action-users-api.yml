@@ -59,6 +59,7 @@ jobs:
           S3_KEY: serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
         # run: |
         #   cd aws
-        #   BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} node aws-deploy.js
+        #   FILE_PATH= test/results/serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json FILE_KEY= serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} node aws-deploy.js
