@@ -44,7 +44,9 @@ jobs:
         run: |
           npm install -g serverless
           npm install -g serverless-artillery
+          echo "version of slsart"
           slsart --version
+
       # Run serverless-artillery test
       - name: deploy
         run: slsart deploy --stage $STAGE_NAME --region us-west-2
