@@ -1,51 +1,54 @@
-# This is a basic workflow to help you get started with Actions
+name: Serverless-Artillery performance test users-userid-tasks
 
-name: serverless artillery test and upload S3 users-user_id-tasks-task_id
+# Run every time a new commit is pushed to the developemtn branch
+# TODO: Actually change this to not be on every push
+on: [push]
 
-# Controls when the action will run. 
-on:
-  # Triggers the workflow on push or pull request events but only for the development branch
-  push:
-    branches: [ development ]
-  pull_request:
-    branches: [ development ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  test_upload:
-    # The type of runner that the job will run on
+  slsart-perf:
+    name: slsart performance test users-userid-tasks
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    env:
+      STAGE_NAME: u-uid-t
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      #set up node js
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.4
+      # Checkout a copy of the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+      # Install node on the VM
+      - name: Setup Node
+        uses: actions/setup-node@v2
         with:
-          # Set always-auth in npmrc
-          always-auth: # optional, default is false
-          # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
-          node-version: # optional
-          # Target architecture for Node to use. Examples: x86, x64. Will use system architecture by default.
-          architecture: # optional
-          # Set this option if you want the action to check for the latest available version that satisfies the version spec
-          check-latest: # optional
-          #  Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN
-          registry-url: # optional
-          # Optional scope for authenticating against scoped registries
-          scope: # optional
-          # Used to pull node distributions from node-versions.  Since there's a default, this is typically not supplied by the user.
-          token: # optional, default is ${{ github.token }}
-          # Deprecated. Use node-version instead. Will not be supported after October 1, 2019
-          version: # optional
+          node-version: '14'
+          check-latest: true
+      # Configure the AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      # Install serverless-artillery
       - name: Install serverless and serverless-artillery
         run: |
           npm install -g serverless@1.38.0
           npm install -g serverless-artillery
+      # Run serverless-artillery test
+      - name: deploy
+        run: slsart deploy --stage $STAGE_NAME --region us-west-2
+      - name: invoke
+        run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-users-uid-tasks-results.json
+      - name: remove
+        run: slsart remove --stage $STAGE_NAME --region us-west-2
+      # Get current date and time
+      # Outputs date
+      - name: Get current date and time
+        id: date
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+      # Rename the results
+      - name: Rename results json
+        run: |
+          cp test/results/slsart-users-uid-tasks-results.json "test/results/serverless-artillery_${{ steps.date.outputs.date }}.json"
+      # Upload the results to S3 bucket
+      - name: AWS CLI S3
+        run: |
+          aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
