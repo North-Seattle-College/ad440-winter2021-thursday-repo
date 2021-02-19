@@ -9,14 +9,15 @@ import azure.functions as func
 import redis 
 
 # Connect to the Redis Server
-r = redis.StrictRedis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port=6380, db=0, password='DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA=', ssl=True)
+r = redis.StrictRedis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', 
+port=6380, db=0, password='DQZfYhdrqhBVm5Mu3WgteoH0GihbxxRMZF6t15NlwNA=', ssl=True)
 
 # Set Message in the Redis Server for testing
 r.set("Message01", "Hello World")
 
 
 #GET API method function
-def get(userId, taskId):
+def get(userId, taskId, r):
     #connects to db
 
     try:
@@ -25,67 +26,45 @@ def get(userId, taskId):
         cursor = cnxn.cursor() 
         logging.debug('opened connection')        
         logging.debug(f'Attempting to execute GET task query for task {taskId}')
-        #Get task title, description and user name by userId and taskId
-        #Avoids using SELECT * to prevent retuning unwanted unformation
-        sql_query = ("""SELECT tasks.userId, CONCAT (users.firstName, ' ', users.lastName) AS "user",
-                    tasks.taskId, tasks.title, tasks.description, tasks.createdDate, tasks.dueDate, 
-                    tasks.completed, tasks.completedDate 
-                    FROM [dbo].[tasks] JOIN [dbo].[users] 
-                    on [dbo].[tasks].userId = [dbo].[users].userId
-                    WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
-        cursor.execute(sql_query, userId, taskId)
-        logging.debug(f'Executed the GET query for {taskId}')          
-        row = cursor.fetchone()
-        logging.debug(f"Got result: {row}")
-        if not row:
-            logging.error('No record with the requested parameters')
-            return func.HttpResponse('Task not found', status_code=404)
+
+        try:
+            cache = get_taskID_cache(r, userId, taskId)
+        except TypeError as e:
+            logging.info(e.args[0])
+
+        if cache:
+            logging.info("Returned data from cache")
+            return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
+
         else:
-            columns = [column[0] for column in cursor.description]
-            data = dict(zip(columns, row))
-        return func.HttpResponse(json.dumps(data, default=str), status_code=200, mimetype="application/json")
+            #Get task title, description and user name by userId and taskId
+            #Avoids using SELECT * to prevent retuning unwanted unformation
+            sql_query = ("""SELECT tasks.userId, CONCAT (users.firstName, ' ', users.lastName) AS "user",
+                        tasks.taskId, tasks.title, tasks.description, tasks.createdDate, tasks.dueDate, 
+                        tasks.completed, tasks.completedDate 
+                        FROM [dbo].[tasks] JOIN [dbo].[users] 
+                        on [dbo].[tasks].userId = [dbo].[users].userId
+                        WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
+            cursor.execute(sql_query, userId, taskId)
+            logging.debug(f'Executed the GET query for {taskId}')          
+            row = cursor.fetchone()
+            logging.debug(f"Got result: {row}")
+            if not row:
+                logging.error('No record with the requested parameters')
+                return func.HttpResponse('Task not found', status_code=404)
+            else:
+                columns = [column[0] for column in cursor.description]
+                data = dict(zip(columns, row))
+            # cashdata 
+            cache_users(r, data, userId, taskId)
+            return func.HttpResponse(json.dumps(data, default=str), status_code=200, mimetype="application/json")
+
     finally:
         cursor.close()
         cnxn.close()
         logging.debug('Closed the db connection')   
 
-def get_users(conn, r):
-    try:
-        cache = get_users_cache(r)
-    except TypeError as e:
-        logging.info(e.args[0])
 
-    if cache:
-        logging.info("Returned data from cache")
-        return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
-    else: 
-        logging.info("Cache is empty, querying database...")
-        with conn.cursor() as cursor:
-            logging.debug(
-                "Using connection cursor to execute query (select all from users)")
-            cursor.execute("SELECT * FROM users")
-
-            # Get users
-            logging.debug("Fetching all queried information")
-            users_table = list(cursor.fetchall())
-
-            # Clean up to put them in JSON.
-            users_data = [tuple(user) for user in users_table]
-
-            # Empty data list
-            users = []
-
-            users_columns = [column[0] for column in cursor.description]
-            for user in users_data:
-                users.append(dict(zip(users_columns, user)))
-
-            # users = dict(zip(columns, rows))
-            logging.debug(
-                "User data retrieved and processed, returning information from get_users function")
-            logging.info("Caching results...")
-
-            # Cache the results 
-            cache_users(r, users)
 
 #PUT API method function
 def update(userId, taskId, task_fields):
@@ -295,7 +274,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     #if GET method is selected, it executes here
         if method == "GET":  
             logging.debug('Passed GET method')      
-            return (get(userId, taskId))
+            return (get(userId, taskId,r))
 
     #if DELETE method is selected, it executes here
         if method == "DELETE":
@@ -329,53 +308,23 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500) 
 
-def get_taskID_cache(r):
+def get_taskID_cache(r, userId, taskId):
     logging.info("Querying cache...")
+    key = "users:" + userId + ":tasks:" + taskId
+
     try:
-        cache = r.get(b'taskId')
+        cache = r.get(key)
         return cache
     except TypeError as e:
         logging.critical("Failed to fetch from cache: " + e.args[1])
         return None
 
-# Get method for task id 
-
-def get_taskId(conn, r):
-    try:
-        cache = get_taskID_cache(r)
+def cache_users(r, task, userId, taskId):
+    key = "users:" + userId + ":tasks:" + taskId
+    try: 
+        r.set(key, json.dumps(task), ex=1200)   
+        logging.info("Caching complete")
     except TypeError as e:
+        logging.info("Caching failed")
         logging.info(e.args[0])
 
-    if cache:
-        logging.info("Returned data from cache")
-        return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
-    else: 
-        logging.info("Cache is empty, querying database...")
-        with conn.cursor() as cursor:
-            logging.debug(
-                "Using connection cursor to execute query (select all from users)")
-            cursor.execute("SELECT * FROM users")
-
-            # Get TaskID
-            logging.debug("Fetching all queried information")
-            users_table = list(cursor.fetchall())
-
-            # Clean up to put them in JSON.
-            task_Id = [tuple(taskId) for taskId in users_table]
-
-            # Empty data list
-            users = []
-
-            users_columns = [column[0] for column in cursor.description]
-            for taskId in task_Id:
-                taskId.append(dict(zip(users_columns, taskId)))
-
-            # users = dict(zip(columns, rows))
-            logging.debug(
-                "User TaskID data retrieved and processed, returning information from get_users function")
-            logging.info("Caching results...")
-
-            # Cache the results 
-            get_taskID_cache(r, taskId)
-
-            return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
