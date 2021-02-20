@@ -12,6 +12,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
         'Python HTTP trigger for users/userId is processing a request ')
 
+    #Initiating REDIS cache
+    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= '${{ secrets.ENV_REDIS_KEY }}', ssl= True)
+
+    #Something to test the redis cache
+    r.get("2")
+
     # Database credentials.
     db_server = os.environ["ENV_DATABASE_SERVER"]
     db_name = os.environ["ENV_DATABASE_NAME"]
@@ -160,11 +167,6 @@ def get_user_row(cursor, user_id):
         "SELECT * FROM dbo.users WHERE userId= ?", (user_id,))
 
     return cursor.fetchone()
-
-#This method initates REDIS cache
-def start_redis():
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-    return redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= '${{ secrets.ENV_REDIS_KEY }}', ssl= True)
 
 #This method caches user_id
 #param: r- redis cache
