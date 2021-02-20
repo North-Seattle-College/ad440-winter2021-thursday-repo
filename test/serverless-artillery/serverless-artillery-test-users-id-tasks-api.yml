@@ -16,5 +16,3 @@ scenarios:
   - flow:
     - get:
       url: "/users/1/tasks"
-      capture:
-        json: "$.taskId"
