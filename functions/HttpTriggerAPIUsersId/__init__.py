@@ -40,7 +40,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                         status_code=404
                     )
                 if req.method == 'GET':
-                    return get(cursor, row)
+                    return get(cursor, row, r)
                 elif req.method == 'PUT':
                     return put(req, cursor, user_id)
                 elif req.method == 'DELETE':
@@ -55,26 +55,27 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500
         )
 
-#This method calls the get user ID cache method
-#param: conn- connection string where the database is
-#r- Redis cache
-#This might have to be combined with the get(cursor,row) method?
-def get_user_id(conn, r):
+#This method calls the retrieves the user based on user_id and caches the user info on Redis
+def get(cursor, row, r):
+    logging.debug("Attempting to retrieve user by ID...")
+    # This will convert the results from the query into json properties.
+    # More information can be found on the link below:
+    # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
     try:
-        cache = get_user_id_cache(r)
+        cache = get_user_id_cache(r, userId)
     except TypeError as e:
         logging.info(e.args[0])
-    
     if cache:
         logging.info("Data returned from cache")
         return func.HttpResponse(cache.decode('utf-8'), status_code =200, mimetype="application/json")
     else:
         logging.info("Empty cache, querying...")
-        with conn.cursor() as cursor:
-            logging.debug("Using connection cursor to perform query (select all from user_id)")
-            cursor.execute("SELECT * FROM user_id")
-    
-    #get User IDs
+        sql_query = ("""SELECT CONCAT (users.firstName, ' ', users.lastName) AS "user",
+                        FROM [dbo].[users] 
+                        WHERE [dbo].[users].userId = ?""")
+        cursor.execute(sql_query, userId)
+
+    #gets user(s)
     logging.debug("Fetching all queries for User IDs")
     user_id_table = list(cursor.fetchall())
 
@@ -84,25 +85,16 @@ def get_user_id(conn, r):
     #Empty User ID list
     user_id_list = []
 
+    #Add data to empty list
     user_id_columns = [column[0] for column in cursor.description]
-
     for user_id in user_id_data:
-        user_id_list.append(dict(zip(user_id_columns, user_id)))
-    
-    logging.debug("User ID data processed and retrieved")
-
-    #Caches the User ID data
-    cache(r, user_id)
-
-def get(cursor, row):
-    logging.debug("Attempting to retrieve user by ID...")
-    # This will convert the results from the query into json properties.
-    # More information can be found on the link below:
-    # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
-    columns = [column[0] for column in cursor.description]
-    data = dict(zip(columns, row))
+        user_id_list.append(dict(zip(columns, row))) 
 
     logging.debug("Users retrieved successfully!")
+
+    #Caches the User ID data
+    cache_user_id(r, user_id)
+
     return func.HttpResponse(
         json.dumps(data),
         status_code=200,
@@ -172,9 +164,7 @@ def get_user_row(cursor, user_id):
 #This method initates REDIS cache
 def start_redis():
     REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-    REDIS_KEY = os.environ['ENV_REDIS_KEY']
-
-    return redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= REDIS_KEY, ssl= True)
+    return redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= '${{ secrets.ENV_REDIS_KEY }}', ssl= True)
 
 #This method caches user_id
 #param: r- redis cache
@@ -190,11 +180,12 @@ def cache_user_id(r, user_id):
 
 #This method retrieves the user_id cache
 #param: r- Redis Cache that it the user_id cache residing in
-#def get_user_id_cache(r):
-    #logging.info("Querying for User ID cache...")
-    #try:
-       # cache = r.get(b'user_id')
-       # return cache
-    #except TypeError as e:
-        #logging.critical("Failed to fetch from cache: " + e.args[1])
-        #return None
+def get_user_id_cache(r, userId):
+    logging.info("Querying for User ID cache...")
+    try:
+        key = "users:" + userId
+        cache = r.get(key)
+        return cache
+    except TypeError as e:
+        logging.critical("Failed to fetch from cache: " + e.args[1])
+        return None
