@@ -6,7 +6,7 @@ jobs:
     name: Serverless Artillery Users API Test Performance testing
     runs-on: ubuntu-latest
     env:
-      NPM_CONFIG_PREFIX: "~/.npm-global"
+   
       STAGE_NAME: perf-test-userid-api
     steps:
     - name: Checkout Code
