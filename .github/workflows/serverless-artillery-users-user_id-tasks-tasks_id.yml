@@ -60,7 +60,7 @@ jobs:
         id: time
         uses: nanzm/get-time-action@v1.1
         with:
-          timeZone: 8
+          timeZone: -8
           format: 'YYYY/MM/DD/HH-mm-ss'
 
       - name: Usage
@@ -73,8 +73,6 @@ jobs:
       - name: ADD time stamp to file name
         run: |
           cp test/results/slsart-users-uid-tasks-tid-results.json test/results/serverless-artillery_${{ steps.time.output.time }}.json
-          cd /test/results
-          ls 
 
       # Upload the results to S3 bucket
       - name: AWS upload S3
