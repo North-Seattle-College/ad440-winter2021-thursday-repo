@@ -23,7 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
 
       # Setup Node.js environment
       - name: Setup Node.js environment
@@ -33,12 +33,12 @@ jobs:
           check-latest: true
 
       # Configuration of AWS secrets
-      - name: Configuration of AWS secrets
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+      #- name: Configuration of AWS secrets
+       # uses: aws-actions/configure-aws-credentials@v1
+        #with:
+         # aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          #aws-region: us-west-2
 
       - name: Installing serverless-artillery
         run: |
@@ -57,18 +57,30 @@ jobs:
 
       # Get current time
       - name: Get Time
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y/%m/%d/%H-%M-%S')"
-        
-
-      
+        id: time
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
        
       # add timstamp to file name
       - name: ADD time stamp to file name
         run: |
-          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.date.output.date }}.json"
+          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.time.output.date }}.json"
+      
+      - name: Upload file to bucket
+        uses: zdurham/s3-upload-github-action@master
+        with:
+          args: --acl public-read
+        env:
+          FILE: /test/results/serverless-artillery_*
+          AWS_REGION: 'us-west-2'
+          S3_BUCKET: ${{ secrets.SLSART_BUCKET }}
+
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+
 
       # Upload the results to S3 bucket
-      - name: AWS upload S3
-        run: |
-          aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
+      #- name: AWS upload S3
+        #run: |
+          #aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
