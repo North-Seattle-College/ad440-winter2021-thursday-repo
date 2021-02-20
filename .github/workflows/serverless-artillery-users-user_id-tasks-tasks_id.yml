@@ -57,13 +57,13 @@ jobs:
 
       # Get current time
       - name: Get Time
-        id: time
+        id: date
         run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
        
       # add timstamp to file name
       - name: ADD time stamp to file name
         run: |
-          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.time.output.date }}.json"
+          cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.date.output.date }}.json"
       
       # Upload the results to S3 bucket
       - name: AWS upload S3
