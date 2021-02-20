@@ -62,6 +62,7 @@ jobs:
         with:
           timeZone: -8
           format: 'YYYY/MM/DD/HH-mm-ss'
+        run: echo "::set-output name=date::$(date +'YYYY/MM/DD/HH-mm-ss')"
 
       - name: Usage
         env:
