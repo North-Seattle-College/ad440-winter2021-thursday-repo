@@ -23,7 +23,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
 
       # Setup Node.js environment
       - name: Setup Node.js environment
@@ -65,22 +65,7 @@ jobs:
         run: |
           cp test/results/slsart-users-uid-tasks-tid-results.json "test/results/serverless-artillery_${{ steps.time.output.date }}.json"
       
-      - name: Upload file to bucket
-        uses: zdurham/s3-upload-github-action@master
-        with:
-          args: --acl public-read
-        env:
-          FILE: /test/results/serverless-artillery_*
-          AWS_REGION: 'us-west-2'
-          S3_BUCKET: ${{ secrets.SLSART_BUCKET }}
-
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-
-
-
       # Upload the results to S3 bucket
-      #- name: AWS upload S3
-        #run: |
-          #aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
+      - name: AWS upload S3
+        run: |
+          aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
