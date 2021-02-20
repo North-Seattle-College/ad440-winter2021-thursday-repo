@@ -58,7 +58,7 @@ jobs:
       # Get current time
       - name: Get Time
         id: date
-        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+        run: echo "::set-output name=date::$(date +'%Y/%m%d/%H-%M-%S')"
        
       # add timstamp to file name
       - name: ADD time stamp to file name
