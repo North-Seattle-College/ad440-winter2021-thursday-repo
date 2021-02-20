@@ -10,27 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
-      STAGE_NAME: merge-perf-test
+      STAGE_NAME: perf-test-userid-api
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
 
     - name: Setup Node.js
       uses: actions/setup-node@v2
-
-    - name: Upload file to bucket  
-    - uses: aws-actions/configure-aws-credentials@v1
       with:
         node-version: '14'
         check-latest: true
+    - name: upload file to s3 bucket
+      uses: yergu/ad440-winter2021-thursday-repo/s3-upload-github-action @feature/GitHub-action-for-serverless-artillery  
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET}}
+        aws_s3_bucket: serverless-artillery
         aws-region: us-west-2
-        source_dir: '../../test/results'
+        source_dir: 'test/results'
+        
+        SOURCE_DIR: 'public'
 
     - name: Install serverless and serverless-artillery
       run: |
@@ -41,8 +42,9 @@ jobs:
     
     - name: invoke functions
       run:  ~/.npm-global/bin/slsart invoke -s ../../test/serverless-artillery/serverless-artillery-test-users-id-api.yaml --stage $STAGE_NAME > ../../test/results/serverless-artillery-test-users-id-api-Results.json
-    
+       
     - name: remove functions
       run:  ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+
 
       
