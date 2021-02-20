@@ -10,7 +10,7 @@ import redis
 
 # Connect to the Redis Server
 r = redis.StrictRedis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', 
-port=6380, db=0, password=os.environ["secrets.ENV_REDIS_KEY"], ssl=True)
+port=6380, db=0, password= '${{ secrets.ENV_REDIS_KEY }}', ssl=True)
 
 # Set Message in the Redis Server for testing
 r.set("Message01", "Hello World")
