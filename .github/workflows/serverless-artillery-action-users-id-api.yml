@@ -41,7 +41,7 @@ jobs:
       run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region=us-west-2
     
     - name: invoke functions
-      run:  ~/.npm-global/bin/slsart invoke -s ../../test/serverless-artillery/serverless-artillery-test-users-id-api.yaml --stage $STAGE_NAME > ../../test/results/serverless-artillery-test-users-id-api-Results.json
+      run:  ~/.npm-global/bin/slsart invoke -s /test/serverless-artillery/serverless-artillery-test-users-id-api.yaml --stage $STAGE_NAME > /test/results/serverless-artillery-test-users-id-api-Results.json
        
     - name: remove functions
       run:  ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
