@@ -56,17 +56,3 @@ jobs:
     # Upload to S3 with shell script + py
     - name: Upload to S3
       run: bash ./scripts/artillery-shell-users-id-tasks-id.sh ${{secrets.AWS_BUCKET_NAME_ARTILLERY}} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} "artillery_${{ steps.date.outputs.date }}.json"
-
-
-# https://github.com/zdurham/s3-upload-github-action
-  #  - name: Upload file to bucket alternative way
-  #  uses: zdurham/s3-upload-github-action@master
-  #  with:
-  #    args: --acl public-read
-  #  env:
-  #   FILE: artillery_${{ steps.date.outputs.date }}.json
-  #   AWS_REGION: 'us-west-2'
-  #   S3_BUCKET: artillery # TODO: Change once s3 secret is created 
-  #   S3_KEY: artillery_${{ steps.date.outputs.date }}.json
-  #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

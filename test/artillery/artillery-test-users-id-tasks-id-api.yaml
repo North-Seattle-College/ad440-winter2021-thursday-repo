@@ -5,15 +5,6 @@ config:
       arrivalRate: 4
       name: Warm up 1 request per second
 
-    # # Testing at higher load  
-    # - duration: 1200
-    #   arrivalRate: 2
-    #   rampTo: 6
-    #   name: Ramp up load 2-6 requests / second
-    # - duration: 1800
-    #   arrivalRate: 10
-    #   name: Sustained load 10 Requests per second
-
 scenarios:
   - name: "Test flow"
     flow:
