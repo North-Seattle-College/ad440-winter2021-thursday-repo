@@ -32,14 +32,14 @@ jobs:
           node-version: '14'
           check-latest: true
 
-      # Configure the AWS credentials
-      - name: Configure AWS credentials
+      # Configuration of AWS secrets
+      - name: Configuration of AWS secrets
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
-      # Install serverless-artillery
+
       - name: Installing serverless-artillery
         run: |
           npm install -g serverless@1.38.0
@@ -47,13 +47,14 @@ jobs:
           echo "version of slsart"
           slsart --version
 
-      # Run serverless-artillery test
+      # serverless-artillery Deploy, invoke and remove
       - name: deploy
         run: slsart deploy --stage $STAGE_NAME --region us-west-2
       - name: invoke
-        run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-uid-tasks-tid-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-users-uid-tasks-tid-results.json
+        run: slsart invoke test/serverless-artillery/serverless-artillery-test-users-uid-tasks-tid-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-users-uid-tasks-tid-results.json
       - name: remove
         run: slsart remove --stage $STAGE_NAME --region us-west-2
+
       # Get current time
       - name: Get Time
         id: time
@@ -61,16 +62,18 @@ jobs:
         with:
           timeZone: 8
           format: 'YYYY/MM/DD/HH-mm-ss'
+
       - name: Usage
         env:
           TIME: "${{ steps.time.outputs.time }}"
         run: |
           echo $TIME
-       # Rename the results
-
-      - name: Rename results json
+       
+      # add timstamp to file name
+      - name: ADD time stamp to file name
         run: |
-          cp test/results/slsart-users-uid-tasks-tid-results.json test/results/serverless-artillery_$TIME.json
+          cp test/results/slsart-users-uid-tasks-tid-results.json test/results/serverless-artillery_${{ steps.time.output.time }}.json
+
       # Upload the results to S3 bucket
       - name: AWS upload S3
         run: |
