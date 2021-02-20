@@ -73,6 +73,8 @@ jobs:
       - name: ADD time stamp to file name
         run: |
           cp test/results/slsart-users-uid-tasks-tid-results.json test/results/serverless-artillery_${{ steps.time.output.time }}.json
+          cd /test/results
+          ls 
 
       # Upload the results to S3 bucket
       - name: AWS upload S3
