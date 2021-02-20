@@ -58,17 +58,10 @@ jobs:
       # Get current time
       - name: Get Time
         id: time
-        uses: nanzm/get-time-action@v1.1
-        with:
-          timeZone: -8
-          format: 'YYYY/MM/DD/HH-mm-ss'
-        run: echo "::set-output name=date::$(date +'YYYY/MM/DD/HH-mm-ss')"
+        run: echo "::set-output name=date::$(date +'%Y/%m/%d/%H-%M-%S')"
+        
 
-      - name: Usage
-        env:
-          TIME: "${{ steps.time.outputs.time }}"
-        run: |
-          echo $TIME
+      
        
       # add timstamp to file name
       - name: ADD time stamp to file name
