@@ -20,7 +20,7 @@ if (!$RedisExists) {
     # create redis with given name (can also add address prefix and location if not same as rg)
     New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile $pathToRedisTemplate 
 } else {
-    Write-Host "Redis Cache with name nsc-redis-dev-usw2-thursday already exists."
+    Write-Host "Redis Cache with name " $RedisServerName "already exists."
 }
 
 # -ResourceGroupName “nsc-rg-dev-usw2-thursday”
