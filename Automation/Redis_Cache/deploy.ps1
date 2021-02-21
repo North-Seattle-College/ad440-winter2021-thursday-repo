@@ -3,10 +3,8 @@
 
 
 param(
-        [string] [Parameter(Mandatory=$true)] $SubscriptionId,
         [string] [Parameter(Mandatory=$true)] $ResourceGroupName,
-        [string] [Parameter(Mandatory=$true)] $Location,
-        [string] [Parameter(Mandatory=$true)] $Redis_nsc_redis_dev_usw2_thursday_name
+        [string] [Parameter(Mandatory=$true)] $RedisServerName
 
       )
 
@@ -15,7 +13,7 @@ $pathToRedisTemplate = "Automation/Redis_Cache/template.json"
 
 
 # Creates REDIS CACHE if one of the same name does not already exist in the Resource Group
-$RedisExists = (Get-AzRedisCache -ResourceGroupName “nsc-rg-dev-usw2-thursday” -Name “nsc-redis-dev-usw2-thursday”) 
+$RedisExists = (Get-AzRedisCache -ResourceGroupName $ResourceGroupName -Name $RedisServerName) 
       
 if (!$RedisExists) { 
     Write-Host "Redis Cache does not exist. Creating now."
@@ -25,3 +23,5 @@ if (!$RedisExists) {
     Write-Host "Redis Cache with name nsc-redis-dev-usw2-thursday already exists."
 }
 
+# -ResourceGroupName “nsc-rg-dev-usw2-thursday”
+# -RedisServerName “nsc-redis-dev-usw2-thursday”
