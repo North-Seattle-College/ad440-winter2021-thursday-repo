@@ -49,8 +49,6 @@ jobs:
         
     - name: Upload s3 bucket
       run: |
-        aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*" 
+        aws s3 cp test/results/ s3://$serverless-artillery --recursive --exclude "*" --include "serverless-artillery*" 
         
     
-
-      
