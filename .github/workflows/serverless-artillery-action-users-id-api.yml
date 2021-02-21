@@ -34,21 +34,27 @@ jobs:
     - name: invoke functions
       run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yaml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-serverless-artillery-test-users-id-api-results.json
           
-    - name: Get Time
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y/%m%d/%H-%M-%S')"
+    #- name: Get Time
+     # id: date
+     # run: echo "::set-output name=date::$(date +'%Y/%m%d/%H-%M-%S')"
 
   
-    - name: ADD time stamp to file name
-      run: |
-        cp test/results/slsart-serverless-artillery-test-users-id-api-results.json "test/results/serverless-artillery_${{ steps.date.output.date }}.json"
- 
-    - name: Upload s3 bucket
-      run: |
-        aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*" 
-
+    #- name: ADD time stamp to file name
+     # run: |
+      #  cp test/results/slsart-serverless-artillery-test-users-id-api-results.json "test/results/serverless-artillery_${{ steps.date.output.date }}.json"
+        
+    #- name: Upload s3 bucket
+    #  run: |
+     #   aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*" 
+        
+        
     - name: remove functions
       run: remove --stage $STAGE_NAME
+    - name: upload to s3
+        run: |
+          cd test/aws
+          BUCKET_NAME='Users_id_Api' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
+  
 
 
       
