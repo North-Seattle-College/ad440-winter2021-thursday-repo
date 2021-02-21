@@ -36,9 +36,10 @@ jobs:
           
           
     - name: remove functions
-      run: remove --stage $STAGE_NAME
+      run: slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
+
       
     - name: upload to s3
       run: |
         cd test/aws
-        BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
+        BUCKET_NAME='users_usersID' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
