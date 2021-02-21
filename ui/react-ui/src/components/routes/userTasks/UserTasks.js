@@ -2,33 +2,34 @@ import React, {useState, useEffect} from 'react';
 import Container from 'react-bootstrap/esm/Container';
 import {useParams} from "react-router-dom";
 import BootstrapTable from '../../bootstrapTable/BootstrapTable.js';
+import BackButton from '../../bootstrapBackButton/BootstrapBackButton.js';
+import PageTitle from '../../PageTitle/PageTitle.js'
+import {fetchSetTblState} from '../../../utils.js' 
 
-var UserTasks = () => {
-  const [userTasks, setUserTasks] = useState([]);
-
-  var {userId} = useParams();
+const UserTasks = () => {
+  let state = [{
+    title: '...Loading', 
+    subtitle: ''
+  }];
+  let [userTasks, setUserTasks] = useState(state);
+  let {userId} = useParams();
 
   useEffect(() => {
-    // url should be replaced with => https://nsc-functionsapp-team1.azurewebsites.net/api/${userId}/tasks?
-    fetch(`https://w21httptriggernataliatest.azurewebsites.net/api/${userId}/tasks?`)
-    .then(response => response.json())
-    .then(data => setUserTasks(data))
+    const response = fetchSetTblState(`users/${userId}/tasks`, setUserTasks)
     .catch((error) => console.error(error))
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId]);
 
   return (
+    <>
+      <BackButton />
+      <PageTitle title={userTasks[0].title} subtitle={userTasks[0].subtitle} />
       <Container>
-      <h3>All Tasks for user with userId {userId}</h3>
-      {userTasks.length > 0 ? 
-        <BootstrapTable 
-          heatherItems={Object.keys(userTasks[0])}
-          rows={userTasks}
-        /> :
-        <h4>There is no task for this user</h4>
+      {userTasks.length > 2 
+        ? <BootstrapTable heatherItems={Object.keys(userTasks[2][0])} rows={userTasks[2]} /> 
+        : <h3>User {userId} Tasks Not Found</h3>
       }
       </Container>
+    </>
   )
 }
 
