@@ -36,8 +36,7 @@ jobs:
           
           
     - name: remove functions
-      run: slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
-
+      run: slsart remove --stage $STAGE_NAME
       
     - name: upload to s3
       run: |
