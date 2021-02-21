@@ -1,6 +1,6 @@
 name: Performance-Test serverless-artillery-action-users-id-api
 on: [push]
-    #
+    
 jobs:
   slsart-perf:
     name: Serverless Artillery Users API Test Performance testing
@@ -34,22 +34,23 @@ jobs:
     - name: invoke functions
       run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yaml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-serverless-artillery-test-users-id-api-results.json
           
-    #- name: Get Time
-     # id: date
-     # run: echo "::set-output name=date::$(date +'%Y/%m%d/%H-%M-%S')"
-
-  
-    #- name: ADD time stamp to file name
-     # run: |
-      #  cp test/results/slsart-serverless-artillery-test-users-id-api-results.json "test/results/serverless-artillery_${{ steps.date.output.date }}.json"
-        
-    #- name: Upload s3 bucket
-    #  run: |
-     #   aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*" 
-        
-        
+          
     - name: remove functions
       run: remove --stage $STAGE_NAME
+    
+    - name: Get Time
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y/%m%d/%H-%M-%S')"
+
+  
+    - name: ADD time stamp to file name
+      run: |
+        cp test/results/slsart-serverless-artillery-test-users-id-api-results.json "test/results/serverless-artillery_${{ steps.date.output.date }}.json"
+        
+    - name: Upload s3 bucket
+      run: |
+        aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*" 
+        
     
 
       
