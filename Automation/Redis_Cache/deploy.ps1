@@ -10,7 +10,7 @@ param(
 
       )
 
-$pathToRedisTemplate = "/Users/student/Documents/GitHub/ad440-winter2021-thursday-repo/Automation/Redis_Cache/template.json"   
+$pathToRedisTemplate = "Automation/Redis_Cache/template.json"   
 
 
 
