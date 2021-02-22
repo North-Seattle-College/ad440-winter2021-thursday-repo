@@ -60,6 +60,7 @@ def main(aws_access_key_id, aws_secret_access_key, region_name):
             bucket_object_list_prepared_for_deletion = []
             if len(bucket_object_list) != 0:
                 print(Fore.GREEN + "Bucket Objects:")
+                # Display object information for the current bucket
                 for bucket_object in bucket_object_list:
                     # Prepare just in case we want to delete the bucket
                     bucket_object_list_prepared_for_deletion.append({
@@ -70,7 +71,7 @@ def main(aws_access_key_id, aws_secret_access_key, region_name):
             # Prompt user for response
             delete_bucket_response = ""
             while delete_bucket_response == "":
-                deletion_prompt_response = input(Fore.YELLOW + "Delete bucket: (y/N/exit)")
+                deletion_prompt_response = input(Fore.YELLOW + f'Delete bucket ({bucket_name}): (y/N/exit)')
                 if deletion_prompt_response in ["y", "N", "exit"]:
                     delete_bucket_response = deletion_prompt_response
                 else:
@@ -130,7 +131,7 @@ def get_owner_email(s3_client, bucket_name):
 
     except s3_client.exceptions.from_code('NoSuchTagSetError') as e:
         print(Fore.YELLOW + "Bucket does not have any tags!")
-        return {"error": e}
+        return "No Owner"
 
 def get_bucket_object_list(s3_client, bucket_name):
     """
