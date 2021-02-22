@@ -1,10 +1,10 @@
 name: Artillery Action to test endpoint function users-userId-tasks
 
-on: [push]
-  # push:
-  #   # Action is called when a branch is merged with development
-  #   branches:
-  #     - development  
+on:
+  push:
+    # Action is called when a branch is merged with development
+    branches:
+      - development  
 
 # Set up env variables for Node and Python
 # Note: there is no Python functionality yet, but there will be eventually for uploadiing results to S3
