@@ -7,7 +7,6 @@ on:
     branches:
       - development
 
-#Test
 # Sets up the environment variables
 env:
   NODE_VERSION: '14' # version of Node we are using
@@ -65,26 +64,7 @@ jobs:
       run: |
         cp test/results/artillery.json "test/results/artillery_${{ steps.date.outputs.date }}.json"
 
-    - name: Touch file
-      run: touch test/results/artillery_${{ steps.date.outputs.date }}.json
-
     # Upload the results to S3 bucket
     - name: AWS CLI S3
       run: |
         aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
-
-    # # Runs artillery test
-    # - name: Run Artillery Test
-    #   run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output test/results/artillery_${{ steps.date.outputs.date }}.json ./test/artillery/artillery-test-users-api.yml
-
-    # # Upload the results to S3 bucket
-    # - name: AWS CLI S3
-    #   run: |
-    #     aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
-    # - name: S3 Uploader
-    #   uses: shallwefootball/s3-upload-action@master
-    #   with:
-    #     aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     aws_bucket: ${{ secrets.AWS_BUCKET_NAME_ARTILLERY }}
-    #     source_dir: "artillery_${{ steps.date.outputs.date }}.json"
