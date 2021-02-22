@@ -1,10 +1,10 @@
 name: Artillery Action to test endpoint function users-userId-tasks
 
-on: 
-  push:
-    # Action is called when a branch is merged with development
-    branches:
-      - development  
+on: [push]
+  # push:
+  #   # Action is called when a branch is merged with development
+  #   branches:
+  #     - development  
 
 # Set up env variables for Node and Python
 # Note: there is no Python functionality yet, but there will be eventually for uploadiing results to S3
@@ -47,7 +47,7 @@ jobs:
     #Get current date for outputted file name
     - name: Get current date
       id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+      run: echo "::set-output name=date::$(date +'%Y_%m_%d_%H-%M-%S')"
 
     # Call artillery test located at ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
     # Return temp results to test/results/artillery-test-users-user_id-tasks-results.json
@@ -57,7 +57,7 @@ jobs:
     # Change results file name to follow naming conventions and include date/time  
     - name: Rename results json
       run: |
-        cp test/results/artillery-test-users-user_id-tasks-results.json "test/results/artillery-test-users-user_id-tasks_${{ steps.date.outputs.date }}.json"
+        cp test/results/artillery-test-users-user_id-tasks-results.json "test/results/artillery_${{ steps.date.outputs.date }}.json"
     
     # Upload the results to S3 bucket
     - name: AWS CLI S3
