@@ -8,7 +8,7 @@ param(
 
       )
 
-$pathToRedisTemplate = "Automation/Redis_Cache/template.json"   
+$pathToRedisTemplate = "./template.json"   
 
 
 
