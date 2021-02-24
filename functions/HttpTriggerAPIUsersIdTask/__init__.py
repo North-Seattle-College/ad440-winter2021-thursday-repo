@@ -7,7 +7,7 @@ import datetime
 import redis 
 
 
-
+redisFeature = 1
 # to handle datetime with JSON
 # It serialize datetime by converting it into string
 def default(dateHandle):
@@ -40,13 +40,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.debug("Connected to DB successfuly!")
 
     #Redis Sever
-    try:
-        
-        rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password='${{ secrets.ENV_REDIS_KEY }}', ssl=True) 
-        rDB.ping()
-        logging.debug("Connected to Redis!")
-    except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
-            logging.error("Redis connection error!" + e.args[0])
+    if(redisFeature):
+        try:
+            rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password='${{ secrets.ENV_REDIS_KEY }}', ssl=True) 
+            rDB.ping()
+            logging.debug("Connected to Redis!")
+        except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
+                logging.error("Redis connection error!" + e.args[0])
+    
             
 
     try:
@@ -105,28 +106,34 @@ def get_user_tasks(conn, userId, rDB):
         tasks = []
         columns = [column[0] for column in cursor.description]
 
-    if(rDB.get('UsersIdTasks')):
-        unpacked_tasks = json.loads(rDB.get('tasks'))
-        tasks = unpacked_tasks
-        logging.debug('Tasks loaded from Redis')
+    if(redisFeature):
+        if(rDB.get('users:user_id:tasks:all')):
+            unpacked_tasks = json.loads(rDB.get('tasks'))
+            tasks = unpacked_tasks
+            logging.debug('Tasks loaded from Redis')
 
+        else:
+            logging.debug('No tasks in Redis')
+
+            for task in task_data:
+                tasks.append(dict(zip(columns, task)))
+
+            logging.debug("tasks received!!")
+
+            #RedisLoad
+            json_tasks = json.dumps(tasks);   
+            rDB.set('users:user_id:tasks:all', json_tasks)
+
+            return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
     else:
-        logging.debug('No tasks in Redis')
-
         for task in task_data:
             tasks.append(dict(zip(columns, task)))
-
+            
         logging.debug("tasks received!!")
-
-        #RedisLoad
-        json_tasks = json.dumps(tasks);   
-        rDB.set('UsersIdTasks', json_tasks)
-        rDB.expire('tasks', 20)
-
         return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
 
 
-def add_tasks(conn, task_req_body, user_id):
+def add_tasks(conn, task_req_body, user_id, rDB):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
     try:
@@ -136,6 +143,8 @@ def add_tasks(conn, task_req_body, user_id):
         logging.error("New user request body did not contain the necessary fields!")
         return func.HttpResponse(task_req_body_content_error.args[0], status_code=400)
     logging.debug("New task request body contains all the necessary fields!")
+
+    rDB.expire('users:user_id:tasks:all')
 
     with conn.cursor() as cursor:
         # get task data
@@ -159,4 +168,5 @@ def add_tasks(conn, task_req_body, user_id):
         task_id = cursor.fetchval()
         logging.info(task_id)
         logging.debug("task with id {} added!".format(task_id))
+        
         return func.HttpResponse(json.dumps({task_id}, default=default), status_code=200, mimetype="application/json")
