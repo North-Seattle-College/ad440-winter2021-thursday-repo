@@ -1,8 +1,9 @@
 import React from 'react';
 import Container from 'react-bootstrap/esm/Container';
 import Alert from 'react-bootstrap/esm/Alert';
+import Button from 'react-bootstrap/Button';
 import ReactTooltip from 'react-tooltip';
-import {withRouter} from "react-router-dom";
+import { withRouter, NavLink} from "react-router-dom";
 import './Home.css';
 
 class Home extends React.Component {
@@ -130,8 +131,12 @@ class Home extends React.Component {
         <p>{reportTaskId}</p>
         <p>{reportUsers}</p>
         <p>{reportTasks}</p>
-
+        <br />
+        <NavLink to={`/create`} onClick={null}>
+          <Button variant="primary" size="lg">Create User</Button>
+        </NavLink>
       </Container>
+      
     )
   }
 }
