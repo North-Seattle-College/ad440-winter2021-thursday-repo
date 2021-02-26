@@ -5,6 +5,8 @@ import os
 import redis
 import azure.functions as func
 
+USERS_CACHE_KEY = "users:all"
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
         'Python HTTP trigger for /users function is processing a request.')
@@ -27,19 +29,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.debug("Connection to DB successful!")
 
     create_users_table(conn)
+    r = init_redis()
 
     try:
         # Return results according to the method
         if method == "GET":
             logging.info("Attempting to retrieve users...")
-            all_users_http_response = get_users(conn, init_redis())
+            all_users_http_response = get_users(conn, r)
             logging.info("Users retrieved successfully!")
             return all_users_http_response
 
         elif method == "POST":
             logging.info("Attempting to add user...")
             user_req_body = req.get_json()
-            new_user_id_http_response = add_user(conn, user_req_body)
+            new_user_id_http_response = add_user(conn, user_req_body, r)
             logging.info("User added successfully!")
             return new_user_id_http_response
 
@@ -100,7 +103,7 @@ def get_users(conn, r):
 
             return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
         
-def add_user(conn, user_req_body):
+def add_user(conn, user_req_body, r):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
     try:
@@ -138,6 +141,8 @@ def add_user(conn, user_req_body):
 
         # Get the user id from cursor
         user_id = cursor.fetchval()
+
+        clear_users_cache(r)
         
         logging.debug(
             "User added and new user id retrieved, returning information from add_user function")
@@ -152,7 +157,7 @@ def init_redis():
 
 def cache_users(r, users):
     try: 
-        r.set('users', json.dumps(users), ex=1200)   
+        r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
         logging.info("Caching complete")
     except TypeError as e:
         logging.info("Caching failed")
@@ -161,11 +166,14 @@ def cache_users(r, users):
 def get_users_cache(r):  
     logging.info("Querying cache...")
     try:
-        cache = r.get(b'users')
+        cache = r.get(USERS_CACHE_KEY)
         return cache
     except TypeError as e:
         logging.critical("Failed to fetch from cache: " + e.args[1])
         return None
+
+def clear_users_cache(r):
+    r.delete(USERS_CACHE_KEY)
 
 def create_users_table(conn):
     cursor = conn.cursor()
