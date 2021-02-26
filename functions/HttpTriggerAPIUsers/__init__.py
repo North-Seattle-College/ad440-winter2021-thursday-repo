@@ -5,6 +5,8 @@ import os
 import redis
 import azure.functions as func
 
+USERS_CACHE_KEY = b'users:all'
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
         'Python HTTP trigger for /users function is processing a request.')
@@ -143,8 +145,7 @@ def add_user(conn, user_req_body, r):
         # Get the user id from cursor
         user_id = cursor.fetchval()
 
-        # clear cache
-        clear = r.delete('users:all')
+        clear_users_cache(r)
         
         logging.debug(
             "User added and new user id retrieved, returning information from add_user function")
@@ -159,7 +160,7 @@ def init_redis():
 
 def cache_users(r, users):
     try: 
-        r.set('users:all', json.dumps(users), ex=1200)   
+        r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
         logging.info("Caching complete")
     except TypeError as e:
         logging.info("Caching failed")
@@ -168,11 +169,14 @@ def cache_users(r, users):
 def get_users_cache(r):  
     logging.info("Querying cache...")
     try:
-        cache = r.get(b'users')
+        cache = r.get(USERS_CACHE_KEY)
         return cache
     except TypeError as e:
         logging.critical("Failed to fetch from cache: " + e.args[1])
         return None
+
+def clear_users_cache(r):
+    r.delete(USERS_CACHE_KEY)
 
 def create_users_table(conn):
     cursor = conn.cursor()
