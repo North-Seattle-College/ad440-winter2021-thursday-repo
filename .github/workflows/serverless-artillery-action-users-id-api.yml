@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - development
-   # test
+   # test2
 jobs:
   slsart-perf:
     name: Serverless Artillery Users API Test Performance testing
