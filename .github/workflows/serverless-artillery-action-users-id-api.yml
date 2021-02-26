@@ -1,15 +1,11 @@
 name: Performance-Test serverless-artillery-action-users-id-api
-on:  
-  push:
-    branches:
-      - development
-   # test33
+on: [push]
+    
 jobs:
   slsart-perf:
     name: Serverless Artillery Users API Test Performance testing
     runs-on: ubuntu-latest
     env:
-      NPM_CONFIG_PREFIX: "~/.npm-global"
       STAGE_NAME: Test-userid-api
     steps:
     - name: Checkout Code
@@ -25,22 +21,21 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        
         aws-region: us-west-2
       
     - name: Install serverless and serverless-artillery
       run: |
         npm install -g serverless@1.38.0 
         npm install -g serverless-artillery
-
     - name: Deploy functions
-      run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region=us-west-2
+      run: slsart deploy --stage $STAGE_NAME --region=us-west-2
     
     - name: invoke functions
-      run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-serverless-artillery-test-users-id-api-results.json
-                 
+      run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yaml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-serverless-artillery-test-users-id-api-results.json
+          
+          
     - name: remove functions
-      run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+      run: slsart remove --stage $STAGE_NAME
       
     - name: upload to s3
       run: |
