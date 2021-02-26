@@ -110,8 +110,10 @@ dist
 test/artillery/report.json
 # Vscode
 
-vscode
+.vscode
 .DS_Store
 DS_Store
 
 # ignore .vscode
+package-lock.json
+

@@ -1,6 +1,7 @@
 
 	Invoking test Lambda
 
+<<<<<<< HEAD
 {
     "timestamp": "2021-02-18T20:55:14.482Z",
     "scenariosCreated": 5,
@@ -82,3 +83,5 @@
     }
   ]
 }
+=======
+>>>>>>> 62a7c24ef55eb068941f0affe2f2885f324093b2
