@@ -56,7 +56,7 @@ const Create = () => {
         }).then((response) => {
             setIsVisible(true);
             // User has been created succsesfully
-            if (response.status === 200 || response.status === 201) { // Can expand status codes later if needed
+            if (response.status === 200 || response.status === 201) { // Can also use created user response userId instead
                 setUserCreateSuccess(true);
             } 
             // There was an error creating the user
@@ -64,6 +64,12 @@ const Create = () => {
                 setUserCreateSuccess(false);
             }
         });
+        //// Alternative if using userId of created user instead of response code
+        // .then((response) => {
+        //     response.json()
+        //         .then((data) => {
+        //             console.log(data.userId)
+        //         })
     }
         return (
             <div className="formContainer">
