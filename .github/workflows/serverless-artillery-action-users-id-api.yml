@@ -14,6 +14,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
+        AWS_SLSART_REGION: "us-west-2"
         node-version: '14'
         check-latest: true
     - name: Configure AWS Credentials
@@ -28,14 +29,14 @@ jobs:
         npm install -g serverless@1.38.0 
         npm install -g serverless-artillery
     - name: Deploy functions
-      run: slsart deploy --stage $STAGE_NAME --region=us-west-2
+      run: slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
     
     - name: invoke functions
-      run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly > test/results/slsart-serverless-artillery-test-users-id-api-results.json
+      run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yml --region $AWS_SLSART_REGION --stage $STAGE_NAME --jsonOnly > test/results/slsart-serverless-artillery-test-users-id-api-results.json
           
           
     - name: remove functions
-      run: slsart remove --stage $STAGE_NAME
+      run: slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
       
     - name: upload to s3
       run: |
