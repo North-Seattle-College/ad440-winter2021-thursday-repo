@@ -1,0 +1,30 @@
+config:
+  target: "https://nsc-functionsapp-team1.azurewebsites.net/api/users/1/tasks/1"
+  phases:
+    - duration: 10
+      arrivalRate: 1
+      name: Warm up 1 request per second
+    - duration: 20
+      arrivalRate: 2
+      rampTo: 6
+      name: Ramp up load 2-6 requests per second
+    - duration: 30
+      arrivalRate: 10
+      name: Sustained load 10 Requests per second
+  processor: "./artillery-functions.js"
+  # Variables in query strings not valid, not working in URL string either even though this bug report details a scenario where post
+  # request response parameters are captured and used in a subsequent request/scenario: https://github.com/artilleryio/artillery/issues/698
+  # Response times are also returned as NaN with this approach.
+  # variables:
+  #   names:
+  #     -["Sean", "Max", "Toddy", "Kieran", "Erica", "Johart"]
+scenarios:
+  - name: "Load Test"
+    flow:
+      - get:
+          url: "/"
+          afterResponse: "logResponse"
+      #Query string both ways returning invalid url. Maybe this is because of the response document type of plain/text?
+      # - get:
+      #     url: "api/HttpTriggerLoadTest?name=sean"
+      #     afterResponse: "logResponse"

@@ -3,10 +3,16 @@
 config:
   target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api"
   phases:
+<<<<<<< HEAD
     - duration: 300
       arrivalRate: 100
       name: "users api test"
 
+=======
+    - duration: 150
+      arrivalRate: 50
+      name: "users api test"
+>>>>>>> 62a7c24ef55eb068941f0affe2f2885f324093b2
 scenarios:
   - flow:
     - get:
@@ -15,4 +21,8 @@ scenarios:
       afterResponse: "logResponse"
       capture:
         json: "$.users"
+<<<<<<< HEAD
         as: "users"
+=======
+        as: "users"
+>>>>>>> 62a7c24ef55eb068941f0affe2f2885f324093b2
