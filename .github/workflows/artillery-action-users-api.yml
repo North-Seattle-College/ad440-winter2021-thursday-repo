@@ -7,6 +7,7 @@ on:
     branches:
       - development
 
+#Test
 # Sets up the environment variables
 env:
   NODE_VERSION: '14' # version of Node we are using
@@ -49,10 +50,6 @@ jobs:
     - name: Get current date
       id: date
       run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
-
-    # # Takes a small break to make sure everything has been processed
-    # - name: Sleep
-    #   run: sleep 10s
 
     # Call artillery test located at ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
     # Return temp results to test/results/artillery-test-users-user_id-tasks-results.json
