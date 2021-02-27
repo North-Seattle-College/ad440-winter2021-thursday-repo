@@ -14,7 +14,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     #Initiating REDIS cache
     REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-    r = redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= '${{ secrets.ENV_REDIS_KEY }}', ssl= True)
+    r = redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= os.environ["ENV_REDIS_KEY"], ssl= True)
 
     #Something to test the redis cache
     r.get("2")
