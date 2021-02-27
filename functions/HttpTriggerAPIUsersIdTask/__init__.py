@@ -42,7 +42,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     #Redis Sever
     try:
         
-        rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password='${{ secrets.ENV_REDIS_KEY }}', ssl=True) 
+        rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password= os.environ["ENV_REDIS_KEY"], ssl=True) 
         rDB.ping()
         logging.debug("Connected to Redis!")
     except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:

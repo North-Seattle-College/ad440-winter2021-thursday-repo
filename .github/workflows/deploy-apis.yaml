@@ -36,7 +36,7 @@ jobs:
         app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }} # this is the name of the function established in the env portion
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }} # this is the path established in the env portion
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }} # this is the secret we've created on GitHub that contains the details necessary to push to Azure
-
+        scm-do-build-during-deployment: 'True'
         # This file was used as reference for deployment of the function app
         # (getting values for app-name and publish-profile for the function app)
         # Feb-10-2021
