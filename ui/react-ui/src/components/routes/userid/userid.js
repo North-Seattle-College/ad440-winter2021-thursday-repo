@@ -3,27 +3,36 @@ import {useParams} from "react-router-dom";
 import BootstrapTable from '../../bootstrapTable/BootstrapTable.js';
 import Container from 'react-bootstrap/esm/Container';
 import BackButton from '../../bootstrapBackButton/BootstrapBackButton.js';
+import PageTitle from '../../PageTitle/PageTitle.js'
+import {fetchSetTblState} from '../../../utils.js';
 
-var User = () => {
-  const [user, setUser] = useState([]);
+const User = () => {
+  let state = [{
+    title: '...Loading', 
+    subtitle: ''
+  }];
+  
+  let [user, setUser] = useState(state);
 
-  var {userId} = useParams();
+  const {userId} = useParams();
 
   useEffect(() => {
-    fetch(`https://nsc-functionsapp-team1.azurewebsites.net/api/users/${userId}?`)
-      .then(response => response.json())
-      .then(data => setUser(data))
-      .catch((error) => console.error(error))
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const response = fetchSetTblState('users', setUser, userId)
+    .catch((error) => {
+      console.error(error)
+    });
+  }, [userId]);
+  
 
   return (
     <>
       <BackButton />
-      <Container className='user-tasks-container'>
-          <h3> {user.firstname} {user.lastname} info</h3>
-          {user.userid ? <BootstrapTable heatherItems={Object.keys(user)} rows={[user]} /> : <Container>...loading</Container>}
+      <PageTitle title={user[0].title} subtitle={user[0].subtitle} />
+      <Container>
+      {user.length > 2 
+        ? <BootstrapTable heatherItems={Object.keys(user[2])} rows={[user[2]]} /> 
+        : <h3>User {userId} {user[0].subtitle}</h3>
+      }
       </Container>
     </>
   )

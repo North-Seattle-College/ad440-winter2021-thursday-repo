@@ -11,7 +11,7 @@ export default class Users extends Component {
 	};
 
 	async componentDidMount() {
-		const url = 'https://nsc-functionsapp-team1.azurewebsites.net/api/users';
+		const url = 'https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users';
 		const response = await fetch(url);
 		const usersData = await response.json();
 		this.setState({
