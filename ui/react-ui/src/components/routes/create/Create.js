@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { NavLink } from "react-router-dom";
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
@@ -45,7 +46,7 @@ const Create = () => {
     }
 
     const createUser = async () => {
-        const body = {firstName, lastName, email};
+        const body = { firstName, lastName, email };
         await fetch('https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/', {
             method: 'post', 
             headers: {
@@ -73,6 +74,9 @@ const Create = () => {
     }
         return (
             <div className="formContainer">
+                <NavLink to={`/`} onClick={null}>
+                    <Button variant="outline-primary" size="sm">Home</Button>
+                </NavLink>
                 <Alert show={isVisible} dismissible variant={userCreateSuccess ? "success" : "danger"} onClose={() => setIsVisible(false)}>
                     {userCreateSuccess ? <Alert.Heading>User Successfully Created</Alert.Heading> : <Alert.Heading>Error Creating User</Alert.Heading> }
                 </Alert>
