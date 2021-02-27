@@ -45,7 +45,7 @@ const Create = () => {
     }
 
     const createUser = async () => {
-        const body = {firstName: firstName, lastName: lastName, email: email};
+        const body = {firstName, lastName, email};
         await fetch('https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/', {
             method: 'post', 
             headers: {
