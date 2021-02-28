@@ -6,7 +6,7 @@ on:
       - development
 env:
   NODE_VERSION: '10.x'
-  TEST_CASE_BODY: {\"title\": "injection", \"description\": \"'hacked'); DELETE FROM users WHERE userId > 1020; -- \"}
+  TEST_CASE_BODY: "{\"title\": \"injection\", \"description\": \"'hacked'); DELETE FROM users WHERE userId > 1020; -- \"}"
   RESULT_FILE_PATH: ../../test/results/sql-injection-users-userid-tasks-post.json
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
       - name: curl
         uses: wei/curl@v1
         with:
-          args: -o ../../test/results/sql-injection-users-userid-tasks-post-${{steps.date.outputs.date}}.json -v -X POST -d $TEST_CASE_BODY http://localhost:7071/api/users/1/tasks
+          args: -o ../../test/results/sql-injection-users-userid-tasks-post-${{steps.date.outputs.date}}.json -v -X POST -d '{"title": "injection", "description": "'hacked'); DELETE FROM users WHERE userId > 1020; -- "}' http://localhost:7071/api/users/1/tasks
       - name: read output
         id: taskId
         uses: notiz-dev/github-action-json-property@release
