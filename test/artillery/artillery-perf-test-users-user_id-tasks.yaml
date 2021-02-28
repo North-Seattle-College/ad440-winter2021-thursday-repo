@@ -1,0 +1,15 @@
+config:
+  target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api"
+  phases:
+  - duration: 100
+    arrivalRate: 0
+    rampTo: 50
+    name: simple-artillery-ramp-up-test
+
+scenarios:
+  - name: "ramp test"
+    flow:
+      - get:
+          url: "/users/1/tasks"
+          expect:
+            - statusCode: 200

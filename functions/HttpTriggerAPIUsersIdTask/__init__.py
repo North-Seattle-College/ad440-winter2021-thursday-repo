@@ -42,7 +42,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     #Redis Sever
 
-
     if(redisFeature):
         try:
             rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password='${{ secrets.ENV_REDIS_KEY }}', ssl=True) 
@@ -51,8 +50,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
                 logging.error("Redis connection error!" + e.args[0])
     
-            
-
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
