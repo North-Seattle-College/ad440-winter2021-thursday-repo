@@ -1,30 +1,32 @@
-# name: sql injection test for users/userid/tasks post
-#  # curl -v -x POST -d "{\"title\": \"test\", \"description\": \"'UPDATE users SET firstName='injection' WHERE userId=5;\"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks
-# on:
-#   push:
-#     branches:
-#       - development
-# env:
-#   AZURE_WEBAPP_PACKAGE_PATH: ui/react-ui
-#   NODE_VERSION: '10.x'
+name: sql injection test for users/userid/tasks post
 
-# jobs:
-#   build-and-deploy:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@main
-#       - name: Set up Node.js version
-#         uses: actions/setup-node@v1
-#         with:
-#           node-version: ${{env.NODE_VERSION}}
-#       - name: npm install and build
-#         run: |
-#           cd ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
-#           npm install
-#           CI='' npm run build
-#       - name: Upload To Azure Blob Storage
-#         uses: bacongobbler/azure-blob-storage-upload@v1.0.0
-#         with:
-#           source_dir: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/build
-#           container_name: $web
-#           connection_string: ${{secrets.BLOB_STORAGE_CONNECTION_STRING}}
+on:
+  push:
+    branches:
+      - development
+env:
+  NODE_VERSION: '10.x'
+  TEST_CASE_BODY: "{\"title\": \"injection\", \"description\": \"'hacked'); DELETE FROM users WHERE userId > 1020; --\"}"
+  RESULT_FILE_PATH: ../../test/results/sql-injection-users-userid-tasks-post.json
+
+jobs:
+  POST test case:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Get current date and time
+        id: date
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+      - name: curl
+        uses: wei/curl@v1
+        with:
+          args: -o ../../test/results/sql-injection-users-userid-tasks-post-${{steps.date.outputs.date}}.json -v -X POST -d $TEST_CASE_BODY http://localhost:7071/api/users/1/tasks
+      - name: read output
+        id: taskId
+        uses: notiz-dev/github-action-json-property@release
+        with: 
+          path: '../../test/results/sql-injection-users-userid-tasks-post-${{steps.date.outputs.date}}.json'
+          prop_path: 'taskId'
+      - run: echo ${{steps.taskId.outputs.prop}} 
+
+
