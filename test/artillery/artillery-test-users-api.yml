@@ -1,0 +1,19 @@
+config:
+  target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net"
+  phases:
+    - duration: 60
+      arrivalRate: 2
+      name: warm up
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 60
+      name: ramp up stress test
+
+      
+scenarios:
+  - name: 
+    flow:
+      - post:
+          url: "/api/users"
+          expect:
+            - statusCode: 200

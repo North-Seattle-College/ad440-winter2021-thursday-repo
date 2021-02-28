@@ -9,6 +9,7 @@ import TaskIdReport from '../routes/reports/taskIdReport/TaskIdReport';
 import userIdReport from '../routes/reports/userIdReport/UserIdReport';
 import usersReport from '../routes/reports/usersReport/UserReport';
 import TasksReport from '../routes/reports/userIdReport/UserIdTasksReport'
+import Create from '../routes/create/Create';
  
 function App() {
   return (
@@ -29,6 +30,9 @@ function App() {
         <Route exact path='/reports/userId' component={userIdReport}/>
         <Route exact path='/reports/users' component={usersReport}/>
         <Route exact path='/reports/tasks' component={TasksReport}/>
+
+        {/* Create user + task */}
+        <Route exact path='/create' component={Create} />
       </Router>
     </div>
   );
