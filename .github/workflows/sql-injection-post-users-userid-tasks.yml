@@ -6,7 +6,7 @@ on:
       - development
 env:
   NODE_VERSION: '10.x'
-  TEST_CASE_BODY: "{\"title\": \"injection\", \"description\": \"'hacked'); DELETE FROM users WHERE userId > 1020; --\"}"
+  TEST_CASE_BODY: "{\"title\": \"injection\", \"description\": \"'hacked'); DELETE FROM users WHERE userId > 1020; -- \"}"
   RESULT_FILE_PATH: ../../test/results/sql-injection-users-userid-tasks-post.json
 
 jobs:
