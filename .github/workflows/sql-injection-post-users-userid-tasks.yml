@@ -10,7 +10,7 @@ env:
   RESULT_FILE_PATH: ../../test/results/sql-injection-users-userid-tasks-post.json
 
 jobs:
-  POST test case:
+  POST-test-case:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
