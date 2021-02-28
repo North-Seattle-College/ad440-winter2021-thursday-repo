@@ -7,6 +7,7 @@ import datetime
 import redis 
 
 
+
 redisFeature = 1
 # to handle datetime with JSON
 # It serialize datetime by converting it into string
@@ -40,6 +41,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.debug("Connected to DB successfuly!")
 
     #Redis Sever
+
+
     if(redisFeature):
         try:
             rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password='${{ secrets.ENV_REDIS_KEY }}', ssl=True) 
@@ -53,14 +56,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
-            all_tasks_by_userId = get_user_tasks(conn, user_id)
+            all_tasks_by_userId = get_user_tasks(conn, user_id, rDB)
             logging.debug("tasks retrieved successfully!")
             return all_tasks_by_userId
 
         elif method == "POST":
             logging.debug("trying to add one task to tasks")
             task_req_body = req.get_json()
-            new_task_id = add_tasks(conn, task_req_body, user_id)
+            new_task_id = add_tasks(conn, task_req_body, user_id, rDB)
             logging.debug("task added successfully!")
             return new_task_id
 
@@ -81,6 +84,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 def connect_to_db():
     # Database credentials.
+    redisFeature = os.environ["CACHE_TOGGLE"]
     server = os.environ["ENV_DATABASE_SERVER"]
     database = os.environ["ENV_DATABASE_NAME"]
     username = os.environ["ENV_DATABASE_USERNAME"]
@@ -144,7 +148,8 @@ def add_tasks(conn, task_req_body, user_id, rDB):
         return func.HttpResponse(task_req_body_content_error.args[0], status_code=400)
     logging.debug("New task request body contains all the necessary fields!")
 
-    rDB.expire('users:user_id:tasks:all')
+    if(redisFeature):
+        rDB.expire('users:user_id:tasks:all')
 
     with conn.cursor() as cursor:
         # get task data
