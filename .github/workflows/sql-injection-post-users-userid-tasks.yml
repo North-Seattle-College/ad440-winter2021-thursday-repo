@@ -18,8 +18,8 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
       - name: curl
-          run: |
-            -o ../../test/results/sql-injection-users-userid-tasks-post-${{steps.date.outputs.date}}.json -v -X POST -d '{"title": "injection", "description": "'hacked'); DELETE FROM users WHERE userId > 1020; -- "}' http://localhost:7071/api/users/1/tasks
+        run: |
+          -o ../../test/results/sql-injection-users-userid-tasks-post-${{steps.date.outputs.date}}.json -v -X POST -d '{"title": "injection", "description": "'hacked'); DELETE FROM users WHERE userId > 1020; -- "}' http://localhost:7071/api/users/1/tasks
       - name: read output
         id: taskId
         uses: notiz-dev/github-action-json-property@release
