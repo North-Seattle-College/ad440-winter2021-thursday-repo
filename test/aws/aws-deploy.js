@@ -11,7 +11,7 @@ const s3Config = {
 }
 const s3 = new AWS.S3(s3Config);
 s3.putObject({
-  Bucket: 'usersapitest',
+  Bucket: 'serverless-artillery',
   Key: 'serverless-artillery-test-users-api.json',
   Body: fs.readFileSync(config.filePath)
 }, (err, res) => {
