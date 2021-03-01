@@ -9,6 +9,7 @@ import redis
 
 
 redisFeature = 1
+
 # to handle datetime with JSON
 # It serialize datetime by converting it into string
 def default(dateHandle):
@@ -45,7 +46,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if(redisFeature):
         try:
-            rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password='${{ secrets.ENV_REDIS_KEY }}', ssl=True) 
+            rDBpassword = os.enviorn["ENV_REDIS_KEY"]
+            rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password=rDBpassword, ssl=True) 
             rDB.ping()
             logging.debug("Connected to Redis!")
         except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
