@@ -43,7 +43,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     #Redis Sever
 
-
     if(redisFeature):
         try:
             rDBpassword = os.enviorn["ENV_REDIS_KEY"]
@@ -53,8 +52,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
                 logging.error("Redis connection error!" + e.args[0])
     
-            
-
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
