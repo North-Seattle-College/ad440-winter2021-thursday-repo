@@ -1,8 +1,9 @@
 import React from 'react';
 import Container from 'react-bootstrap/esm/Container';
 import Alert from 'react-bootstrap/esm/Alert';
+import Button from 'react-bootstrap/Button';
 import ReactTooltip from 'react-tooltip';
-import {withRouter} from "react-router-dom";
+import { withRouter, NavLink} from "react-router-dom";
 import './Home.css';
 
 class Home extends React.Component {
@@ -13,7 +14,14 @@ class Home extends React.Component {
       GET: [
         {key: '/users', params: []}, 
         {key: '/users/{userId}', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]},
-        {key: '/users/{userId}/tasks', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]}
+        {key: '/users/{userId}/tasks', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]},
+        {
+          key: '/users/{userId}/tasks/{taskId}', 
+          params: [
+            {key: 'userId', value: 0, type: 'number', regex: /{userId}/g},
+            {key: 'taskId', value: 0, type: 'number', regex: /{taskId}/g},
+          ]
+        }
       ]
     },
     badInputAlert: '',
@@ -52,7 +60,7 @@ class Home extends React.Component {
 
     if (params.length > 0) {
       params.forEach(param => {
-        if (param.value) updatedEndpoint = endpoint.replace(param.regex, param.value);
+        if (param.value) updatedEndpoint = updatedEndpoint.replace(param.regex, param.value);
         else {
           readyToTrigger = false;
           this.setState({emptyInputAlert: 'make sure you fill in all required params!!'});
@@ -69,7 +77,14 @@ class Home extends React.Component {
   render() {
     var {endpointsByMethods, badInputAlert, emptyInputAlert} = this.state;
     var methods = Object.keys(endpointsByMethods);
-    let reportUserId = '/reports/userId';
+  //test results endpoints
+  let reportUserId = '/reports/userId';
+  let reportTaskId = '/reports/taskId';
+
+
+  let reportUsers = '/reports/users';
+  let reportTasks = '/reports/tasks';
+
 
     // what happens here is basically mapping over endpointsByMethods and rendering a method title, endpoints, and params
     return (
@@ -95,7 +110,7 @@ class Home extends React.Component {
                       return (
                         <input 
                           className='param-input' 
-                          id={endpoint.key} type='text' 
+                          id={`${endpoint.key}-${param.key}`} type='text' 
                           placeholder={param.key} 
                           key={index}
                           onChange={(event) => this.handleParamInputChange({value: event.target.value, ...handlePramInputChangeArgs})}
@@ -109,10 +124,19 @@ class Home extends React.Component {
           )
         })}
         
-        <h2>Test Result Endpoints:</h2>
+        <h2 style={{marginTop: '2rem'}}>Test Results Supported Endpoints</h2>
+
         <hr/>
         <p>{reportUserId}</p>
+        <p>{reportTaskId}</p>
+        <p>{reportUsers}</p>
+        <p>{reportTasks}</p>
+        <br />
+        <NavLink to={`/create`} onClick={null}>
+          <Button variant="primary" size="lg">Create User</Button>
+        </NavLink>
       </Container>
+      
     )
   }
 }
