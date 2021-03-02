@@ -2,7 +2,7 @@ name: Artillery action to test function users
 
 # When there is a push to the development branch, this
 # GitHub action workflow will run
-on:
+on: 
   push:
     branches:
       - development
@@ -56,7 +56,7 @@ jobs:
     - name: Run Artillery Test
       run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output test/results/artillery.json ./test/artillery/artillery-test-users-api.yml
 
-    # Change results file name to follow naming conventions and include date/time
+    # Change results file name to follow naming conventions and include date/time 
     - name: Rename results json
       run: |
         cp test/results/artillery.json "test/results/artillery_${{ steps.date.outputs.date }}.json"
