@@ -2,7 +2,7 @@ name: Artillery action to test function users
 
 # When there is a push to the development branch, this
 # GitHub action workflow will run
-on: 
+on:  
   push:
     branches:
       - development
