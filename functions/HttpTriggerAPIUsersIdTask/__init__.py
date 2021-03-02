@@ -4,17 +4,8 @@ import logging
 import os
 import azure.functions as func
 import datetime
-import redis 
+import redis
 
-
-
-redisFeature = 1
-
-# to handle datetime with JSON
-# It serialize datetime by converting it into string
-def default(dateHandle):
-  if isinstance(dateHandle, (datetime.datetime, datetime.date)):
-    return dateHandle.isoformat()
 
 # to handle datetime with JSON
 # It serialize datetime by converting it into string
@@ -23,15 +14,10 @@ def default(o):
     return o.isoformat()
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info(
-        'Python HTTP trigger for /users/userId endpoint.')
+    logging.info('Python HTTP trigger for /users/userId/tasks endpoint.')
 
     method = req.method
     user_id = req.route_params.get('userId')
-
-    
-
-
 
     try:
         conn = connect_to_db()
@@ -41,17 +27,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=500)
     logging.debug("Connected to DB successfuly!")
 
-    #Redis Sever
+    # Redis Sever
+    try:
+        rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password= os.environ["ENV_REDIS_KEY"], ssl=True) 
+        rDB.ping()
+        logging.debug("Connected to Redis!")
+    except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
+            logging.error("Redis connection error!" + e.args[0])
 
-    if(redisFeature):
-        try:
-            rDBpassword = os.enviorn["ENV_REDIS_KEY"]
-            rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password=rDBpassword, ssl=True) 
-            rDB.ping()
-            logging.debug("Connected to Redis!")
-        except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
-                logging.error("Redis connection error!" + e.args[0])
-    
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
@@ -62,7 +45,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         elif method == "POST":
             logging.debug("trying to add one task to tasks")
             task_req_body = req.get_json()
-            new_task_id = add_tasks(conn, task_req_body, user_id, rDB)
+            new_task_id = add_tasks(conn, task_req_body, user_id)
             logging.debug("task added successfully!")
             return new_task_id
 
@@ -70,20 +53,16 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.warn(f"{method} method is not allowed for this endpoint")
             return func.HttpResponse(status_code=405)
 
-    #displays erros encountered when API methods were called
+    # displays erros encountered when API methods were called
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500)
     finally:
         conn.close()
         logging.debug('Connection to DB closed')
 
-        
-
-
 
 def connect_to_db():
     # Database credentials.
-    redisFeature = os.environ["CACHE_TOGGLE"]
     server = os.environ["ENV_DATABASE_SERVER"]
     database = os.environ["ENV_DATABASE_NAME"]
     username = os.environ["ENV_DATABASE_USERNAME"]
@@ -109,10 +88,8 @@ def get_user_tasks(conn, userId, rDB):
         tasks = []
         columns = [column[0] for column in cursor.description]
 
-    if(redisFeature):
-        if(rDB.get('users:user_id:tasks:all')):
-            unpacked_tasks = json.loads(rDB.get('tasks'))
-            tasks = unpacked_tasks
+        if(rDB.get('UsersIdTasks') is not None):
+            tasks = json.loads(rDB.get('UsersIdTasks').decode('utf-8'))
             logging.debug('Tasks loaded from Redis')
 
         else:
@@ -123,20 +100,14 @@ def get_user_tasks(conn, userId, rDB):
 
             logging.debug("tasks received!!")
 
-            #RedisLoad
-            json_tasks = json.dumps(tasks);   
-            rDB.set('users:user_id:tasks:all', json_tasks)
-
-            return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
-    else:
-        for task in task_data:
-            tasks.append(dict(zip(columns, task)))
-            
-        logging.debug("tasks received!!")
-        return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
+        # RedisLoad
+        json_tasks = json.dumps(tasks, default=default)
+        rDB.set('UsersIdTasks', json_tasks)
+        rDB.expire('tasks', 20)
+        return func.HttpResponse(json_tasks, status_code=200, mimetype="application/json")
 
 
-def add_tasks(conn, task_req_body, user_id, rDB):
+def add_tasks(conn, task_req_body, user_id):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
     try:
@@ -147,23 +118,20 @@ def add_tasks(conn, task_req_body, user_id, rDB):
         return func.HttpResponse(task_req_body_content_error.args[0], status_code=400)
     logging.debug("New task request body contains all the necessary fields!")
 
-    if(redisFeature):
-        rDB.expire('users:user_id:tasks:all')
-
     with conn.cursor() as cursor:
         # get task data
         userId = user_id
         title = task_req_body["title"]
         description = task_req_body["description"]
-        createdDate = datetime.datetime.now()
-        task_params = (userId, title, description, createdDate)
+        # createdDate = datetime.datetime.now()
+        task_params = (userId, title, description)
         # Create the query
         add_task_query = """
                          SET NOCOUNT ON;
                          DECLARE @NEWID TABLE(ID INT);
-                         INSERT INTO tasks (userId, title, description, createdDate)
+                         INSERT INTO tasks (userId, title, description)
                          OUTPUT inserted.taskId INTO @NEWID(ID)
-                         VALUES(?, ?, ?, ?);
+                         VALUES(?, ?, ?);
                          SELECT ID FROM @NEWID
                          """
         logging.debug("execute query")
@@ -172,5 +140,4 @@ def add_tasks(conn, task_req_body, user_id, rDB):
         task_id = cursor.fetchval()
         logging.info(task_id)
         logging.debug("task with id {} added!".format(task_id))
-        
-        return func.HttpResponse(json.dumps({task_id}, default=default), status_code=200, mimetype="application/json")
+        return func.HttpResponse(json.dumps({"taskId": task_id}), status_code=200, mimetype="application/json")
