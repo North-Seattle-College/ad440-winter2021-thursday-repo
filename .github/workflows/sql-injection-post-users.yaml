@@ -1,0 +1,18 @@
+name: sql injection test for users post
+on:
+  push:
+    branches:
+      - development
+env:
+  NODE_VERSION: "10.x"
+jobs:
+  POST-test-case:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Get current date and time
+        id: date
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+      - name: sql-injection-post-users-endpoint
+        run: |
+          curl -v -X POST -d "{\"firstName\": \"injection\", \"lastName\": \"You got hacked\",\"email\": \"'ups!!'); DELETE FROM users WHERE userId > 1020; -- \"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users? | tee
