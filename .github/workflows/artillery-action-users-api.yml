@@ -1,6 +1,6 @@
 name: Performance-Test Artillery UserId Tasks
 
-on: 
+on:  
   push:
     branches:
       - development
