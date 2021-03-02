@@ -5,189 +5,260 @@ import azure.functions as func
 import json
 import redis
 
+
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
-
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    method = req.method
+    user_id = req.route_params.get('userId')
+
     logging.info(
-        'Python HTTP trigger for users/userId is processing a request ')
+      '''
+        Python HTTP trigger for users/userId is
+        processing a request to get user with id {}
+      '''.format(user_id)
+    )
 
-    #Initiating REDIS cache
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-    r = redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= os.environ["ENV_REDIS_KEY"], ssl= True)
+    # Create a new connection
+    logging.debug('Attempting DB connection!')
+    try:
+        conn = get_db_connection()
+    except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
+        logging.critical('Failed to connect to DB: ' + e.args[0])
+        logging.info('Error: ' + e.args[1])
+        return func.HttpResponse(status_code=500)
 
-    #Something to test the redis cache
-    r.get("2")
-
-    # Database credentials.
-    db_server = os.environ["ENV_DATABASE_SERVER"]
-    db_name = os.environ["ENV_DATABASE_NAME"]
-    db_username = os.environ["ENV_DATABASE_USERNAME"]
-    db_password = os.environ["ENV_DATABASE_PASSWORD"]
-    driver = '{ODBC Driver 17 for SQL Server}'
-    connectionString = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
-        driver, db_server, db_name, db_username, db_password)
-
+    logging.debug('Connection to DB successful!')
 
     try:
-        # Create a new connection
-        logging.debug("Attempting DB connection!")
-        with pyodbc.connect(connectionString) as conn:
-            with conn.cursor() as cursor:
-                logging.debug("Connection to DB successful!")
+        # Return results according to the method
+        if method == 'GET':
+            logging.info('Attempting to retrieve user...')
+            user_http_response = get_user(conn, user_id, init_redis())
+            logging.info('User retrieved successfully!')
 
-                # Get user id from url (...api/users/{user_id}) and query db to check if it exists
-                user_id = req.route_params.get('userId')
-                logging.debug("Check if userId exists in database: " + user_id)
-                row = get_user_row(cursor, user_id)
-                if not row:
-                    logging.debug("User Id not found")
-                    return func.HttpResponse(
-                        "User not found",
-                        status_code=404
-                    )
-                if req.method == 'GET':
-                    return get(cursor, row, r)
-                elif req.method == 'PUT':
-                    return put(req, cursor, user_id)
-                elif req.method == 'DELETE':
-                    return delete(cursor, user_id)
-                else:
-                    return methodNotAllowed()
+            return user_http_response
+        elif req.method == 'PUT':
+            user_req_body = get_user_req_body(req)
 
+            logging.info('Attempting to update (PUT) user...')
+
+            return update_user(user_req_body, conn, user_id)
+        elif req.method == 'PATCH':
+            user_req_body = get_user_req_body(req)
+
+            logging.info('Attempting to update (PATCH) user...')
+
+            return patch_user(user_req_body, conn, user_id)
+        elif method == 'DELETE':
+            logging.info('Attempting to delete user...')
+
+            return delete_user(conn, user_id)
+        else:
+            logging.warn('''
+              Request with method {} has been recieved,
+              but that is not allowed for this endpoint
+            '''.format(method))
+
+            return func.HttpResponse('invalid request method', status_code=405)
+
+    # displays erros encountered when API methods were called
     except Exception as e:
-        logging.critical("Error: %s" % str(e))
+        return func.HttpResponse('Error: %s' % str(e), status_code=500)
+    finally:
+        conn.close()
+        logging.debug('Connection to DB closed')
+
+
+def get_db_connection():
+    # Connection String
+    connection_string = os.environ['ENV_DATABASE_CONNECTION_STRING']
+
+    return pyodbc.connect(connection_string)
+
+
+def init_redis():
+    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    REDIS_KEY = os.environ['ENV_REDIS_KEY']
+
+    return redis.StrictRedis(
+      host=REDIS_HOST, port=6380, db=0, password=REDIS_KEY, ssl=True
+    )
+
+
+def get_user(conn, user_id, init_redis):
+    try:
+        cache = get_user_cache(init_redis)
+        user = json.loads(cache)
+        user_user_id = user['userId']
+    except TypeError as e:
+        logging.info(e.args[0])
+
+    if cache is not None and int(user_user_id) != int(user_id):
+        with conn.cursor() as cursor:
+            logging.debug(
+                '''
+                  Using connection cursor to execute query
+                  (select user from users)
+                '''
+            )
+
+            cursor.execute('SELECT * FROM users WHERE userId = ?', user_id)
+
+            # Get user
+            logging.debug('Fetching all queried information')
+            user_data = list(cursor.fetchone())
+
+            columns = [column[0] for column in cursor.description]
+            user = dict(zip(columns, user_data))
+
+            logging.debug(
+                '''
+                  User data retrieved and processed,
+                  returning information from get_users function
+                '''
+              )
+
+            logging.info('Caching results...')
+
+            # Cache the results
+            cache_user(init_redis, user)
+
+            return func.HttpResponse(
+              json.dumps(user), status_code=200, mimetype='application/json'
+            )
+
+    else:
         return func.HttpResponse(
-            "Internal Server Error",
-            status_code=500
+          cache.decode('utf-8'), status_code=200, mimetype='application/json'
         )
 
-#This method calls the retrieves the user based on user_id and caches the user info on Redis
-def get(cursor, row, r):
-    logging.debug("Attempting to retrieve user by ID...")
-    # This will convert the results from the query into json properties.
-    # More information can be found on the link below:
-    # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
+
+def get_user_cache(init_redis):
+    logging.info('Querying cache...')
     try:
-        cache = get_user_id_cache(r, userId)
-    except TypeError as e:
-        logging.info(e.args[0])
-    if cache:
-        logging.info("Data returned from cache")
-        return func.HttpResponse(cache.decode('utf-8'), status_code =200, mimetype="application/json")
-    else:
-        logging.info("Empty cache, querying...")
-        sql_query = ("""SELECT CONCAT (users.firstName, ' ', users.lastName) AS "user",
-                        FROM [dbo].[users] 
-                        WHERE [dbo].[users].userId = ?""")
-        cursor.execute(sql_query, userId)
-
-    #gets user(s)
-    logging.debug("Fetching all queries for User IDs")
-    user_id_table = list(cursor.fetchall())
-
-    #Cleans User ID data to put into table
-    user_id_data = [tuple(user_id) for user_id in user_id_table]
-
-    #Empty User ID list
-    user_id_list = []
-
-    #Add data to empty list
-    user_id_columns = [column[0] for column in cursor.description]
-    for user_id in user_id_data:
-        user_id_list.append(dict(zip(columns, row))) 
-
-    logging.debug("Users retrieved successfully!")
-
-    #Caches the User ID data
-    cache_user_id(r, user_id)
-
-    return func.HttpResponse(
-        json.dumps(data),
-        status_code=200,
-        mimetype="application/json"
-    )
-
-
-# For POST and PATCH
-def methodNotAllowed():
-    logging.debug("This method is not Implemented")
-    return func.HttpResponse(
-        "Method not allowed!",
-        status_code=405
-    )
-
-
-def put(req, cursor, user_id):
-    user_req_body = req.get_json()
-
-    # Validate request body
-    logging.debug("Verifying fields in request body to update a user by ID")
-    try:
-        assert "firstName" in user_req_body, "User request body did not contain field: 'firstName'"
-        assert "lastName" in user_req_body, "User request body did not contain field: 'lastName'"
-        assert "email" in user_req_body, "User request body did not contain field: 'email'"
-    except AssertionError as user_req_body_content_error:
-        logging.error(
-            "User request body did not contain the necessary fields!")
-        return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
-    logging.debug("User request body contains all the necessary fields!")
-
-    # Unpack user data
-    firstName = user_req_body["firstName"]
-    lastName = user_req_body["lastName"]
-    email = user_req_body["email"]
-
-    # Update user in DB
-    update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId= ?"
-    logging.debug("Executing query: " + update_user_query)
-    cursor.execute(update_user_query,
-                   (firstName, lastName, email, user_id))
-    logging.debug("User was updated successfully!.")
-    return func.HttpResponse(
-        "User updated",
-        status_code=200
-    )
-
-
-def delete(cursor, user_id):
-    logging.debug("Attempting to retrieve user by ID and delete the user...")
-    delete_user_query = "DELETE FROM dbo.users  WHERE userId= ?"
-    logging.debug("Executing query: " + delete_user_query)
-    cursor.execute(delete_user_query, (user_id,))
-    logging.debug("User was deleted successfully!.")
-    return func.HttpResponse(
-        "User deleted",
-        status_code=200
-    )
-
-
-def get_user_row(cursor, user_id):
-    cursor.execute(
-        "SELECT * FROM dbo.users WHERE userId= ?", (user_id,))
-
-    return cursor.fetchone()
-
-#This method caches user_id
-#param: r- redis cache
-#user_id: User IDs that need to cached
-def cache_user_id(r, user_id):
-    key = "users:" + userId
-    try:
-        r.set(key, json.dumps(users), ex= 1200) 
-        logging.info("Caching complete!")
-    except TypeError as e:
-        logging.info("Caching failed")
-        logging.info(e.args[0])
-
-#This method retrieves the user_id cache
-#param: r- Redis Cache that it the user_id cache residing in
-def get_user_id_cache(r, userId):
-    logging.info("Querying for User ID cache...")
-    try:
-        key = "users:" + userId
-        cache = r.get(key)
+        cache = init_redis.get('user')
         return cache
     except TypeError as e:
-        logging.critical("Failed to fetch from cache: " + e.args[1])
+        logging.critical('Failed to fetch user from cache: ' + e.args[1])
         return None
+
+
+def cache_user(init_redis, user):
+    try:
+        init_redis.set('user', json.dumps(user), ex=1200)
+        logging.info('Caching complete')
+    except TypeError as e:
+        logging.info('Caching failed')
+        logging.info(e.args[0])
+
+
+def update_user(user_req_body, conn, user_id):
+    # Validate request body
+    logging.debug('Verifying fields in request body to update a user by ID')
+    try:
+        assert 'firstName' in user_req_body, 'User request body did not contain field: "firstName"'
+        assert 'lastName' in user_req_body, 'User request body did not contain field: "lastName"'
+        assert 'email' in user_req_body, 'User request body did not contain field: "email"'
+    except AssertionError as user_req_body_content_error:
+        logging.error(
+            'User request body did not contain the necessary fields!'
+        )
+        return func.HttpResponse(
+          user_req_body_content_error.args[0], status_code=400
+        )
+
+    logging.debug('User request body contains all the necessary fields!')
+
+    with conn.cursor() as cursor:
+        # Unpack user data
+        firstName = user_req_body['firstName']
+        lastName = user_req_body['lastName']
+        email = user_req_body['email']
+
+        # Update user in DB
+        update_user_query = '''
+          UPDATE dbo.users SET firstName = ?,
+          lastName = ?, email = ? WHERE userId= ?
+        '''
+
+        logging.debug('Executing query: ' + update_user_query)
+
+        cursor.execute(
+          update_user_query, (firstName, lastName, email, user_id)
+        )
+
+        logging.debug('User was updated successfully!.')
+
+        return func.HttpResponse('User updated', status_code=200)
+
+
+def patch_user(user_req_body, conn, user_id):
+    logging.debug('''
+      Going to execute PATCH query on user {}
+    '''.format(user_id))
+
+    fieldsToUpdate = list(user_req_body.keys())
+    updatableFields = ['firstName', 'lastNAme', 'emeil']
+
+    with conn.cursor() as cursor:
+        if len(fieldsToUpdate) == 0:
+            logging.critical('''
+              request body did not contain fields to update the user
+            ''')
+
+            return func.HttpResponse('no field to update', status_code=400)
+        elif set(fieldsToUpdate).issubset(updatableFields):
+            fieldsInQuery = ''
+            params = []
+
+            for field in fieldsToUpdate:
+                comma = ' ' if field == fieldsToUpdate[-1] else ', '
+                params.append(field)
+
+                fieldsInQuery += "{} = ?{}".format(str(field), comma)
+
+            sql_query = """
+              UPDATE users SET {} WHERE userId = ?
+            """.format(fieldsInQuery)
+
+            params.append(int(user_id))
+
+            cursor.execute(sql_query, tuple(params))
+
+            return func.HttpResponse(
+                'user updated successfully',
+                status_code=200,
+                mimetype='application/json'
+            )
+        else:
+            return func.HttpResponse('invalid request body', status_code=400)
+
+
+def delete_user(conn, user_id):
+    with conn.cursor() as cursor:
+        logging.debug('''
+          Attempting to retrieve user by ID and delete the user...
+        ''')
+
+        delete_user_query = 'DELETE FROM users WHERE userId= ?'
+
+        logging.debug('Executing query: ' + delete_user_query)
+
+        cursor.execute(delete_user_query, (user_id))
+
+        logging.debug('User was deleted successfully!.')
+
+        return func.HttpResponse('User deleted', status_code=200)
+
+
+def get_user_req_body(req):
+    user_req_body = dict()
+
+    try:
+        user_req_body = req.get_json()
+    except ValueError:
+        logging.error('Empty req body or non-JSON file passed')
+        pass
+
+    return user_req_body
