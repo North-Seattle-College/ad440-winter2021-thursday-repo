@@ -36,7 +36,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             logging.info('Attempting to retrieve user...')
             user_http_response = get_user(conn, user_id, init_redis())
             logging.info('User retrieved successfully!')
-
             return user_http_response
         elif req.method == 'PUT':
             user_req_body = get_user_req_body(req)
@@ -91,10 +90,11 @@ def get_user(conn, user_id, init_redis):
         cache = get_user_cache(init_redis)
         user = json.loads(cache)
         user_user_id = user['userId']
+        is_cachable = cache is not None and int(user_user_id) == int(user_id)
     except TypeError as e:
         logging.info(e.args[0])
 
-    if cache is not None and int(user_user_id) != int(user_id):
+    if (cache is None) or not is_cachable:
         with conn.cursor() as cursor:
             logging.debug(
                 '''
@@ -128,14 +128,13 @@ def get_user(conn, user_id, init_redis):
               json.dumps(user), status_code=200, mimetype='application/json'
             )
 
-    else:
+    if cache is not None:
         return func.HttpResponse(
           cache.decode('utf-8'), status_code=200, mimetype='application/json'
         )
 
 
 def get_user_cache(init_redis):
-    logging.info('Querying cache...')
     try:
         cache = init_redis.get('user')
         return cache
