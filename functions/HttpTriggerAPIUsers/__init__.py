@@ -177,6 +177,7 @@ def get_users_cache(r):
 
 def clear_users_cache(r):
     r.delete(USERS_CACHE_KEY)
+    logging.info("Cache cleared")
 
 def create_users_table(conn):
     cursor = conn.cursor()
