@@ -60,6 +60,7 @@ jobs:
     - name: Rename results json
       run: |
         cp test/results/artillery.json "test/results/artillery_${{ steps.date.outputs.date }}.json"
+
     # Upload the results to S3 bucket
     - name: AWS CLI S3
       run: |
