@@ -10,6 +10,7 @@ import userIdReport from '../routes/reports/userIdReport/UserIdReport';
 import usersReport from '../routes/reports/usersReport/UserReport';
 import TasksReport from '../routes/reports/userIdReport/UserIdTasksReport'
 import Create from '../routes/create/Create';
+import CreateTask from '../routes/create/CreateTask';
  
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
 
         {/* Create user + task */}
         <Route exact path='/create' component={Create} />
+        <Route exact path='/createtask' component={CreateTask} />
       </Router>
     </div>
   );
