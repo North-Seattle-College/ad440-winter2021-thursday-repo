@@ -16,9 +16,3 @@ jobs:
       - name: curl
         run: |
           curl -o ../../test/security/sql-injection/test-sql-injection-users-${{steps.date.outputs.date}}.json -v -X POST -d "{\"firstName\": \"injection\", \"lastName\": \"You got hacked\",\"email\": \"'ups!!'); DELETE FROM users WHERE userId > 1020; -- \"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users?      - name: read output
-        id: userId
-        uses: notiz-dev/github-action-json-property@release
-        with:
-          path: "../../test/security/sql-injection/test-sql-injection-users-${{steps.date.outputs.date}}.json"
-          prop_path: "user"
-      - run: echo ${{steps.userId.outputs.prop}}
