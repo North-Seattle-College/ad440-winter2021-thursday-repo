@@ -15,4 +15,4 @@ jobs:
         run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
       - name: sql-injection-post-users-endpoint
         run: |
-          curl -o ../../test/security/sql-injection/test-sql-injection-users-${{steps.date.outputs.date}}.json -v -X POST -d "{\"firstName\": \"injection\", \"lastName\": \"You got hacked\",\"email\": \"'ups!!'); DELETE FROM users WHERE userId > 1020; -- \"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users? | tee
+          curl -v -X POST -d "{\"firstName\": \"injection\", \"lastName\": \"You got hacked\",\"email\": \"'ups!!'); DELETE FROM users WHERE userId > 1020; -- \"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users? | tee
