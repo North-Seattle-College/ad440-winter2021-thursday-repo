@@ -6,6 +6,7 @@ import redis
 import azure.functions as func
 
 USERS_CACHE_KEY = b'users:all'
+CACHE_TOGGLE = os.environ["CACHE_TOGGLE"]
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
@@ -159,21 +160,23 @@ def init_redis():
         port=6380, db=0, password=REDIS_KEY, ssl=True)
 
 def cache_users(r, users):
-    try: 
-        r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
-        logging.info("Caching complete")
-    except TypeError as e:
-        logging.info("Caching failed")
-        logging.info(e.args[0])
+    if (CACHE_TOGGLE == "On"):
+        try: 
+            r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
+            logging.info("Caching complete")
+        except Exception as e:
+            logging.info("Caching failed")
+            logging.info(e.args[0])
 
 def get_users_cache(r):  
-    logging.info("Querying cache...")
-    try:
-        cache = r.get(USERS_CACHE_KEY)
-        return cache
-    except TypeError as e:
-        logging.critical("Failed to fetch from cache: " + e.args[1])
-        return None
+    if (CACHE_TOGGLE == "On"):
+        logging.info("Querying cache...")
+        try:
+            cache = r.get(USERS_CACHE_KEY)
+            return cache
+        except Exception as e:
+            logging.critical("Failed to fetch from cache: " + e.args[1])
+            return None
 
 def clear_users_cache(r):
     r.delete(USERS_CACHE_KEY)
