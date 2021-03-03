@@ -102,7 +102,7 @@ const CreateTask = () => {
                         <Form.Label>Title: </Form.Label>
                         <Form.Control required as="input" type="text" placeholder="Clean storage"  name="lastName" />
                         <Form.Control.Feedback type="invalid">
-                            Invalid Last Name
+                            Invalid Title
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
