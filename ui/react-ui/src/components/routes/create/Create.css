@@ -1,7 +1,18 @@
 .formContainer {
-    margin: 150px;
+  margin: 150px;
 }
 
 .title {
-    text-align: center;
+  text-align: center;
+}
+.taskForm {
+  display: grid;
+  padding-left: 40px;
+
+  grid-template-rows: 100px;
+}
+.taskButton {
+  display: grid;
+  width: 20%;
+  height: 30px;
 }
