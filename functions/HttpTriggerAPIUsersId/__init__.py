@@ -31,10 +31,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.debug('Connection to DB successful!')
 
     try:
+        _redis = init_redis()
         # Return results according to the method
         if method == 'GET':
             logging.info('Attempting to retrieve user...')
-            user_http_response = get_user(conn, user_id, init_redis())
+            user_http_response = get_user(conn, user_id, _redis)
             logging.info('User retrieved successfully!')
             return user_http_response
         elif req.method == 'PUT':
@@ -42,17 +43,17 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             logging.info('Attempting to update (PUT) user...')
 
-            return update_user(user_req_body, conn, user_id)
+            return update_user(user_req_body, conn, user_id, _redis)
         elif req.method == 'PATCH':
             user_req_body = get_user_req_body(req)
 
             logging.info('Attempting to update (PATCH) user...')
 
-            return patch_user(user_req_body, conn, user_id)
+            return patch_user(user_req_body, conn, user_id, _redis)
         elif method == 'DELETE':
             logging.info('Attempting to delete user...')
 
-            return delete_user(conn, user_id)
+            return delete_user(conn, user_id, _redis)
         else:
             logging.warn('''
               Request with method {} has been recieved,
@@ -85,74 +86,89 @@ def init_redis():
     )
 
 
-def get_user(conn, user_id, init_redis):
+def get_user(conn, user_id, _redis):
     try:
-        cache = get_user_cache(init_redis)
+        cache = get_user_cache(_redis)
         user = json.loads(cache)
         user_user_id = user['userId']
         is_cachable = cache is not None and int(user_user_id) == int(user_id)
     except TypeError as e:
         logging.info(e.args[0])
 
-    if (cache is None) or not is_cachable:
-        with conn.cursor() as cursor:
-            logging.debug(
-                '''
-                  Using connection cursor to execute query
-                  (select user from users)
-                '''
-            )
-
-            cursor.execute('SELECT * FROM users WHERE userId = ?', user_id)
-
-            # Get user
-            logging.debug('Fetching all queried information')
-            user_data = list(cursor.fetchone())
-
-            columns = [column[0] for column in cursor.description]
-            user = dict(zip(columns, user_data))
-
-            logging.debug(
-                '''
-                  User data retrieved and processed,
-                  returning information from get_users function
-                '''
-              )
-
-            logging.info('Caching results...')
-
-            # Cache the results
-            cache_user(init_redis, user)
-
-            return func.HttpResponse(
-              json.dumps(user), status_code=200, mimetype='application/json'
-            )
-
-    if cache is not None:
-        return func.HttpResponse(
-          cache.decode('utf-8'), status_code=200, mimetype='application/json'
-        )
-
-
-def get_user_cache(init_redis):
     try:
-        cache = init_redis.get('user')
+        if (cache is None) or not is_cachable:
+            with conn.cursor() as cursor:
+                logging.debug(
+                    '''
+                      Using connection cursor to execute query
+                      (select user from users)
+                    '''
+                )
+
+                cursor.execute('SELECT * FROM users WHERE userId = ?', user_id)
+
+                # Get user
+                logging.debug('Fetching all queried information')
+                user_data = list(cursor.fetchone())
+                columns = [column[0] for column in cursor.description]
+                user = dict(zip(columns, user_data))
+
+                logging.debug(
+                    '''
+                      User data retrieved and processed,
+                      returning information from get_users function
+                    '''
+                  )
+
+                logging.info('Caching results...')
+
+                # Cache the results
+                cache_user(_redis, user)
+
+                respond = json.dumps(user)
+                statuse_code = 200
+
+        if cache is not None:
+            respond = cache.decode('utf-8')
+            statuse_code = 200
+
+    except TypeError as e:
+        respond = 'get user failed'
+        logging.info(respond)
+        logging.info(e.args[0])
+        statuse_code = 400
+
+    return func.HttpResponse(
+        respond,
+        status_code=statuse_code,
+        mimetype='application/json'
+    )
+
+
+def get_user_cache(_redis):
+    try:
+        cache = _redis.get('user')
         return cache
     except TypeError as e:
         logging.critical('Failed to fetch user from cache: ' + e.args[1])
         return None
 
 
-def cache_user(init_redis, user):
+def set_user_cache(_redis, clear_cache):
+    if clear_cache:
+        _redis.flushdb()
+
+
+def cache_user(_redis, user):
     try:
-        init_redis.set('user', json.dumps(user), ex=1200)
+        _redis.set('user', json.dumps(user), ex=1200)
         logging.info('Caching complete')
     except TypeError as e:
         logging.info('Caching failed')
         logging.info(e.args[0])
 
 
-def update_user(user_req_body, conn, user_id):
+def update_user(user_req_body, conn, user_id, _redis):
     # Validate request body
     logging.debug('Verifying fields in request body to update a user by ID')
     try:
@@ -169,30 +185,45 @@ def update_user(user_req_body, conn, user_id):
 
     logging.debug('User request body contains all the necessary fields!')
 
-    with conn.cursor() as cursor:
-        # Unpack user data
-        firstName = user_req_body['firstName']
-        lastName = user_req_body['lastName']
-        email = user_req_body['email']
+    try:
+        with conn.cursor() as cursor:
+            # Unpack user data
+            firstName = user_req_body['firstName']
+            lastName = user_req_body['lastName']
+            email = user_req_body['email']
 
-        # Update user in DB
-        update_user_query = '''
-          UPDATE dbo.users SET firstName = ?,
-          lastName = ?, email = ? WHERE userId= ?
-        '''
+            # Update user in DB
+            update_user_query = '''
+              UPDATE dbo.users SET firstName = ?,
+              lastName = ?, email = ? WHERE userId= ?
+            '''
 
-        logging.debug('Executing query: ' + update_user_query)
+            logging.debug('Executing query: ' + update_user_query)
 
-        cursor.execute(
-          update_user_query, (firstName, lastName, email, user_id)
-        )
+            cursor.execute(
+              update_user_query, (firstName, lastName, email, user_id)
+            )
 
-        logging.debug('User was updated successfully!.')
+            logging.debug('User was updated successfully!.')
 
-        return func.HttpResponse('User updated', status_code=200)
+            set_user_cache(_redis, True)
+
+            respond = 'User updated'
+            statuse_code = 200
+
+    except TypeError as e:
+        respond = 'patch failed'
+        logging.info(respond)
+        logging.info(e.args[0])
+        statuse_code = 400
+
+    return func.HttpResponse(
+        respond,
+        status_code=statuse_code
+    )
 
 
-def patch_user(user_req_body, conn, user_id):
+def patch_user(user_req_body, conn, user_id, _redis):
     logging.debug('''
       Going to execute PATCH query on user {}
     '''.format(user_id))
@@ -200,57 +231,86 @@ def patch_user(user_req_body, conn, user_id):
     fieldsToUpdate = list(user_req_body.keys())
     updatableFields = ['firstName', 'lastName', 'email']
 
-    with conn.cursor() as cursor:
-        if len(fieldsToUpdate) == 0:
-            logging.critical('''
-              request body did not contain fields to update the user
+    try:
+        with conn.cursor() as cursor:
+            if len(fieldsToUpdate) == 0:
+                logging.critical('''
+                  request body did not contain fields to update the user
+                ''')
+
+                respond = 'no field to update'
+                statuse_code = 400
+
+            elif set(fieldsToUpdate).issubset(updatableFields):
+                fieldsInQuery = ''
+                params = []
+
+                for field in fieldsToUpdate:
+                    comma = ' ' if field == fieldsToUpdate[-1] else ', '
+                    params.append(user_req_body[field])
+
+                    fieldsInQuery += "{} = ?{}".format(str(field), comma)
+
+                sql_query = """
+                  UPDATE users SET {} WHERE userId = ?
+                """.format(fieldsInQuery)
+
+                params.append(int(user_id))
+
+                cursor.execute(sql_query, tuple(params))
+
+                set_user_cache(_redis, True)
+
+                respond = 'user updated successfully'
+                statuse_code = 200
+
+            else:
+                respond = 'invalid request body'
+                statuse_code = 400
+
+    except TypeError as e:
+        respond = 'patch failed'
+        logging.info(respond)
+        logging.info(e.args[0])
+        statuse_code = 400
+
+    return func.HttpResponse(
+        respond,
+        status_code=statuse_code
+    )
+
+
+def delete_user(conn, user_id, _redis):
+    try:
+        with conn.cursor() as cursor:
+            logging.debug('''
+              Attempting to retrieve user by ID and delete the user...
             ''')
 
-            return func.HttpResponse('no field to update', status_code=400)
-        elif set(fieldsToUpdate).issubset(updatableFields):
-            fieldsInQuery = ''
-            params = []
+            delete_user_query = 'DELETE FROM users WHERE userId= ?'
 
-            for field in fieldsToUpdate:
-                comma = ' ' if field == fieldsToUpdate[-1] else ', '
-                params.append(user_req_body[field])
+            logging.debug('Executing query: ' + delete_user_query)
 
-                fieldsInQuery += "{} = ?{}".format(str(field), comma)
+            cursor.execute(delete_user_query, (user_id))
 
-            sql_query = """
-              UPDATE users SET {} WHERE userId = ?
-            """.format(fieldsInQuery)
-            logging.info(sql_query)
-            logging.info(tuple(params))
+            logging.debug('User was deleted successfully!.')
 
-            params.append(int(user_id))
+            cache = get_user_cache(_redis)
+            user = json.loads(cache)
+            is_clearable = cache is not None and int(user['userId']) == int(user_id)
 
-            cursor.execute(sql_query, tuple(params))
+            if is_clearable:
+                set_user_cache(_redis, True)
 
-            return func.HttpResponse(
-                'user updated successfully',
-                status_code=200,
-                mimetype='application/json'
-            )
-        else:
-            return func.HttpResponse('invalid request body', status_code=400)
+            respond = 'User deleted'
+            statuse_code = 200
+    except TypeError as e:
+        respond = 'delete failed'
+        logging.info(respond)
+        logging.info(e.args[0])
+        statuse_code = 400
 
-
-def delete_user(conn, user_id):
-    with conn.cursor() as cursor:
-        logging.debug('''
-          Attempting to retrieve user by ID and delete the user...
-        ''')
-
-        delete_user_query = 'DELETE FROM users WHERE userId= ?'
-
-        logging.debug('Executing query: ' + delete_user_query)
-
-        cursor.execute(delete_user_query, (user_id))
-
-        logging.debug('User was deleted successfully!.')
-
-        return func.HttpResponse('User deleted', status_code=200)
+    return func.HttpResponse(respond, status_code=statuse_code)
 
 
 def get_user_req_body(req):
