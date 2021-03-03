@@ -1,0 +1,67 @@
+name: Artillery action to test function users
+
+# When there is a push to the development branch, this
+# GitHub action workflow will run
+on: 
+  push:
+    branches:
+      - development
+
+#Test
+# Sets up the environment variables
+env:
+  NODE_VERSION: '14' # version of Node we are using
+  NPM_CONFIG_PREFIX: '~/.npm-global' # required to set path for Artillery call
+
+jobs:
+  # Sets up ubuntu VM for actions
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks out current repo
+    - name: 'Checkout Repository GitHub Action'
+      uses: actions/checkout@v2
+
+    # Sets up Node
+    - name: Setup Node ${{ env.NODE_VERSION }} Environment
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        check-latest: true
+    
+    # Sets up NPM
+    - name: 'Run npm init'
+      run: npm init -y
+
+    # Uses AWS-Actions to set up AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+    # Installs Artillery globally
+    - name: Run npm install artillery
+      run: npm install -g artillery
+
+    # Grabs the current date and time for naming convention
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+
+    # Call artillery test located at ./test/artillery/artillery-perf-test-users-user_id-tasks.yaml
+    # Return temp results to test/results/artillery-test-users-user_id-tasks-results.json
+    - name: Run Artillery Test
+      run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output test/results/artillery.json ./test/artillery/artillery-test-users-api.yml
+
+    # Change results file name to follow naming conventions and include date/time  
+    - name: Rename results json
+      run: |
+        cp test/results/artillery.json "test/results/artillery_${{ steps.date.outputs.date }}.json"
+
+    # Upload the results to S3 bucket
+    - name: AWS CLI S3
+      run: |
+        aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
