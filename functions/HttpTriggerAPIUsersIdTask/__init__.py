@@ -159,4 +159,4 @@ def add_tasks(conn, task_req_body, user_id):
         task_id = cursor.fetchval()
         logging.info(task_id)
         logging.debug("task with id {} added!".format(task_id))
-        return func.HttpResponse(json.dumps({"taskId": task_id}), status_code=200, mimetype="application/json")
+        return func.HttpResponse(json.dumps({task_id}, default=default), status_code=200, mimetype="application/json")
