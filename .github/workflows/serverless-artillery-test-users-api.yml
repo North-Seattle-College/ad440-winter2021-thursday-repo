@@ -50,7 +50,7 @@ jobs:
         with:
           args: --acl public-read
         env:
-          FILE: ../../test/results/serverless-artillery-test-users-api.json
+          FILE: test/results/serverless-artillery-test-users-api.json
           AWS_REGION: 'us-east-1'
           S3_BUCKET: 'serverless-artillery'
           S3_KEY: 'serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json'
