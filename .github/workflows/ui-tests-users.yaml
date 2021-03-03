@@ -31,10 +31,20 @@ jobs:
           npm install
           npm run test-users
           popd
+        
       - name: Upload screenshot to Azure Blob Storage
-        uses: bacongobbler/azure-blob-storage-upload@v1.0.0
+        uses: azure/CLI@v1
         with:
-          source_dir: ${{ env.UI_RESULTS_USERS_FILE_PATH }}
-          container_name: screenshots
-          connection_string: ${{secrets.BLOB_STORAGE_CONNECTION_STRING}}
-          extra_args: '--pattern *.png'
+          inlineScript: |
+            az storage blob upload-batch \
+              --destination screenshots \
+              --source ${{ env.UI_RESULTS_USERS_FILE_PATH }} \
+              --connection-string ${{secrets.BLOB_STORAGE_CONNECTION_STRING}}
+              --pattern *.png
+      # - name: Upload screenshot to Azure Blob Storage
+      #   uses: bacongobbler/azure-blob-storage-upload@v1.0.0
+      #   with:
+      #     source_dir: ${{ env.UI_RESULTS_USERS_FILE_PATH }}
+      #     container_name: screenshots
+      #     connection_string: ${{secrets.BLOB_STORAGE_CONNECTION_STRING}}
+      #     extra_args: '--pattern *.png'
