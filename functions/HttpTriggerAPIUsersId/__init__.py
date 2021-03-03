@@ -198,7 +198,7 @@ def patch_user(user_req_body, conn, user_id):
     '''.format(user_id))
 
     fieldsToUpdate = list(user_req_body.keys())
-    updatableFields = ['firstName', 'lastNAme', 'emeil']
+    updatableFields = ['firstName', 'lastName', 'email']
 
     with conn.cursor() as cursor:
         if len(fieldsToUpdate) == 0:
@@ -213,13 +213,15 @@ def patch_user(user_req_body, conn, user_id):
 
             for field in fieldsToUpdate:
                 comma = ' ' if field == fieldsToUpdate[-1] else ', '
-                params.append(field)
+                params.append(user_req_body[field])
 
                 fieldsInQuery += "{} = ?{}".format(str(field), comma)
 
             sql_query = """
               UPDATE users SET {} WHERE userId = ?
             """.format(fieldsInQuery)
+            logging.info(sql_query)
+            logging.info(tuple(params))
 
             params.append(int(user_id))
 
