@@ -8,7 +8,7 @@ on:
 env:
   NODE_VERSION: '14'
   UI_TESTS_PATH: './test/ui'
-  UI_RESULTS_USERS_FILE_PATH: './test/results/ui-test-results/'
+  UI_RESULTS_USERS_FILE_PATH: './test/results/ui-test-results/users/'
 
 jobs:
   # Tentative title for the job
