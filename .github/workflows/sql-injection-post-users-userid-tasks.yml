@@ -21,7 +21,7 @@ jobs:
         id: taskId
         uses: notiz-dev/github-action-json-property@release
         with: 
-          path: '../../test/results/sql-injection-users-userid-tasks-post.json'
+          path: '../../test/security/sql-injection/sql-injection-users-userid-tasks-post.json'
           prop_path: 'taskId'
       - name: "task created with id: ${{steps.taskId.outputs.prop}} "
         run: echo "task created with id:" ${{steps.taskId.outputs.prop}} 
