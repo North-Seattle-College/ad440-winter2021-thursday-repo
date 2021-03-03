@@ -132,9 +132,14 @@ class Home extends React.Component {
         <p>{reportUsers}</p>
         <p>{reportTasks}</p>
         <br />
-        <NavLink to={`/create`} onClick={null}>
+        <Container className="usertasksbuttons">
+        <NavLink  to={`/create`} onClick={null}>
           <Button variant="primary" size="lg">Create User</Button>
         </NavLink>
+        <NavLink  to={`/createtask`} onClick={null}>
+          <Button variant="primary" size="lg">Create Task</Button>
+        </NavLink>
+        </Container>
       </Container>
       
     )

@@ -84,6 +84,13 @@ const CreateTask = () => {
                 </Alert>
                 <h2 className='title'>Create Task</h2>
                 <Form noValidate validated={validated} onSubmit={handleSubmit} onChange={handleChange} ref={formRef}>
+                <Form.Group>
+                        <Form.Label>Tasks ID: </Form.Label>
+                        <Form.Control required as="input" type="text" placeholder="##" name="firstName" />
+                        <Form.Control.Feedback type="invalid">
+                            Invalid Task ID
+                        </Form.Control.Feedback>
+                    </Form.Group>
                     <Form.Group>
                         <Form.Label>User ID: </Form.Label>
                         <Form.Control required as="input" type="text" placeholder="##" name="firstName" />
@@ -92,17 +99,24 @@ const CreateTask = () => {
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>Last Name: </Form.Label>
-                        <Form.Control required as="input" type="text" placeholder="Smith"  name="lastName" />
+                        <Form.Label>Title: </Form.Label>
+                        <Form.Control required as="input" type="text" placeholder="Clean storage"  name="lastName" />
                         <Form.Control.Feedback type="invalid">
                             Invalid Last Name
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>Email: </Form.Label>
-                        <Form.Control required type="email" placeholder="test@example.com"  name="email" />
+                        <Form.Label>Description: </Form.Label>
+                        <Form.Control required type="input" placeholder="Remove Old items, Powerwash"  name="email" />
                         <Form.Control.Feedback type="invalid">
-                            Invalid Email
+                            Invalid description
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Created Date: </Form.Label>
+                        <Form.Control required type="input" placeholder="02/27/2021"  name="email" />
+                        <Form.Control.Feedback type="invalid">
+                            Invalid Date
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Button variant="primary" type="submit">
