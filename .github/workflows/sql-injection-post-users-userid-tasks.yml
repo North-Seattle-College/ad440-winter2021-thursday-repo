@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@main
       - name: curl
         run: |
-          curl -o ../../test/security/sql-injection/sql-injection-users-userid-tasks-post.json -v -X POST -d '{"title": "sqlINJ", "description": "'oops'); DELETE FROM users WHERE userId > 1000; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1078/tasks? | tee
+          curl -v -X POST -d '{"title": "sqlINJ", "description": "'oops'); DELETE FROM users WHERE userId > 1000; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1078/tasks? | tee test/security/sql-injection/sql-injection-users-userid-tasks-post.json
       - name: Sleep for 10 seconds
         uses: jakejarvis/wait-action@master
         with:
