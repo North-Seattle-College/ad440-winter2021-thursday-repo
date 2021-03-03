@@ -32,4 +32,4 @@ jobs:
       - name: Remove File
         uses: JesseTG/rm@v1.0.2
         with:
-          path: 'test/results/sql-injection-users-userid-tasks-post.json'
+          path: 'test/security/sql-injection/sql-injection-users-userid-tasks-post.json'
