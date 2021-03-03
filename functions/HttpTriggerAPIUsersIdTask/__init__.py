@@ -10,13 +10,11 @@ import redis
 # to handle datetime with JSON
 # It serialize datetime by converting it into string
 def default(o):
-  if isinstance(o, (datetime.date, datetime.datetime)):
+  if isinstance(o, (datetime.datetime, datetime.date)):
     return o.isoformat()
 
-
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info(
-        'Python HTTP trigger for /users/userId endpoint.')
+    logging.info('Python HTTP trigger for /users/userId/tasks endpoint.')
 
     method = req.method
     user_id = req.route_params.get('userId')
@@ -31,7 +29,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     # Redis Sever
     try:
-        rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password= os.environ["ENV_REDIS_KEY"], ssl=True)
+        rDB = redis.Redis(host='nsc-redis-dev-usw2-thursday.redis.cache.windows.net', port='6380', db=0, password= os.environ["ENV_REDIS_KEY"], ssl=True) 
         rDB.ping()
         logging.debug("Connected to Redis!")
     except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
