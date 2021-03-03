@@ -24,6 +24,6 @@ jobs:
           path: 'test/results/sql-injection-users-userid-tasks-post.json'
           prop_path: 'taskId'
       - name: show the respond to the POST request
-      run: echo "task created with id:" ${{steps.taskId.outputs.prop}} 
+        run: echo "task created with id:" ${{steps.taskId.outputs.prop}} 
 
 
