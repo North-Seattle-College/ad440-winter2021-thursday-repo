@@ -1,9 +1,9 @@
 name: UI Test /users
 
 on:
-  push:
+  pull_request:
     branches:
-      - feature/task192-ReactUITest
+      - development
 
 env:
   NODE_VERSION: '14'
