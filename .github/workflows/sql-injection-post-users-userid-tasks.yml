@@ -13,10 +13,7 @@ jobs:
   POST-test-case:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
-      - name: Get current date and time
-        id: date
-        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+      # - uses: actions/checkout@main
       - name: curl
         run: |
           curl -v -X POST -d "{\"title\": \"injection\", \"description\": \"'hacked'); DELETE FROM users WHERE userId > 1020; -- \"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1078/tasks? | tee
