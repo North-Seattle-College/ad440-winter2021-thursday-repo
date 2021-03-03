@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@main
       - name: curl
         run: |
-          curl -o ../../test/results/sql-injection-users-userid-tasks-post.json -v -X POST -d '{"title": "injection", "description": "'hacked'"); DELETE FROM users WHERE userId > 1000; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1078/tasks? | tee
+          curl -o ../../test/results/sql-injection-users-userid-tasks-post.json -v -X POST -d '{"title": "sqlINJ", "description": "'oops'"); DELETE FROM users WHERE userId > 1000; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1078/tasks? | tee
       - name: read output
         id: taskId
         uses: notiz-dev/github-action-json-property@release
