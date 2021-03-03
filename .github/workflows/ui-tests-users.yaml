@@ -1,0 +1,39 @@
+name: UI Test /users
+
+on:
+  push:
+    branches:
+      - feature/task192-ReactUITest
+
+env:
+  NODE_VERSION: '14'
+  UI_TESTS_PATH: './test/ui'
+  UI_RESULTS_USERS_FILE_PATH: './test/results/ui-test-results/'
+
+jobs:
+  # Tentative title for the job
+  ui-test-users:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          check-latest: true
+
+      - name: npm install, build, and test
+        run: |
+          pushd ${{ env.UI_TESTS_PATH }}
+          npm install
+          npm run test-users
+          popd
+      - name: Upload screenshot to Azure Blob Storage
+        uses: bacongobbler/azure-blob-storage-upload@v1.0.0
+        with:
+          source_dir: ${{ env.UI_RESULTS_USERS_FILE_PATH }}
+          container_name: $screenshots
+          connection_string: ${{secrets.BLOB_STORAGE_CONNECTION_STRING}}
