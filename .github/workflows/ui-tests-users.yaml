@@ -35,5 +35,5 @@ jobs:
         uses: bacongobbler/azure-blob-storage-upload@v1.0.0
         with:
           source_dir: ${{ env.UI_RESULTS_USERS_FILE_PATH }}
-          container_name: $screenshots
-          connection_string: ${{secrets.BLOB_STORAGE_CONNECTION_STRING}}
+          container_name: screenshots
+          connection_string: "${{secrets.BLOB_STORAGE_CONNECTION_STRING}}"
