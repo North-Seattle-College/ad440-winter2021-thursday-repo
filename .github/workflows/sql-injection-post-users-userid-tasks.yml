@@ -16,12 +16,16 @@ jobs:
       - uses: actions/checkout@main
       - name: curl
         run: |
-          curl -o test/security/sql-injection/sql-injection-users-userid-tasks-post.json -v -X POST -d '{"title": "sqlINJ", "description": "'oops'); DELETE FROM users WHERE userId > 1000; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1078/tasks? | tee
+          curl -o ../../test/security/sql-injection/sql-injection-users-userid-tasks-post.json -v -X POST -d '{"title": "sqlINJ", "description": "'oops'); DELETE FROM users WHERE userId > 1000; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1078/tasks? | tee
+      - name: Sleep for 30 seconds
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '10s'
       - name: read output
         id: taskId
         uses: notiz-dev/github-action-json-property@release
         with: 
-          path: 'test/security/sql-injection/sql-injection-users-userid-tasks-post.json'
+          path: '../../test/security/sql-injection/sql-injection-users-userid-tasks-post.json'
           prop_path: 'taskId'
       - name: "task created with id: ${{steps.taskId.outputs.prop}} "
         run: echo "task created with id:" ${{steps.taskId.outputs.prop}} 
