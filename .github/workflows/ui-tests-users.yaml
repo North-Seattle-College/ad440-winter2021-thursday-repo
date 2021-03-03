@@ -1,7 +1,7 @@
 name: UI Test /users
 
 on:
-  pull_request_target:
+  push:
     branches:
       - development
 
