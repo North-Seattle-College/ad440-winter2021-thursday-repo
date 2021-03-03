@@ -14,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: create a test user
+      - name: create a test user to run the post request on it
         run: |
           curl -v -X POST -d '{"firstName": "injection-user-test", "lastName": "injection-user-test", "email": "injection-user-test"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/sql-injection-users-userid-tasks-post.json
-      - name: get userId
+      - name: reading the created userId
         id: userId
         uses: notiz-dev/github-action-json-property@release
         with: 
           path: test/security/sql-injection/sql-injection-users-userid-tasks-post.json
           prop_path: 'userId'
-      - name: "create a task for the created user id ${{steps.userId.outputs.prop}}"
+      - name: "create a task for the created user id ${{steps.userId.outputs.prop}} with this sql injection input: 'oops'); DELETE FROM users WHERE userId > 1000; -- "
         run: |
           curl -v -X POST -d '{"title": "sqlINJ", "description": "'oops'); DELETE FROM users WHERE userId > 1000; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userId.outputs.prop}}/tasks? > test/security/sql-injection/sql-injection-users-userid-tasks-post.json
-      - name: read output
+      - name: read the output of POST request
         id: taskId
         uses: notiz-dev/github-action-json-property@release
         with: 
@@ -34,7 +34,7 @@ jobs:
           prop_path: 'taskId'
       - name: "task created with id: ${{steps.taskId.outputs.prop}}"
         run: echo "task created with id:" ${{steps.taskId.outputs.prop}} 
-      - name: Remove File
+      - name: Remove the output file
         uses: JesseTG/rm@v1.0.2
         with:
           path: 'test/security/sql-injection/sql-injection-users-userid-tasks-post.json'
