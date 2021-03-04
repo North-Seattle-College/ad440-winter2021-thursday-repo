@@ -18,12 +18,9 @@ jobs:
       with:
         node-version: '14'
         check-latest: true
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
+    - name: Get current date and time
+      id: date
+      run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"  
       
     - name: Install serverless and serverless-artillery
       run: |
@@ -43,4 +40,16 @@ jobs:
     - name: upload to s3
       run: |
         cd test/aws
-        BUCKET_NAME='serverless-artillery' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
+        BUCKET_NAME='userusersidapi' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
+ 
+    - name: Upload file to bucket
+      uses: zdurham/s3-upload-github-action@master
+      with:
+        args: --acl public-read
+      env:
+          FILE: test/results/serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json
+          AWS_REGION: 'us-west-2'
+          S3_BUCKET: 'serverless-artillery'
+          S3_KEY: 'serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json'
+          AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
