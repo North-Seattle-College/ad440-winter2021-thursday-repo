@@ -8,70 +8,9 @@ import Form from 'react-bootstrap/Form'
 import './Create.css';
 
 
-/*              taskId: '',
-             userId: '',
-             title: '',
-             description: '',
-             createdDate: '',
-             duedate: '',
-             completed: '',
-             completedDate: ''
-
-
-    changerHandler = (e) => {
-        this.setState({[e.target.name]: e.target.value })
-
- https://nsc-func-dev-usw2-thursday.azurewebsites.net/api/users/:userId/task
-    
-    submitHandler = (e) => {
-        e.preventDefault()
-        console.log(this.state)
-        axios.post('https://jsonplaceholder.typicode.com/posts', this.state)
-        .then(response =>{
-
-
-            userId: '',
-            title: '',
-            body: ''
-
-
-             <label>userId: &nbsp;
-            <input
-                    type="text" required
-                    value={values.userId} onChange={set('userId')}
-                />
-            </label>
-            <label>title: &nbsp;
-            <input
-                    type="text" required
-                    value={values.title} onChange={set('title')}
-                />
-            </label>
-            <label>body: &nbsp;
-            <input
-                    type="text" required
-                    value={values.body} onChange={set('body')}
-                />
-            </label>
-
-
-
-
-
-
-
-
-
-
- */
-
-
-// userId": 1,
-// "id": 1,
-// "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-// "body
 
 function CreateTask() {
+    grabURLid();
     const [values, setValues] = useState({
         taskId: '',
         userId: '',
@@ -103,16 +42,35 @@ function CreateTask() {
             },
             body: JSON.stringify(values)
         });
-        if (response.status !== 200) {
+        if (response.status !== 201) { 
             throw new Error(`Request failed: ${response.status}`);
         }
     }
+
+
+
+     function grabURLid() {
+
+            let url_str = 'http://localhost:3000/users/1/tasks';
+            let url = new URL(url_str);
+            let hrefUrl = url.href
+            let jsonUrl = JSON.stringify(hrefUrl);
+            let splitUrl = jsonUrl.split("/")
+            console.log(splitUrl)
+
+
+         //   console.log(url2)
+       
+            // let search_params = url.searchParams; 
+            // console.log(search_params.getAll(''));
+}
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
             await saveFormData();
-            alert('Your task has successfully been entered!');
+            alert('Task input complete');
             setValues({
                 taskId: '',
                 userId: '',
@@ -124,7 +82,7 @@ function CreateTask() {
                 completedDate: ''
             });
         } catch (e) {
-            alert(`Task creation failed! ${e.message}`);
+            alert(`Creating a task has failed. ${e.message}`);
         }
     }
 
@@ -136,53 +94,53 @@ function CreateTask() {
                 </NavLink>
             <h2>Create Task</h2>
 
-            <label>taskId: &nbsp;
+            <label>taskId: &nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.taskId} onChange={set('taskId')}
                 />
             </label>
 
-            <label>userId: &nbsp;
+            <label>userId: &nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.userId} onChange={set('userId')}
                 />
             </label>
 
-            <label>title: &nbsp;
+            <label>title: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.title} onChange={set('title')}
                 />
             </label>
 
-            <label>description: &nbsp;
+            <label>description: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.description} onChange={set('description')}
                 />
             </label>
 
-            <label>createdDate: &nbsp;
+            <label>createdDate: &nbsp;&nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.createdDate} onChange={set('createdDate')}
                 />
             </label>
-            <label>duedate: &nbsp;
+            <label>duedate: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.duedate} onChange={set('duedate')}
                 />
             </label>
-            <label>completed: &nbsp;
+            <label>completed: &nbsp;&nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.completed} onChange={set('completed')}
                 />
             </label>
-            <label>completedDate: &nbsp;
+            <label>completedDate: &nbsp;&nbsp;&nbsp;
             <input
                     type="text" required
                     value={values.completedDate} onChange={set('completedDate')}
