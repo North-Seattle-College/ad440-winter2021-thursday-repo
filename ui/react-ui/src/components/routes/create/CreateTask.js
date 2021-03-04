@@ -46,7 +46,7 @@ function CreateTask() {
         console.log(userId)
 
         console.log(JSON.stringify(values));
-        const response = await fetch('https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userid}/tasks', {
+        const response = await fetch('https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/2/tasks', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -54,7 +54,7 @@ function CreateTask() {
             },
             body: JSON.stringify(values)
         });
-        if (response.status !== 201) { 
+        if (response.status !== 200) { 
             throw new Error(`Request failed: ${response.status}`);
         }
     }
