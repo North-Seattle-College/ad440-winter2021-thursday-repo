@@ -28,7 +28,7 @@ jobs:
         run: |
           pushd ${{ env.UI_TESTS_PATH }}
           npm install
-          npm test-users-id
+          node ui-tests-user-id.js
           popd
 
       - name: Upload screenshot to Azure Blob Storage
