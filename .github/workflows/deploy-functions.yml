@@ -45,10 +45,10 @@ jobs:
 
     # Trigger artillery test on users workflow
     - name: Trigger next workflow
-        if: success()
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.REPO_GHA_PAT }}
-          repository: ${{ github.repository }}
-          event-type: trigger-art-u
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-art-u
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

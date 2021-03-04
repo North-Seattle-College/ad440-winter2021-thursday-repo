@@ -70,10 +70,10 @@ jobs:
     # TODO: Skips expected workflow 4 "artillery-users-user_id"
     #       Update event-type to "trigger-art-u-ui" and have missing workflow listen for that
     - name: Trigger next workflow
-        if: success()
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.REPO_GHA_PAT }}
-          repository: ${{ github.repository }}
-          event-type: trigger-art-u-ui-t
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-art-u-ui-t
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
