@@ -1,42 +1,42 @@
-# name: serverless artillery test users
-# on:
-#   push:
-#     branches:
-#       - development
-# jobs:
-#   slsart-perf:
-#     name: serverless artillery test users
-#     runs-on: ubuntu-latest
-#     env:
-#       NPM_CONFIG_PREFIX: "~/.npm-global"
-#       AWS_SLSART_REGION: "us-west-2"
-#       STAGE_NAME: users-api
-#     steps:
-#       - name: Checkout the code
-#         uses: actions/checkout@v2
-#       - name: setup Node
-#         uses: actions/setup-node@v1
-#         with:
-#           node-version: '14'
-#           check-latest: true
-#       - name: install dependencies
-#         run: npm install
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v1
-#         with:
-#           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-#           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-#           aws-region: "us-west-2"
-#       - name: installing serverless-artillery
-#         run: npm install -g serverless@1.38.0 serverless-artillery
+name: serverless artillery test users
+on:
+  push:
+    branches:
+      - development
+jobs:
+  slsart-perf:
+    name: serverless artillery test users
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_PREFIX: "~/.npm-global"
+      AWS_SLSART_REGION: "us-west-2"
+      STAGE_NAME: users-api
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+      - name: setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14"
+          check-latest: true
+      - name: install dependencies
+        run: npm install
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: "us-west-2"
+      - name: installing serverless-artillery
+        run: npm install -g serverless@1.38.0 serverless-artillery
 
-#       - name: deploy, invoke, remove
-#         run: |
-#           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
-#           ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-api.json
-#           ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
+      - name: deploy, invoke, remove
+        run: |
+          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
+          ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-api.json
+          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
 
-#       - name: upload to s3
-#         run: |
-#           cd test/aws
-#           BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
+      - name: upload to s3
+        run: |
+          cd test/aws
+          BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
