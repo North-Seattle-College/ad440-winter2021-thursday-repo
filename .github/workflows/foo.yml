@@ -7,8 +7,8 @@ jobs:
     name: workflow 1
     runs-on: ubuntu-latest
     steps:
-      - name: wait two minutes
+      - name: wait one minute
         run: |
           echo foo
-          sleep 120
+          sleep 60
           echo foo end
