@@ -1,0 +1,33 @@
+name: SQL injection test for DELETE users/userid
+
+on:
+  push:
+    branches:
+      - development
+env:
+  NODE_VERSION: '10.x'
+  RESULT_FILE_PATH: ../../test/security/sql-injection/delete-users-userid.json
+
+jobs:
+  DELETE-test-case:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      # Test set up
+      - name: 'Create test user for delete injection test'
+        run: |
+          curl -v -X POST -d '{"firstName": "inject-del-fname", "lastName": "inject-del-lname", "email": "inject-del-email"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/delete-users-userid.json
+      - name: 'Get userId'
+        id: userId
+        uses: notiz-dev/github-action-json-property@release
+        with: 
+          path: env.RESULT_FILE_PATH
+          prop_path: 'userId'
+
+
+
+      # Remove test file created
+      - name: 'Remove Test Results File'
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: env.RESULT_FILE_PATH
