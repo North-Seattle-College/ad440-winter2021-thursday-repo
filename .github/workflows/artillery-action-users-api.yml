@@ -12,7 +12,6 @@ on:
 env:
   NODE_VERSION: '14' # version of Node we are using
   NPM_CONFIG_PREFIX: '~/.npm-global' # required to set path for Artillery call
-
 jobs:
   # Sets up ubuntu VM for actions
   setup:
