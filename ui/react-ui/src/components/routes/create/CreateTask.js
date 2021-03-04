@@ -13,7 +13,6 @@ function CreateTask() {
    
     const [values, setValues] = useState({
         taskId: '',
-        userId: '',
         title: '',
         description: '',
         createdDate: '',
@@ -21,10 +20,6 @@ function CreateTask() {
         completed: '',
         completedDate: ''
     });
-
-    const onChange = (event) => {
-        setValues(event.target.value);
-    };
 
     const set = name => {
         return ({ target: { value } }) => {
@@ -62,14 +57,13 @@ function CreateTask() {
 
 
 
-    const handleSubmit = async (event) => {
+    const submitHandler = async (event) => {
         event.preventDefault();
         try {
             await saveFormData();
             alert('Task input complete');
             setValues({
                 taskId: '',
-                userId: '',
                 title: '',
                 description: '',
                 createdDate: '',
@@ -84,31 +78,20 @@ function CreateTask() {
 
     return (
         
-        <form className="taskForm" onSubmit={handleSubmit}>
+        <form className="taskForm" onSubmit={submitHandler}>
         <NavLink to={`/`} onClick={null}>
                     <Button variant="outline-primary" size="sm">Home</Button>
                 </NavLink>
             <h2>Create Task</h2>
-
             <label>taskId: &nbsp;&nbsp;
-            <input
-                    type="text" required
-                    value={values.taskId} onChange={set('taskId')}
-                />
+            <input  type="text" required
+                    value={values.taskId} onChange={set('taskId')}/>
             </label>
 
-            <label>userId: &nbsp;&nbsp;
-            <input
-                    type="text" required
-                    value={values.userId} onChange={set('userId')}
-                />
-            </label>
 
             <label>title: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <input
-                    type="text" required
-                    value={values.title} onChange={set('title')}
-                />
+            <input  type="text" required
+                    value={values.title} onChange={set('title')}/>
             </label>
 
             <label>description: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
