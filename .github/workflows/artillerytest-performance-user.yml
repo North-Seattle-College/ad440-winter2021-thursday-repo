@@ -1,13 +1,11 @@
 name: sls art performance test
   on:
     push:
-      -development
 
 jobs:
   slsart-perf:
     name: artillery performance test
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest 
   env:
     NPM_CONFIG_PREFIX: "~/.npm-global"
 

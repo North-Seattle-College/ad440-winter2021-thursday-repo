@@ -1,6 +1,7 @@
 name: Performance-Test-Users-UserID
 
-on:
+on:  
+
   push:
     branches:
       - development
@@ -17,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "14"
+          node-version: '14'
           check-latest: true
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -40,4 +41,5 @@ jobs:
           ~/.npm-global/bin/slsart invoke -p test/artillery/performanceScript-users-userID.yaml --region $AWS_SLSART_REGION  > test/results/performanceResults-users-userID.json
           ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
         env:
-          AWS_SLSART_REGION: us-west-2
+          AWS_SLSART_REGION: us-west-2  
+

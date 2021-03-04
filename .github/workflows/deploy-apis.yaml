@@ -6,6 +6,7 @@ on:
       - development
 
 env:
+
   AZURE_FUNCTIONAPP_PACKAGE_PATH: "functions" # relative to the root, where are you keeping the functions
   PYTHON_VERSION: "3.8" # the version of python we are using
 
@@ -13,6 +14,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest # tells GH actions what we'll be running everything on
     steps:
+
       - name: "Checkout Repository GitHub Action" # checks out the repository
         uses: actions/checkout@main
 
@@ -40,3 +42,4 @@ jobs:
           # This file was used as reference for deployment of the function app
           # (getting values for app-name and publish-profile for the function app)
           # Feb-10-2021
+
