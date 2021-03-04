@@ -5,6 +5,8 @@ import azure.functions as func
 import json
 import redis
 
+CACHE_TOGGLE= os.environ["CACHE_TOGGLE"]
+
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
 
@@ -13,11 +15,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         'Python HTTP trigger for users/userId is processing a request ')
 
     #Initiating REDIS cache
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
-    r = redis.Redis(host= REDIS_HOST, port= 6380, db= 0, password= '${{ secrets.ENV_REDIS_KEY }}', ssl= True)
+    rDBHost = os.environ["ENV_REDIS_HOST"]
+    rDBPort = os.environ["ENV_REDIS_PORT"]
+    r = redis.Redis(host= rDBHost, port= rDBPort, db= 0, password= '${{ secrets.ENV_REDIS_KEY }}', ssl= True)
 
-    #Something to test the redis cache
-    r.get("2")
 
     # Database credentials.
     db_server = os.environ["ENV_DATABASE_SERVER"]
@@ -69,18 +70,19 @@ def get(cursor, row, r):
     # More information can be found on the link below:
     # https://stackoverflow.com/questions/16519385/output-pyodbc-cursor-results-as-python-dictionary/16523148#16523148
     try:
-        cache = get_user_id_cache(r, userId)
+        cache = get_user_id_cache(r, user_id)
     except TypeError as e:
         logging.info(e.args[0])
     if cache:
         logging.info("Data returned from cache")
         return func.HttpResponse(cache.decode('utf-8'), status_code =200, mimetype="application/json")
     else:
-        logging.info("Empty cache, querying...")
+        if(CACHE_TOGGLE == "On")
+            logging.info("Empty cache, querying...")
         sql_query = ("""SELECT CONCAT (users.firstName, ' ', users.lastName) AS "user",
                         FROM [dbo].[users] 
                         WHERE [dbo].[users].userId = ?""")
-        cursor.execute(sql_query, userId)
+        cursor.execute(sql_query, user_id)
 
     #gets user(s)
     logging.debug("Fetching all queries for User IDs")
@@ -100,10 +102,10 @@ def get(cursor, row, r):
     logging.debug("Users retrieved successfully!")
 
     #Caches the User ID data
-    cache_user_id(r, user_id)
+    cache_user_id(r, user_id, users)
 
     return func.HttpResponse(
-        json.dumps(data),
+        json.dumps(user_id_data),
         status_code=200,
         mimetype="application/json"
     )
@@ -124,10 +126,12 @@ def put(req, cursor, user_id):
     # Validate request body
     logging.debug("Verifying fields in request body to update a user by ID")
     try:
+        cache = put_user_id_cache(r, user_id)
         assert "firstName" in user_req_body, "User request body did not contain field: 'firstName'"
         assert "lastName" in user_req_body, "User request body did not contain field: 'lastName'"
         assert "email" in user_req_body, "User request body did not contain field: 'email'"
     except AssertionError as user_req_body_content_error:
+        logging.error(e.args[0])
         logging.error(
             "User request body did not contain the necessary fields!")
         return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
@@ -138,16 +142,38 @@ def put(req, cursor, user_id):
     lastName = user_req_body["lastName"]
     email = user_req_body["email"]
 
-    # Update user in DB
-    update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId= ?"
-    logging.debug("Executing query: " + update_user_query)
-    cursor.execute(update_user_query,
+    if cache:
+        logging.info("Data returned from cache")
+        return func.HttpResponse(cache.decode('utf-8'), status_code =200, mimetype="application/json")        
+    else:
+        # Update user in DB
+        update_user_query = "UPDATE dbo.users SET firstName = ?, lastName = ?, email = ? WHERE userId= ?"
+        logging.debug("Executing query: " + update_user_query)
+        cursor.execute(update_user_query,
                    (firstName, lastName, email, user_id))
-    logging.debug("User was updated successfully!.")
-    return func.HttpResponse(
-        "User updated",
-        status_code=200
-    )
+        logging.debug("User was updated successfully!.")
+        logging.debug("Fetching new entries...")
+        new_user_id_table = list(cursor.fetchall())
+        #Cleans data to put into cache
+        new_user_id_data = [tuple(user_id) for user_id in new_user_id_table]
+        #Initialize empty list
+        new_user_id_list = []
+        #Add data to empty list
+        new_user_id_columns = [column[0] for column in cursor.description]
+        for user_id in new_user_id_data:
+            #Initialize validation method for duplicate user_id into cache
+            isDuplicate = duplicate_cache(r, user_id)
+            if(isDuplicate == False)
+                new_user_id_list.append(dict(zip(columns, row))) 
+        logging.debug("New User placed sucessfully!")
+
+        #Cache the data
+        cache_user_id(r, user_id, users)
+
+        return func.HttpResponse(
+            "User updated",
+            status_code=200
+        )
 
 
 def delete(cursor, user_id):
@@ -156,6 +182,10 @@ def delete(cursor, user_id):
     logging.debug("Executing query: " + delete_user_query)
     cursor.execute(delete_user_query, (user_id,))
     logging.debug("User was deleted successfully!.")
+    try:
+        delete_user_id_cache(r,user_id)
+    except TypeError as e:
+        logging.error(e.args[0])
     return func.HttpResponse(
         "User deleted",
         status_code=200
@@ -171,23 +201,38 @@ def get_user_row(cursor, user_id):
 #This method caches user_id
 #param: r- redis cache
 #user_id: User IDs that need to cached
-def cache_user_id(r, user_id):
-    key = "users:" + userId
-    try:
-        r.set(key, json.dumps(users), ex= 1200) 
-        logging.info("Caching complete!")
-    except TypeError as e:
-        logging.info("Caching failed")
-        logging.info(e.args[0])
+def cache_user_id(r, user_id, users):
+    key = "users:" + user_id
+    if(CACHE_TOGGLE == "On"):
+        try:
+            r.set(key, json.dumps(users), ex= 1200) 
+            logging.info("Caching complete!")
+        except TypeError as e:
+            logging.info("Caching failed")
+            logging.info(e.args[0])
 
 #This method retrieves the user_id cache
 #param: r- Redis Cache that it the user_id cache residing in
-def get_user_id_cache(r, userId):
+def get_user_id_cache(r, user_id):
     logging.info("Querying for User ID cache...")
     try:
-        key = "users:" + userId
+        key = "users:" + user_id
         cache = r.get(key)
         return cache
     except TypeError as e:
         logging.critical("Failed to fetch from cache: " + e.args[1])
         return None
+
+
+def duplicate_cache(r, user_id):
+    if user_id is in r:
+        return true
+    else
+        return false
+
+def delete_user_id_cache(r, user_id):
+    if user_id is in r:
+        key = "users: " + user_id
+        r.delete(key)
+    else
+        logging.critical("This cannot be done as user id does not exist")
