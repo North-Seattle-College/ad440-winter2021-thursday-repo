@@ -31,7 +31,7 @@ jobs:
         run: echo "user created with id:" ${{steps.userId2.outputs.prop}}
       - name: making sure that sql injection statement wasn't successfully injected. get user ${{steps.userId1.outputs.prop}}
         run: |
-          curl -v -X GET https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userId1.outputs.prop}} > test/security/sql-injection/sql-injection-users-userid1-post.json
+          curl -v -X GET https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userId1.outputs.prop}} > test/security/sql-injection/sql-injection-users-userId1-post.json
       - name: read the output of GET request
         id: getUserId
         uses: notiz-dev/github-action-json-property@release
@@ -43,8 +43,8 @@ jobs:
       - name: Remove the output file
         uses: JesseTG/rm@v1.0.2
         with:
-          path: "test/security/sql-injection/sql-injection-users-userid1-post.json"
+          path: "test/security/sql-injection/sql-injection-users-userId1-post.json"
       - name: Remove the output file
         uses: JesseTG/rm@v1.0.2
         with:
-          path: "test/security/sql-injection/sql-injection-users-userid2-post.json"
+          path: "test/security/sql-injection/sql-injection-users-userId2-post.json"
