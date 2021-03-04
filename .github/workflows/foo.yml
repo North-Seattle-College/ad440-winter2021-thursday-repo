@@ -7,10 +7,12 @@ jobs:
     name: workflow 1
     runs-on: ubuntu-latest
     steps:
-      - name: wait one minute
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: wait fifteen seconds
         run: |
           echo foo
-          sleep 60
+          sleep 15
       - name: Trigger next workflow
         if: success()
         uses: peter-evans/repository-dispatch@v1
