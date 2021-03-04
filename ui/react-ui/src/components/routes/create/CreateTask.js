@@ -115,13 +115,13 @@ function CreateTask() {
             </label>
             <label>completed: &nbsp;&nbsp;&nbsp;
             <input
-                    type="text" required
+                    type="text" 
                     value={values.completed} onChange={set('completed')}
                 />
             </label>
             <label>completedDate: &nbsp;&nbsp;&nbsp;
             <input
-                    type="text" required
+                    type="text" 
                     value={values.completedDate} onChange={set('completedDate')}
                 />
             </label>
