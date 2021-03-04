@@ -1,5 +1,4 @@
 name: SQL injection test for DELETE users/userid
-
 on:
   push:
     branches:
@@ -13,20 +12,62 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      # Test set up
-      - name: 'Create test user for delete injection test'
+      # Create test user to delete and write user json to result file
+      - name: 'Create test user to delete'
         run: |
           curl -v -X POST -d '{"firstName": "inject-del-fname", "lastName": "inject-del-lname", "email": "inject-del-email"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/delete-users-userid.json
-      - name: 'Get userId'
-        id: userId
+      # Retrieve userId from json result file
+      - name: 'Get userId-to delete'
+        id: userDeleteId
+        uses: notiz-dev/github-action-json-property@release
+        with: 
+          path: env.RESULT_FILE_PATH
+          prop_path: 'userId'
+
+      # Create test user and write user json to result file
+      - name: 'Create test user to update'
+        run: |
+          curl -v -X POST -d '{"firstName": "inject-update-fname", "lastName": "inject-update-lname", "email": "inject-update-email"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/delete-users-userid.json
+      # Retrieve userId from json result file
+      - name: 'Get userId-to update'
+        id: userUpdateId
         uses: notiz-dev/github-action-json-property@release
         with: 
           path: env.RESULT_FILE_PATH
           prop_path: 'userId'
 
 
+  
 
-      # Remove test file created
+      # Attempt delete injection on userUpdateId and update json result file
+      - name: "Delete user with userId ${{steps.userDeleteId.outputs.prop}}"
+        run: |
+          curl -v -X DELETE -d '{"userId": "'${{steps.userDeleteId.outputs.prop}}'); or 1=1; UPDATE users SET email='attacked email' WHERE userId='${{steps.userUpdateId.outputs.prop}}'; --"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userDeleteId.outputs.prop}} > test/security/sql-injection/delete-users-userid.json
+
+      # Check for userDeleteId in json result file
+      - name: 'Check for userDeleteId deletion'
+        id: deletionCheck
+        uses: notiz-dev/github-action-json-property@release
+        with: 
+          path: env.RESULT_FILE_PATH
+          prop_path: 'userId'
+
+      - name: "User deletion confirmation"
+        run: "Deleted user " ${{steps.deletionCheck.outputs.prop}}
+
+      # Check for userUpdateId email update in json result file
+      - name: 'Check for userUpdateteId email attack'
+        id: injectionCheck
+        uses: notiz-dev/github-action-json-property@release
+        with: 
+          path: env.RESULT_FILE_PATH
+          prop_path: 'email'
+
+      - name: "Email update injection confirmation"
+        run: "Email updated " ${{steps.injectionCheck.outputs.prop}}
+
+
+      # Remove test results file
       - name: 'Remove Test Results File'
         uses: JesseTG/rm@v1.0.2
         with:
