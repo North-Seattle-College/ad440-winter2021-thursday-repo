@@ -9,11 +9,14 @@ import azure.functions as func
 import redis 
 
 # Connect to the Redis Server
-r = redis.StrictRedis(host= os.environ['ENV_REDIS_HOST'], 
-port=6380, 
-db=0, 
-password= os.environ['ENV_REDIS_KEY'], 
-ssl=True)
+r = redis.StrictRedis(
+    host= os.environ['ENV_REDIS_HOST'], 
+    port=6380, 
+    db=0, 
+    password= os.environ['ENV_REDIS_KEY'], 
+    ssl=True)
+
+USERS_TASKS_ALL_CACHE_KEY = b'users:{user_id}:tasks:all'
 
 # Set Message in the Redis Server for testing
 r.set("Message01", "Hello World")
@@ -58,7 +61,8 @@ def get(userId, taskId, r):
             else:
                 columns = [column[0] for column in cursor.description]
                 data = dict(zip(columns, row))
-            # cashdata 
+            
+            # Cache the data in the GET  
             cache_users(r, data, userId, taskId)
             return func.HttpResponse(json.dumps(data, default=str), status_code=200, mimetype="application/json")
 
@@ -267,13 +271,17 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
     #if GET method is selected, it executes here
         if method == "GET":  
-            logging.debug('Passed GET method')      
+            logging.debug('Passed GET method')  
+            # ADDED implementation of redis r=redis    
             return (get(userId, taskId,r))
 
     #if DELETE method is selected, it executes here
         if method == "DELETE":
-            logging.debug('Passed DELETE method')   
-            return (delete(userId, taskId))
+            logging.debug('Passed DELETE method')  
+            # Invalidate users tasks all call 
+            invalidate_users_tasks_all_cache(r)
+            # ADDED implementation of redis r=redis 
+            return (delete(userId, taskId,r))
 
         #examines JSON passed by the client, required for PUT and PATCH execution
         req_body = {}
@@ -285,10 +293,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             pass
         task_fields = parse(req_body)
 
-        #if PUT method is selected, it executes here
+        #if PUT method is selected, it executes here 
         if method == "PUT":
-            logging.debug('Passed PUT method')   
-            return (update(userId, taskId, task_fields))
+            logging.debug('Passed PUT method')  
+            # Invalidate users tasks all call 
+            invalidate_users_tasks_all_cache(r) 
+            # ADDED implementation of redis r=redis
+            return (update(userId, taskId, task_fields,r))
 
         #if PATCH method is selected, it executes here
         elif method == "PATCH":
@@ -321,4 +332,9 @@ def cache_users(r, task, userId, taskId):
     except TypeError as e:
         logging.info("Caching failed")
         logging.info(e.args[0])
+
+# Invalidate users tasks all method
+def invalidate_users_tasks_all_cache(r):
+    r.invalidate(USERS_TASKS_ALL_CACHE_KEY)
+    logging.info("Cache Invalidated")
 
