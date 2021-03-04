@@ -33,9 +33,20 @@ function CreateTask() {
     };
 
     const saveFormData = async () => {
-        grabURLid();
+        
+        let url_str = 'http://localhost:3000/users/1/tasks';
+        let url = new URL(url_str);
+        let hrefUrl = url.href
+        let jsonUrl = JSON.stringify(hrefUrl);
+        let splitUrl = jsonUrl.split("/")
+        const userId = splitUrl[4]
+        
+        // ${userid}
+
+        console.log(userId)
+
         console.log(JSON.stringify(values));
-        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        const response = await fetch('https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${userid}/tasks', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -49,23 +60,6 @@ function CreateTask() {
     }
 
 
-
-     function grabURLid() {
-
-            let url_str = 'http://localhost:3000/users/1/tasks';
-            let url = new URL(url_str);
-            let hrefUrl = url.href
-            let jsonUrl = JSON.stringify(hrefUrl);
-            let splitUrl = jsonUrl.split("/")
-            console.log(splitUrl[4])
-            let userId = splitUrl[4]
-
-
-         //   console.log(url2)
-       
-            // let search_params = url.searchParams; 
-            // console.log(search_params.getAll(''));
-}
 
 
     const handleSubmit = async (event) => {
