@@ -63,3 +63,10 @@ jobs:
     - name: AWS CLI S3
       run: |
         aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
+
+      
+      
+      
+      
+
+   
