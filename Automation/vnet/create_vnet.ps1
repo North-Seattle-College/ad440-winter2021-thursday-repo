@@ -17,7 +17,7 @@ $pathToVNetTemplate = "./vnet_template.json"
 # Logs in and sets subscription      
 #& "../login.ps1" $tenantId $applicationId $secret $subscriptionId
 Import-Module ..\Login
-Login $tenantId $applicationId $secret $subscriptionId
+Login $TenantId $SPApplicationId $SPSecret $SubscriptionId
 
 
 # Creates/Updates resource group
