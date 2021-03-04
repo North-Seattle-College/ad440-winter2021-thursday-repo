@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "UI tests for the react portion of the cloud tasks app",
   "scripts": {
-    "test-users": "node ui-tests-user.js"
+    "test-users": "node ui-tests-user.js",
+    "test-users-id": "node ui-tests-user-id.js"
   },
   "author": "Lenny Brown",
   "license": "ISC",
