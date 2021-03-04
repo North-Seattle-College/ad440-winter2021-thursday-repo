@@ -1,17 +1,4 @@
-# Workflow Action name
 name: UI Test /users/{userid}/tasks/{taskid}
-#Controls when the action will run
-on:
-  # Triggers the workflow on push or pull request events for the development branch
-  # and  natalia-uitest-sprint4 feature branch
-
-  # workflow_run:
-  #   workflows: ["UI Test /users/id/tasks/id"]
-  #   branches: 
-  #     - development  # On merge with master, call this action.
-  #     - natalia-uitest-sprint4
-  #   types:
-  #     - completed
 
 on: 
   push:
@@ -23,65 +10,43 @@ on:
       - development
       - natalia-uitest-sprint4
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  #job title as ui-test-task-id
-  ui-test-task-id:
+
+  ui-test-taskid:
     runs-on: ubuntu-latest
     
     env:
       NODE_VERSION: '14'
       UI_TESTS_PATH: './test/ui'
-      UI_RESULTS_TASKID_FILE_PATH: './test/results/ui-test-results/users-id-tasks-id'
+      UI_RESULTS_TASKID_FILE_PATH: './test/results/ui-test-results/users-id-tasks-id/'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Use Node.js ${{env.NODE_VERSION}}
+      - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
           check-latest: true
 
-      - name: nodeJS and npm version
-        run: npm -v
+      - name: Run the ui test-taskid
+        run: |
+          pushd ${{ env.UI_TESTS_PATH }}
+          npm install
+          npm run ui-test-taskid
+          popd
 
-      - name: npm init
-        run: npm init -y
-
-      - name: Install artillery
-        run: npm install -g serverless@1.38.0 serverless-artillery
-
-      - name: Get current date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
-
-      - name: Sleep
-        run: sleep 10s
-
-      - name: Running Artillery Test
-        run: /home/runner/.npm-global/lib/node_modules/artillery/bin/artillery run --output artilleryReport_${{ steps.date.outputs.date }}.json ./testing/artillery/artillery-users-id-tasks-id.yml
-
-      - name: Check Artillery Performance test file
-        run: ls -ltr artilleryReport_${{ steps.date.outputs.date }}.json 
-
-        #Azure Login 
-      - name: Azure Login
-        uses: azure/login@v1
-
-        with:
-            creds: ${{ secrets.AZURE_SP_CREDENTIALS }}
-            
-        #Upload File
-      - name: uploading to Azure Blob Storage
+      - name: Upload screenshots to Azure Blob Storage
         uses: azure/CLI@v1
         with:
-          azcliversion: 2.19.1
           inlineScript: |
-            az storage blob upload  --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.STORAGE_ACCOUNT_KEY }}  --container-name ${{ secrets.BLOB_CONTAINER }}   --name artilleryReport_userid_tasks_id${{ steps.date.outputs.date }}.json --file  artilleryReport_${{ steps.date.outputs.date }}.json
-        
-        # Azure logout
-      - name: logout
+            az storage blob upload-batch \
+            --destination screenshots \
+            --source ${{ env.UI_RESULTS_TASKID_FILE_PATH }} \
+            --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}" \
+            --pattern *.png
+
+      - name: Azure logout
         run: |
           az logout

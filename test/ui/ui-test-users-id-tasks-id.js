@@ -6,8 +6,8 @@ const puppeteer = require("puppeteer");
   await page.goto("https://nscstrdevusw2thucommon.z5.web.core.windows.net/users/1/tasks/1"); //promise to go to the specified page
   
 
-  let unversaldate = new Date(); //   capture current local date and time in universal time
-  let stringDate = universalldate.getFullYear() + "-" + (universaldate.getMonth() + 1) + "-" + universalldate.getDate() + "-" + universalldate.getHours() + ":" + universalldate.getMinutes() + ':' + universalldate.getSeconds();
+  let universaldate = new Date(); //   capture current local date and time in universal time
+  let stringDate = universaldate.getFullYear() + "-" + (universaldate.getMonth() + 1) + "-" + universaldate.getDate() + "-" + universaldate.getHours() + ":" + universaldate.getMinutes() + ':' + universaldate.getSeconds();
 
   await page.screenshot({ path: `../results/ui-test-results/users-id-tasks-id/ui_taskid_${stringDate}.png` });
 
