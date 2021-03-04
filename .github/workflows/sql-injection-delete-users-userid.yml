@@ -8,7 +8,7 @@ env:
   RESULT_FILE_PATH: ../../test/security/sql-injection/delete-users-userid.json
 
 jobs:
-  DELETE-test-case:
+  DELETE-user-test-case:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
