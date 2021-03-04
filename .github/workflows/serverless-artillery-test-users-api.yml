@@ -37,7 +37,7 @@ jobs:
       - name: deploy, invoke, remove
         run: |
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json
+          ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json
           ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
       - name: Upload file to bucket
         uses: zdurham/s3-upload-github-action@master
