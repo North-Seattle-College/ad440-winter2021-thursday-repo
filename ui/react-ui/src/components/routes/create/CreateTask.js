@@ -10,7 +10,7 @@ import './Create.css';
 
 
 function CreateTask() {
-    grabURLid();
+   
     const [values, setValues] = useState({
         taskId: '',
         userId: '',
@@ -33,6 +33,7 @@ function CreateTask() {
     };
 
     const saveFormData = async () => {
+        grabURLid();
         console.log(JSON.stringify(values));
         const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
             method: 'POST',
@@ -56,7 +57,8 @@ function CreateTask() {
             let hrefUrl = url.href
             let jsonUrl = JSON.stringify(hrefUrl);
             let splitUrl = jsonUrl.split("/")
-            console.log(splitUrl)
+            console.log(splitUrl[4])
+            let userId = splitUrl[4]
 
 
          //   console.log(url2)
