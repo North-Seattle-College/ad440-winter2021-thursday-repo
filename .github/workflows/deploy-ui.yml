@@ -38,4 +38,4 @@ jobs:
           token: ${{ secrets.REPO_GHA_PAT }}
           repository: ${{ github.repository }}
           event-type: trigger-deploy-functions
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}': 
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}' 
