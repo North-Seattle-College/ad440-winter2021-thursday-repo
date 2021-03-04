@@ -19,7 +19,7 @@ jobs:
         with: 
           path: test/security/sql-injection/sql-injection-users-userid-put.json
           prop_path: 'userId'
-      - name: ${{steps.userId.outputs.prop}} created
+      # - name: ${{steps.userId.outputs.prop}} created
       - name: "update user ${{steps.userId.outputs.prop}} with this sql injection input: 'hacked'"; DELETE FROM users WHERE userId = ${{steps.userId.outputs.prop}}; -- "
         run: |
           curl -v -X PUT -d '{"firstName": "'oops'); DELETE FROM users WHERE userId = ${{steps.userId.outputs.prop}}; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userId.outputs.prop}}
