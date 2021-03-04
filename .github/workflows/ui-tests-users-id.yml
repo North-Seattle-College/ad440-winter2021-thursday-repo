@@ -3,7 +3,7 @@ name: Web UI Test for /users/{user_id}
 on:
   push:
     branches:
-      - nate/WebUITest
+      - development
 
 env:
   NODE_VERSION: "14"
