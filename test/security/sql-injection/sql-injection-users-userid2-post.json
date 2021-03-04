@@ -1,0 +1,1 @@
+Error: ('42000', "[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]String or binary data would be truncated in table 'nsc-sqldb-dev-usw2-thursday.dbo.users', column 'email'. Truncated value: '''To late!!''); DELETE FROM users WHERE userId = ${{'. (2628) (SQLExecDirectW)")
