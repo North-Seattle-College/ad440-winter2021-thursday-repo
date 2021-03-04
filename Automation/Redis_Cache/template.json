@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Redis_nsc_redis_dev_usw2_thursday_name": {
+            "defaultValue": "nsc-redis-dev-usw2-thursday2",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Cache/Redis",
+            "apiVersion": "2019-07-01",
+            "name": "[parameters('Redis_nsc_redis_dev_usw2_thursday_name')]",
+            "location": "West US 2",
+            "properties": {
+                "sku": {
+                    "name": "Standard",
+                    "family": "C",
+                    "capacity": 1
+                },
+                "enableNonSslPort": false,
+                "minimumTlsVersion": "1.2",
+                "redisConfiguration": {
+                    "maxclients": "1000",
+                    "maxmemory-reserved": "50",
+                    "maxfragmentationmemory-reserved": "50",
+                    "maxmemory-delta": "50"
+                }
+            }
+        }
+    ]
+}
