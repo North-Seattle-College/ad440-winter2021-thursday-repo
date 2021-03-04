@@ -1,0 +1,14 @@
+name: test on workflow 1
+
+on: [push]
+
+jobs:
+  workflow1:
+    name: workflow 1
+    runs-on: ubuntu-latest
+    steps:
+      - name: wait thirty seconds
+        run: |
+          echo foo
+          sleep 30
+          echo foo end
