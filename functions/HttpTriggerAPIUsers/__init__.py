@@ -77,7 +77,8 @@ def get_users(conn, r):
         logging.info("Returned data from cache")
         return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
     else: 
-        logging.info("Cache is empty, querying database...")
+        if (CACHE_TOGGLE == "On"):
+            logging.info("Cache is empty, querying database...")
         with conn.cursor() as cursor:
             logging.debug(
                 "Using connection cursor to execute query (select all from users)")
@@ -100,7 +101,6 @@ def get_users(conn, r):
             # users = dict(zip(columns, rows))
             logging.debug(
                 "User data retrieved and processed, returning information from get_users function")
-            logging.info("Caching results...")
 
             # Cache the results 
             cache_users(r, users)
@@ -162,6 +162,7 @@ def init_redis():
 def cache_users(r, users):
     if (CACHE_TOGGLE == "On"):
         try: 
+            logging.info("Caching results...")
             r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
             logging.info("Caching complete")
         except Exception as e:
