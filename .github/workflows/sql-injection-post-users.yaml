@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@main
       - name: create a test-user to run the post request on it
         run: |
-          curl -v -X POST -d '{"firstName": "injection-user-test2", "lastName": "injection-user-test2", "email": "injection-user-test2"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/sql-injection-users-userid1-post.json
+          curl -v -X POST -d "{\"firstName\": \"injection-user-test2\", \"lastName\": \"injection-user-test2\", \"email\": \"injection-user-test2\"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/sql-injection-users-userId1-post.json
       - name: reading the created userId1
         id: userId1
         uses: notiz-dev/github-action-json-property@release
