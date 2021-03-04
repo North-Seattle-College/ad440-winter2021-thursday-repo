@@ -1,0 +1,69 @@
+name: Serverless-Artillery performance test users-userid-tasks
+
+# Ninth workflow to run
+on:
+  repository_dispatch:
+    types: [trigger-slsart-u-ui-t]
+
+jobs:
+  slsart-perf:
+    name: slsart performance test users-userid-tasks
+    runs-on: ubuntu-latest
+    env:
+      STAGE_NAME: u-uid-t
+    steps:
+      # Checkout a copy of the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.sha }}
+      # Install node on the VM
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          check-latest: true
+      # Configure the AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      # Install serverless-artillery
+      - name: Install serverless and serverless-artillery
+        run: |
+          npm install -g serverless@1.38.0
+          npm install -g serverless-artillery
+      # Run serverless-artillery test
+      - name: deploy
+        run: slsart deploy --stage $STAGE_NAME --region us-west-2
+      - name: invoke
+        run: slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-tasks-api.yml --region us-west-2 --stage $STAGE_NAME --jsonOnly | tee test/results/slsart-users-uid-tasks-results.json
+      - name: remove
+        run: slsart remove --stage $STAGE_NAME --region us-west-2
+      # Get current date and time
+      # Outputs date
+      - name: Get current date and time
+        id: date
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
+      # Rename the results
+      - name: Rename results json
+        run: |
+          cp test/results/slsart-users-uid-tasks-results.json "test/results/slsart_u-uid-t_${{ steps.date.outputs.date }}.json"
+      # Upload the results to S3 bucket
+      - name: AWS CLI S3
+        run: |
+          aws s3 cp test/results/ s3://${{ secrets.SLSART_BUCKET }} --recursive --exclude "*" --include "serverless-artillery*"
+
+      # Trigger serverless-artillery test on /users/{user_id}/tasks/{task_id} workflow **SEE BELOW
+      # TODO: Skips expected workflow 10 "slsart-api-users-user_id-tasks-task_id"
+      #       Update event-type to "trigger-slsart-u-ui-t-ti" when added
+      - name: Trigger next workflow
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-ui-tests-u
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

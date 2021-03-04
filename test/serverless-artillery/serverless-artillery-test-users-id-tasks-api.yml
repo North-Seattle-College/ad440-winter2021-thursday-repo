@@ -1,0 +1,18 @@
+# Test api endpoint /users/{user_id}/tasks
+#
+# Initial testing setup:
+#   duration: 200
+#   arrivalRate: 1
+#   rampTo: 10
+#
+# See: https://github.com/Nordstrom/serverless-artillery
+config:
+  target: "https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api"
+  phases:
+    - duration: 150
+      arrivalRate: 50
+      name: "users userid tasks test"
+scenarios:
+  - flow:
+    - get:
+      url: "/users/1/tasks"

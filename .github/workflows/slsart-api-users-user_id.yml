@@ -1,0 +1,56 @@
+name: Performance-Test-Users-UserID
+
+# Eighth workflow to run
+on:  
+  repository_dispatch:
+    types: [trigger-slsart-u-ui]
+
+jobs:
+  slsart-perf:
+    name: slsart Performance Test
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_PREFIX: "~/.npm-global"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.sha }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          check-latest: true
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      - name: Install serverless and serverless-artillery
+        run: |
+          npm install -g serverless@1.38.0 serverless-artillery
+      # once a folder with slsart script.yml and serverless.yml are created and in the repo
+      # we can copy them into the working dir to run those specific tests with those configurations
+      # - currently this just runs the defaults
+      # examples for future:
+      # - run: cp ./slsart/script.yml ./
+  
+      # TODO: rename and move below script file to match other serverless-artillery tests
+      - name: Deploy, invoke, remove functions
+        run: |
+          ~/.npm-global/bin/slsart deploy --region $AWS_SLSART_REGION
+          ~/.npm-global/bin/slsart invoke -p test/artillery/performanceScript-users-userID.yaml --region $AWS_SLSART_REGION  > test/results/performanceResults-users-userID.json
+          ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
+        env:
+          AWS_SLSART_REGION: us-west-2  
+
+      # Trigger serverless-artillery test on users/{user_id}/tasks workflow
+      - name: Trigger next workflow
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-slsart-u-ui-t
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
