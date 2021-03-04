@@ -41,7 +41,7 @@ function CreateTask() {
         console.log(userId)
 
         console.log(JSON.stringify(values));
-        const response = await fetch('https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/2/tasks', {
+        const response = await fetch('https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/' +userId + '/tasks', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
