@@ -38,8 +38,10 @@ jobs:
       run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
     
     - name: invoke functions
-      run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yml --region $AWS_SLSART_REGION --stage $STAGE_NAME --jsonOnly > test/results/slsart-serverless-artillery-test-users-id-api-results.json
-          
+      run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yml --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-id-api-${{steps.date.outputs.date}}.json
+  
+        
+                                    
           
     - name: remove functions
       run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
