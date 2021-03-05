@@ -1,4 +1,4 @@
-name: sql injection test for users/userid/tasks post
+name: sql injection test for users/ post
 on:
   push:
     branches:
