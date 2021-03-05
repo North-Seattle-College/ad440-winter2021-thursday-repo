@@ -1,6 +1,6 @@
 name: sql injection PUT
 
-on push: 
+on: 
   push:
     # Action is called when a branch is merged with development
     branches:
