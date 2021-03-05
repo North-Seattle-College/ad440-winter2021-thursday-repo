@@ -1,10 +1,10 @@
 name: sql injection PUT
 
-on [push]: 
-  # push:
-  #   # Action is called when a branch is merged with development
-  #   branches:
-  #     - development  
+on push: 
+  push:
+    # Action is called when a branch is merged with development
+    branches:
+      - development  
 
 jobs:
   sql-injection-put-users-userid-tasks-taskid:
