@@ -1,8 +1,10 @@
 name: SQL injection test for DELETE users/userid
+
 on:
   push:
     branches:
       - development
+      
 env:
   NODE_VERSION: '10.x'
   RESULT_FILE_PATH: ../../test/security/sql-injection/delete-users-userid.json
@@ -16,6 +18,7 @@ jobs:
       - name: 'Create test user to delete'
         run: |
           curl -v -X POST -d '{"firstName": "inject-del-fname", "lastName": "inject-del-lname", "email": "inject-del-email"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/delete-users-userid.json
+
       # Retrieve userId from json result file
       - name: 'Get userId-to delete'
         id: userDeleteId
@@ -24,27 +27,30 @@ jobs:
           path: env.RESULT_FILE_PATH
           prop_path: 'userId'
 
-      # Create test user and write user json to result file
+      # Create test user to update and write user json to result file
       - name: 'Create test user to update'
         run: |
           curl -v -X POST -d '{"firstName": "inject-update-fname", "lastName": "inject-update-lname", "email": "inject-update-email"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/delete-users-userid.json
+
       # Retrieve userId from json result file
       - name: 'Get userId-to update'
         id: userUpdateId
         uses: notiz-dev/github-action-json-property@release
         with: 
           path: env.RESULT_FILE_PATH
-          prop_path: 'userId'
+          prop_path: 'userId'  
 
-
-  
-
-      # Attempt delete injection on userUpdateId and update json result file
+      # Attempt update injection on email and update result file
       - name: "Delete user with userId ${{steps.userDeleteId.outputs.prop}}"
         run: |
-          curl -v -X DELETE -d '{"userId": "'${{steps.userDeleteId.outputs.prop}}'); or 1=1; UPDATE users SET email='attacked email' WHERE userId='${{steps.userUpdateId.outputs.prop}}'; --"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userDeleteId.outputs.prop}} > test/security/sql-injection/delete-users-userid.json
+          curl -v -X DELETE -d '{"userId": "'${{steps.userDeleteId.outputs.prop}}'); or 1=1; UPDATE users SET email='attacked email' WHERE userId = ${{steps.userUpdateId.outputs.prop}}; --"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userDeleteId.outputs.prop}} > test/security/sql-injection/delete-users-userid.json
 
       # Check for userDeleteId in json result file
+      - name: 'Check for userDeleteId deletion'
+        run: |
+          curl -v -X GET https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userDeleteId.outputs.prop}} > test/security/sql-injection/delete-users-userid.json
+
+      # Retrieve GET results
       - name: 'Check for userDeleteId deletion'
         id: deletionCheck
         uses: notiz-dev/github-action-json-property@release
@@ -52,20 +58,26 @@ jobs:
           path: env.RESULT_FILE_PATH
           prop_path: 'userId'
 
+      # Check for userDeleteId in json result file
       - name: "User deletion confirmation"
-        run: "Deleted user " ${{steps.deletionCheck.outputs.prop}}
+        if: ${{steps.deletionCheck.outputs.prop}} != ${{steps.userDeleteId.outputs.prop}}
+        run: echo "Deleted user " ${{steps.deletionCheck.outputs.prop}}
 
       # Check for userUpdateId email update in json result file
-      - name: 'Check for userUpdateteId email attack'
-        id: injectionCheck
+      - name: 'Get userUpdateteId email'
+        run: |
+          curl -v -X GET https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userUpdateId.outputs.prop}} > test/security/sql-injection/delete-users-userid.json
+      - name: 'Retrieve email from GET request'
+        id: getEmail
         uses: notiz-dev/github-action-json-property@release
         with: 
           path: env.RESULT_FILE_PATH
           prop_path: 'email'
 
-      - name: "Email update injection confirmation"
-        run: "Email updated " ${{steps.injectionCheck.outputs.prop}}
-
+      # Use the output from above step
+      - name: "Compare email to original"
+        if: ${{steps.getEmail.outputs.prop}} = "inject-update-email"}}
+        run: echo "Injection unsuccessful; email remains unaltered:"" ${{steps.getEmail.outputs.prop}} = "inject-update-email"}}" 
 
       # Remove test results file
       - name: 'Remove Test Results File'
