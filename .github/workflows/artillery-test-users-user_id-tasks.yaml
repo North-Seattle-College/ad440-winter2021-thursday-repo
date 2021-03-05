@@ -4,13 +4,12 @@ on:
   push:
     # Action is called when a branch is merged with development
     branches:
+      - development  
 
 # Set up env variables for Node and Python
 # Note: there is no Python functionality yet, but there will be eventually for uploadiing results to S3
 env:
-
   NODE_VERSION: '14'  # the version of node we are using
-
   NPM_CONFIG_PREFIX: "~/.npm-global" # Required to set path for artillery call
 
 jobs:
@@ -64,3 +63,8 @@ jobs:
     - name: AWS CLI S3
       run: |
         aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
+      
+      
+      
+      
+   
