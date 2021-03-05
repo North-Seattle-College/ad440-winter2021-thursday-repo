@@ -1,10 +1,11 @@
 name: Artillery Action to test endpoint function users-userId-tasks
 
+# Fifth workflow to run
+# TODO: Missing fourth workflow, third temporarily triggers this in the meantime
+#       If new fourth sends below dispatch no updates to this file needed
 on:
-  push:
-    # Action is called when a branch is merged with development
-    branches:
-      - development  
+  repository_dispatch:
+    types: [trigger-art-u-ui-t]
 
 # Set up env variables for Node and Python
 # Note: there is no Python functionality yet, but there will be eventually for uploadiing results to S3
@@ -21,6 +22,8 @@ jobs:
     #Checkout current repo
     - name: 'Checkout Repository GitHub Action' 
       uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.sha }}
 
     #Setup Node
     - name: Setup Node ${{ env.NODE_VERSION }} Environment
@@ -63,6 +66,16 @@ jobs:
     - name: AWS CLI S3
       run: |
         aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
+
+    # Trigger artillery test on users/{user_id}/tasks/{task_id} workflow
+    - name: Trigger next workflow
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-art-u-ui-t-ti
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
 
       
       

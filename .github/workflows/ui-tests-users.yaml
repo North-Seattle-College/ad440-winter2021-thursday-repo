@@ -1,9 +1,11 @@
 name: UI Test /users
 
+# Eleventh(?) workflow to run
+# TODO: Doesn't seem to be the UI test wanted in task spec
+#       Included in the expected space anyways since it tests that specific UI
 on:
-  push:
-    branches:
-      - development
+  repository_dispatch:
+    types: [trigger-ui-tests-u]
 
 env:
   NODE_VERSION: '14'
@@ -18,6 +20,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.sha }}
 
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v2
@@ -41,3 +45,15 @@ jobs:
               --source ${{ env.UI_RESULTS_USERS_FILE_PATH }} \
               --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}" \
               --pattern *.png
+
+      # Trigger the next workflow **SEE BELOW
+      # TODO: The rest of the expected UI tests do not exist
+      #       Temporarily just triggering the final workflow, the SQL injection test
+      - name: Trigger next workflow
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-sql-injection
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

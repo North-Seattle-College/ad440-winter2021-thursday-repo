@@ -1,8 +1,10 @@
 name: serverless artillery test users
+
+# Seventh workflow to run
 on:
-  push:
-    branches:
-      - development
+  repository_dispatch:
+    types: [trigger-slsart-u]
+
 jobs:
   slsart-perf:
     name: serverless artillery test users
@@ -14,6 +16,8 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.sha }}
       - name: setup Node
         uses: actions/setup-node@v1
         with:
@@ -48,3 +52,13 @@ jobs:
           S3_KEY: 'serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json'
           AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      
+      # Trigger serverless-artillery test on users/{user_id} workflow
+      - name: Trigger next workflow
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-slsart-u-ui
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

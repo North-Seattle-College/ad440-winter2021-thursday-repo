@@ -1,15 +1,21 @@
 name: sql injection test for users/userid/tasks post
 
+# LAST(?) workflow to run
+# Not initially specified in task doc
+#   but a lot of work seems to have gone into this so I'm leaving it
+# Maybe there's supposed to be more of these judging by filename?
+#  If so adjust trigger to be unique
 on:
-  push:
-    branches:
-      - development
+  repository_dispatch:
+    types: [trigger-sql-injection]
 
 jobs:
   POST-test-case:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.sha }}
       - name: create a test user to run the post request on it
         run: |
           curl -v -X POST -d '{"firstName": "injection-user-test", "lastName": "injection-user-test", "email": "injection-user-test"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/sql-injection-users-userid-tasks-post.json
@@ -45,3 +51,6 @@ jobs:
         uses: JesseTG/rm@v1.0.2
         with:
           path: 'test/security/sql-injection/sql-injection-users-userid-tasks-post.json'
+
+      # Last workflow to run, no further peter-evans/repository-dispatch@v1 uses
+      # Simple to add if needed though

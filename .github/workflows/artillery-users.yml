@@ -1,11 +1,9 @@
 name: Artillery action to test function users
 
-# When there is a push to the development branch, this
-# GitHub action workflow will run
+# Third workflow to run
 on: 
-  push:
-    branches:
-      - development
+  repository_dispatch:
+    types: [trigger-art-u]
 
 #Test
 # Sets up the environment variables
@@ -22,6 +20,8 @@ jobs:
     # Checks out current repo
     - name: 'Checkout Repository GitHub Action'
       uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.sha }}
 
     # Sets up Node
     - name: Setup Node ${{ env.NODE_VERSION }} Environment
@@ -65,3 +65,15 @@ jobs:
     - name: AWS CLI S3
       run: |
         aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "artillery*"
+
+    # Trigger artillery test on users/{user_id} workflow **SEE BELOW
+    # TODO: Skips expected workflow 4 "artillery-users-user_id"
+    #       Update event-type to "trigger-art-u-ui" and have missing workflow listen for that
+    - name: Trigger next workflow
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-art-u-ui-t
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

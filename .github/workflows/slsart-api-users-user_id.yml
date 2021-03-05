@@ -1,9 +1,9 @@
-name: Performance-Test Artillery UserId Tasks
+name: Performance-Test-Users-UserID
 
+# Eighth workflow to run
 on:  
-  push:
-    branches:
-      - development
+  repository_dispatch:
+    types: [trigger-slsart-u-ui]
 
 jobs:
   slsart-perf:
@@ -11,10 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
-      STAGE_NAME: merge-perf-test
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.client_payload.sha }}
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
@@ -34,9 +35,22 @@ jobs:
       # - currently this just runs the defaults
       # examples for future:
       # - run: cp ./slsart/script.yml ./
-      # - run: cp ./slsart/serverless.yml ./
+  
+      # TODO: rename and move below script file to match other serverless-artillery tests
       - name: Deploy, invoke, remove functions
         run: |
-          ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region=us-west-2
-          ~/.npm-global/bin/slsart invoke -s ../../test/artillery/Artillery-test-users-user_id-tasks.yaml --stage $STAGE_NAME > ../../test/results/Artillery-test-users-user_id-tasks-Results.json
-          ~/.npm-global/bin/slsart remove --stage $STAGE_NAME
+          ~/.npm-global/bin/slsart deploy --region $AWS_SLSART_REGION
+          ~/.npm-global/bin/slsart invoke -p test/artillery/performanceScript-users-userID.yaml --region $AWS_SLSART_REGION  > test/results/performanceResults-users-userID.json
+          ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
+        env:
+          AWS_SLSART_REGION: us-west-2  
+
+      # Trigger serverless-artillery test on users/{user_id}/tasks workflow
+      - name: Trigger next workflow
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-slsart-u-ui-t
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

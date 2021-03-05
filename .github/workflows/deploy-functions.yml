@@ -1,9 +1,9 @@
 name: Deploy Azure functions on pull request from development branch
 
+# Second workflow to run
 on:
-  push:
-    branches:
-      - development
+  repository_dispatch:
+    types: [trigger-deploy-functions]
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'functions'   # relative to the root, where are you keeping the functions
@@ -14,7 +14,9 @@ jobs:
     runs-on: ubuntu-latest # tells GH actions what we'll be running everything on
     steps:
     - name: 'Checkout Repository GitHub Action' # checks out the repository
-      uses: actions/checkout@main 
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.sha }}
 
     - name: Setup Python ${{ env.PYTHON_VERSION }} Environment # this is the script that sets up python
       uses: actions/setup-python@v1 
@@ -40,3 +42,13 @@ jobs:
         # This file was used as reference for deployment of the function app
         # (getting values for app-name and publish-profile for the function app)
         # Feb-10-2021
+
+    # Trigger artillery test on users workflow
+    - name: Trigger next workflow
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: trigger-art-u
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

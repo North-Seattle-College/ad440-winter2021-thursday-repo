@@ -1,6 +1,7 @@
 # deploy to blob storage =>
 name: Build and deploy the app to the Azure Blob Storage
 
+# First workflow to run
 on:
   push:
     branches:
@@ -29,3 +30,12 @@ jobs:
           source_dir: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/build
           container_name: $web
           connection_string: ${{secrets.BLOB_STORAGE_CONNECTION_STRING}}
+      # Trigger deploy functions workflow
+      - name: Trigger next workflow
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-deploy-functions
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}' 
