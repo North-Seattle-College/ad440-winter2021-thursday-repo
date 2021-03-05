@@ -7,7 +7,7 @@ const puppeteer = require("puppeteer");
   
 
   let universaldate = new Date(); //   capture current local date and time in universal time
-  let stringDate = universaldate.getFullYear() + "-" + (universaldate.getMonth() + 1) + "-" + universaldate.getDate() + "-" + universaldate.getHours() + ":" + universaldate.getMinutes() + ':' + universaldate.getSeconds();
+  let stringDate = universaldate.getFullYear() + "_" + (universaldate.getMonth() + 1) + "_" + universaldate.getDate() + "-" + universaldate.getHours() + "-" + universaldate.getMinutes() + '-' + universaldate.getSeconds();
 
   await page.screenshot({ path: `../results/ui-test-results/users-id-tasks-id/ui_taskid_${stringDate}.png` });
 

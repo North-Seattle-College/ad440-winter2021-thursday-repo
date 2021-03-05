@@ -5,10 +5,6 @@ on:
     branches:
       - development
       - natalia-uitest-sprint4
-  pull_request:
-    branches: 
-      - development
-      - natalia-uitest-sprint4
 
 jobs:
 
@@ -19,7 +15,6 @@ jobs:
       NODE_VERSION: '14'
       UI_TESTS_PATH: './test/ui'
       UI_RESULTS_TASKID_FILE_PATH: './test/results/ui-test-results/users-id-tasks-id/'
-      STRING_SECRET: ${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}
 
     steps:
       - name: Checkout
@@ -45,5 +40,5 @@ jobs:
             az storage blob upload-batch \
             --destination screenshots \
             --source ${{ env.UI_RESULTS_TASKID_FILE_PATH }} \
-            --connection-string "$STRING_SECRET" \
+            --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}" \
             --pattern "*.png"
