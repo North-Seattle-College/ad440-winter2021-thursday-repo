@@ -1,11 +1,13 @@
 name: sls art performance test
   on:
     push:
+      -development 
 
 jobs:
   slsart-perf:
     name: artillery performance test
     runs-on: ubuntu-latest 
+
   env:
     NPM_CONFIG_PREFIX: "~/.npm-global"
 
@@ -13,7 +15,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       uses: actions/setup-node@v1
-      with:
+      with: 
         node-version: '14'
         #according to node js website, version 15 was just released, not sure if this can be used too
         check-latest: true
@@ -35,4 +37,5 @@ jobs:
     #I wasn't sure if I was supposed to leave the results.json blank or not, it looks like there was nothing in it
       env:
         AWS_REGION: "us-west-2"
+
 
