@@ -36,11 +36,13 @@ def get(userId, taskId, r):
 
         try:
             cache = get_taskID_cache(r, userId, taskId)
+           
         except TypeError as e:
             logging.info(e.args[0])
 
         if cache:
             logging.info("Returned data from cache")
+            r.ping()
             return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
 
         else:
@@ -279,8 +281,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     #if DELETE method is selected, it executes here
         if method == "DELETE":
             logging.debug('Passed DELETE method')  
+            
             # Invalidate users tasks all call 
             invalidate_users_tasks_all_cache(r)
+            
             # ADDED implementation of redis r=redis 
             return (delete(userId, taskId,r))
 
@@ -297,8 +301,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         #if PUT method is selected, it executes here 
         if method == "PUT":
             logging.debug('Passed PUT method')  
+            
             # Invalidate users tasks all call 
             invalidate_users_tasks_all_cache(r) 
+            
             # ADDED implementation of redis r=redis
             return (update(userId, taskId, task_fields,r))
 
@@ -329,7 +335,7 @@ def cache_users(r, task, userId, taskId):
     key = "users:" + userId + ":tasks:" + taskId
     if (USERS_USERID_TASKS_TASKSID_CACHE != key):
         try: 
-            r.set(key, json.dumps(task), ex=1200)   
+            r.set(key, json.dumps(task, default=str), ex=1200)   
             logging.info("Caching complete")
         except TypeError as e:
             logging.info("Caching failed")
