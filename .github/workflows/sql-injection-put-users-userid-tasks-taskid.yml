@@ -22,7 +22,7 @@ jobs:
         curl https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
                         
     #PUT Request with SQL Injection statement
-    - name: 'SQL Injection PUT'
+    - name: 'SQL Injection PUT on https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103'
       run: |
         curl -v -X PUT -d "{\"userId\": 1,
                             \"user\": \"'OR'1'='1\",
@@ -36,7 +36,7 @@ jobs:
                           }" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
     
     #Restores task back to normal state for next SQL Injection test.    
-    - name: 'Restore Task'
+    - name: 'Restore https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103'
       run: |
         curl -v -X PUT -d '{
                             "userId": 1,
