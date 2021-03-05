@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - development
-      - natalia-uitest-sprint4
+
   pull_request:
     branches: 
       - development
-      - natalia-uitest-sprint4
-      
+
 jobs:
 
   ui-test-taskid:
