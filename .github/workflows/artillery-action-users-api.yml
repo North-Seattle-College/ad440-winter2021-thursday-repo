@@ -58,9 +58,8 @@ jobs:
 
     # Change results file name to follow naming conventions and include date/time  
     - name: Rename results json
-      run: |  
+      run: |
         cp test/results/artillery.json "test/results/artillery_${{ steps.date.outputs.date }}.json"
-    
     # Upload the results to S3 bucket
     - name: AWS CLI S3
       run: |
