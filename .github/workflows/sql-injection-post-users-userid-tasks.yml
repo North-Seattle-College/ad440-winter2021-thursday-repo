@@ -21,7 +21,7 @@ jobs:
           prop_path: 'userId'
       - name: "create a task for user id ${{steps.userId-users-userid-tasks-post.outputs.prop}} with this sql injection input: 'oops'); DELETE FROM users WHERE userId = ${{steps.userId-users-userid-tasks-post.outputs.prop}}; -- "
         run: |
-          curl -v -X POST -d '{"title": "sqlINJ", "description": "'oops'); DELETE FROM users WHERE userId = ${{steps.userId-users-userid-tasks-post.outputs.prop}}; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userId-users-userid-tasks-post.outputs.prop}}/tasks? > test/security/sql-injection/sql-injection-users-userid-tasks-post.json
+          curl -v -X POST -d '{"title": "sqlINJ", "description": "'oops'); DELETE FROM users WHERE userId = ${{steps.userId-users-userid-tasks-post.outputs.prop}}; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userId-users-userid-tasks-post.outputs.prop}}/tasks? >> test/security/sql-injection/sql-injection-users-userid-tasks-post.json
       - name: reading the output of POST request
         id: taskId-users-userid-tasks-post
         uses: notiz-dev/github-action-json-property@release
