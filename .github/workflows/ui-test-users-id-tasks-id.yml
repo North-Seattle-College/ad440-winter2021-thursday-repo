@@ -44,8 +44,8 @@ jobs:
             az storage blob upload-batch \
             --destination screenshots \
             --source ${{ env.UI_RESULTS_TASKID_FILE_PATH }} \
-            --connection-string ${{ secrets.AZBLOB_CONNECTION_STRING }} \
-            --pattern *.png
+            --connection-string "${{ secrets.AZBLOB_CONNECTION_STRING }}" \
+            --pattern "*.png"
 
       - name: Azure logout
         run: |
