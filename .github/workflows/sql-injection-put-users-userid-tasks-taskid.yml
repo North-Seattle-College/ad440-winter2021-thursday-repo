@@ -1,0 +1,42 @@
+name: sql injection PUT
+
+on: 
+  push:
+    # Action is called when a branch is merged with development
+    branches:
+      - development  
+
+jobs:
+  sql-injection-put-users-userid-tasks-taskid:
+    # Create ubuntu VM for actions
+    runs-on: ubuntu-latest 
+
+    steps:
+    #Checkout current repo
+    - name: 'Checkout Repository GitHub Action' 
+      uses: actions/checkout@v2
+
+    #Test endpoint with GET request to ensure it is still there
+    - name: 'GET curl'
+      run: | 
+        curl https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
+
+    #PUT Request with SQL Injection statement
+    - name: 'SQL Injection'
+      run: |
+        curl -v -X PUT -d '{
+                            "title": "Alterations",
+                            "description": SQL Injection’; DROP TABLE userId,
+                            "createdDate": "2021-03-03 02:22:06.450000",
+                            "completed": 1,
+                            "completedDate": null
+                           }' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
+  
+
+
+ 
+
+ 
+ 
+
+ 
