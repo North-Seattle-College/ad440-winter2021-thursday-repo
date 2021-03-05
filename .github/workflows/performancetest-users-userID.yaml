@@ -1,7 +1,6 @@
 name: Performance-Test-Users-UserID
 
 on:  
-
   push:
     branches:
       - development
@@ -34,7 +33,8 @@ jobs:
       # - currently this just runs the defaults
       # examples for future:
       # - run: cp ./slsart/script.yml ./
-
+  
+          
       - name: Deploy, invoke, remove functions
         run: |
           ~/.npm-global/bin/slsart deploy --region $AWS_SLSART_REGION
@@ -42,4 +42,3 @@ jobs:
           ~/.npm-global/bin/slsart remove --region $AWS_SLSART_REGION
         env:
           AWS_SLSART_REGION: us-west-2  
-
