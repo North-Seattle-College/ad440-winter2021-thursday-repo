@@ -5,7 +5,6 @@ on:
       - development
 env:
   NODE_VERSION: '10.x'
-  RESULT_FILE_PATH: ../../test/security/sql-injection/delete-users-userid.json
 jobs:
   DELETE-user-test-case:
     runs-on: ubuntu-latest
@@ -20,7 +19,7 @@ jobs:
         id: userDeleteId
         uses: notiz-dev/github-action-json-property@release
         with: 
-          path: env.RESULT_FILE_PATH
+          path: test/security/sql-injection/delete-users-userid.json
           prop_path: 'userId'
       # Create test user to update and write user json to result file
       - name: 'Create test user to update'
@@ -31,7 +30,7 @@ jobs:
         id: userUpdateId
         uses: notiz-dev/github-action-json-property@release
         with: 
-          path: env.RESULT_FILE_PATH
+          path: test/security/sql-injection/delete-users-userid.json
           prop_path: 'userId'  
       # Attempt update injection on email and update result file
       - name: "Delete user with userId ${{steps.userDeleteId.outputs.prop}}"
@@ -46,7 +45,7 @@ jobs:
         id: deletionCheck
         uses: notiz-dev/github-action-json-property@release
         with: 
-          path: env.RESULT_FILE_PATH
+          path: test/security/sql-injection/delete-users-userid.json
           prop_path: 'userId'
       # Check for userDeleteId in json result file
       - name: "User deletion confirmation"
@@ -60,7 +59,7 @@ jobs:
         id: getEmail
         uses: notiz-dev/github-action-json-property@release
         with: 
-          path: env.RESULT_FILE_PATH
+          path: test/security/sql-injection/delete-users-userid.json
           prop_path: 'email'
       # Use the output from above step
       - name: "Compare email to original"
@@ -70,4 +69,4 @@ jobs:
       - name: 'Remove Test Results File'
         uses: JesseTG/rm@v1.0.2
         with:
-          path: env.RESULT_FILE_PATH
+          path: test/security/sql-injection/delete-users-userid.json
