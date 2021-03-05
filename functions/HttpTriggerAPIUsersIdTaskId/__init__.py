@@ -158,15 +158,7 @@ def delete(userId, taskId):
 def connect():
     try:
         #creates connection string
-        db_server = os.environ["ENV_DATABASE_SERVER"]
-        db_name = os.environ["ENV_DATABASE_NAME"]
-        db_username = os.environ["ENV_DATABASE_USERNAME"]
-        db_password = os.environ["ENV_DATABASE_PASSWORD"]
-        driver = '{ODBC Driver 17 for SQL Server}'
-        logging.debug('Uses hardcoded ODBC Driver 17 for SQL Server string')
-        #assigns the connection string
-        conn_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;".format(
-        driver, db_server, db_name, db_username, db_password)
+        conn_string = os.environ['ENV_DATABASE_CONNECTION_STRING']
      
         #creates and returns connection variable
         try:         
