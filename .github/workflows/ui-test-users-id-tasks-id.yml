@@ -19,6 +19,7 @@ jobs:
       NODE_VERSION: '14'
       UI_TESTS_PATH: './test/ui'
       UI_RESULTS_TASKID_FILE_PATH: './test/results/ui-test-results/users-id-tasks-id/'
+      STRING_SECRET: ${{ secrets.AZBLOB_CONNECTION_STRING }}
 
     steps:
       - name: Checkout
@@ -44,7 +45,7 @@ jobs:
             az storage blob upload-batch \
             --destination screenshots \
             --source ${{ env.UI_RESULTS_TASKID_FILE_PATH }} \
-            --connection-string "${{ secrets.AZBLOB_CONNECTION_STRING }}" \
+            --connection-string "$STRING_SECRET" \
             --pattern "*.png"
 
       - name: Azure logout
