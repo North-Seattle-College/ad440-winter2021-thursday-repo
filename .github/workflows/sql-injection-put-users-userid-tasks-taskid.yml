@@ -1,10 +1,10 @@
 name: sql injection PUT
 
-on: 
-  push:
-    # Action is called when a branch is merged with development
-    branches:
-      - development  
+on [push]: 
+  # push:
+  #   # Action is called when a branch is merged with development
+  #   branches:
+  #     - development  
 
 jobs:
   sql-injection-put-users-userid-tasks-taskid:
@@ -22,16 +22,35 @@ jobs:
         curl https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
 
     #PUT Request with SQL Injection statement
-    - name: 'SQL Injection'
+    - name: 'SQL Injection PUT'
       run: |
         curl -v -X PUT -d '{
-                            "title": "Alterations",
-                            "description": SQL Injection’; DROP TABLE userId,
-                            "createdDate": "2021-03-03 02:22:06.450000",
+                          "userId": 1,
+                          "user": "'OR'1'='1",
+                          "taskId": 3103,
+                          "title": "'; DROP TABLE users",
+                          "description": "Review and alter as needed",
+                          "createdDate": "2021-03-03 02:30:00.150000",
+                          "dueDate": "21/03/03 02:35:00",
+                          "completed": 1,
+                          "completedDate": "21/03/03 02:35:00"
+                          }' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
+    
+    #Restores task back to normal state                    
+    - name: 'Restore Task'
+      run: |
+        curl -v -X PUT -d '{
+                            "userId": 1,
+                            "user": "Aidan Weber",
+                            "taskId": 3103,
+                            "title": "Alterarions",
+                            "description": "Review and alter as needed",
+                            "createdDate": "2021-03-03 02:30:00.150000",
+                            "dueDate": "2003-03-21 02:35:00",
                             "completed": 1,
-                            "completedDate": null
-                           }' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
-  
+                            "completedDate": "2003-03-21 02:35:00"
+                          }' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
+                        
 
 
  
