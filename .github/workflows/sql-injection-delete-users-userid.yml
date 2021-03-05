@@ -38,7 +38,7 @@ jobs:
         run: |
           curl -v -X DELETE -d '{"userId": "'${{steps.userDeleteId.outputs.prop}}'); or 1=1; UPDATE users SET email='attacked email' WHERE userId = ${{steps.userUpdateId.outputs.prop}}; --"}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userDeleteId.outputs.prop}} > test/security/sql-injection/delete-users-userid.json
       # Check for userDeleteId in json result file
-      - name: 'Check for userDeleteId deletion'
+      - name: 'Make GET request for userDeleteId after delete attempt'
         run: |
           curl -v -X GET https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userDeleteId.outputs.prop}} > test/security/sql-injection/delete-users-userid.json
       # Retrieve GET results
