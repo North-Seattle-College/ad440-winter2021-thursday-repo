@@ -95,7 +95,14 @@ def get_user(conn, user_id, _redis):
         cache = get_user_cache(_redis)
         user = json.loads(cache)
         user_user_id = user['userId']
+
+        #Calls invalidate method to see if data is cachable
         is_cachable = canInvalidate(user, user_id)
+
+        #Clears cache if data was not cachable
+        if not is_cachable:
+            clear_cache(_redis)
+
     except TypeError as e:
         logging.info(e.args[0])
 
@@ -180,7 +187,7 @@ def update_user(user_req_body, conn, user_id, _redis):
         assert 'lastName' in user_req_body, 'User request body did not contain field: "lastName"'
         assert 'email' in user_req_body, 'User request body did not contain field: "email"'
     except AssertionError as user_req_body_content_error:
-        logging.error(e.args[0])
+        logging.error(user_req_body_content_error.args[0])
         logging.error(
             'User request body did not contain the necessary fields!'
         )
