@@ -100,7 +100,7 @@ def get_user(conn, user_id, _redis):
         user_user_id = user['userId']
 
         #Calls invalidate method to see if data is cachable
-        is_cachable = canInvalidate(user, user_id)
+        is_cachable = canInvalidate(cache, user_user_id, user_id)
 
         #Clears cache if data was not cachable
         if not is_cachable:
@@ -168,9 +168,8 @@ def get_user_cache(_redis):
         return None
 
 
-def set_user_cache(_redis, clear_cache):
-    if clear_cache:
-        _redis.flushdb()
+def clear_cache(_redis):
+    _redis.flushdb()
 
 
 def cache_user(_redis, user):
@@ -221,7 +220,7 @@ def update_user(user_req_body, conn, user_id, _redis):
 
             logging.debug('User was updated successfully!.')
 
-            set_user_cache(_redis, True)
+            clear_cache(_redis)
 
             respond = 'User updated'
             statuse_code = 200
@@ -274,7 +273,7 @@ def patch_user(user_req_body, conn, user_id, _redis):
 
                 cursor.execute(sql_query, tuple(params))
 
-                set_user_cache(_redis, True)
+                clear_cache(_redis)
 
                 respond = 'user updated successfully'
                 statuse_code = 200
@@ -314,10 +313,10 @@ def delete_user(conn, user_id, _redis):
             user = json.loads(cache)
 
             #calls canInvalidate method
-            is_clearable = canInvalidate(user, user_id)
+            is_clearable = canInvalidate(cache, user['userId'], user_id)
 
             if is_clearable:
-                set_user_cache(_redis, True)
+                clear_cache(_redis)
 
             respond = 'User deleted'
             statuse_code = 200
@@ -341,6 +340,6 @@ def get_user_req_body(req):
 
     return user_req_body
 
-def canInvalidate(cache, user_id):
-    return cache is not None and int(user['userId']) == int(user_id)
+def canInvalidate(cache, user_user_id, user_id):
+    return cache is not None and int(user_user_id) == int(user_id)
     
