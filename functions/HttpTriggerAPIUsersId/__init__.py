@@ -5,7 +5,9 @@ import azure.functions as func
 import json
 import redis
 
+#Global value to be used to invalidate GET,PUT, and DELETE for Redis Cache
 ALL_USERS_KEY = b'users:all'
+
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -62,7 +64,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             return func.HttpResponse('invalid request method', status_code=405)
 
-    # displays erros encountered when API methods were called
+    # displays errors encountered when API methods were called
     except Exception as e:
         return func.HttpResponse('Error: %s' % str(e), status_code=500)
     finally:
@@ -98,7 +100,7 @@ def get_user(conn, user_id, _redis):
         logging.info(e.args[0])
 
     try:
-        if (cache is None) or is_cachable:
+        if (cache is None) or not is_cachable:
             with conn.cursor() as cursor:
                 logging.debug(
                     '''
@@ -130,7 +132,7 @@ def get_user(conn, user_id, _redis):
                 respond = json.dumps(user)
                 statuse_code = 200
 
-        if cache is not None:
+        elif cache is not None:
             respond = cache.decode('utf-8')
             statuse_code = 200
 
@@ -300,7 +302,9 @@ def delete_user(conn, user_id, _redis):
 
             cache = get_user_cache(_redis)
             user = json.loads(cache)
-            is_clearable = cache is not None and int(user['userId']) == int(user_id)
+
+            #calls canInvalidate method
+            is_clearable = canInvalidate(user, user_id)
 
             if is_clearable:
                 set_user_cache(_redis, True)
@@ -328,8 +332,5 @@ def get_user_req_body(req):
     return user_req_body
 
 def canInvalidate(cache, user_id):
-    if (cache is not None) and user_id in cache:
-        return true
-    else:
-        return false
+    return cache is not None and int(user['userId']) == int(user_id)
     
