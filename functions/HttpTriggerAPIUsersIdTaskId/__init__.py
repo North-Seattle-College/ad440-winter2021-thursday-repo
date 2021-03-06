@@ -11,7 +11,7 @@ import redis
 # Connect to the Redis Server
 r = redis.StrictRedis(
     host= os.environ['ENV_REDIS_HOST'], 
-    port=6380, 
+    port=os.environ['ENV_REDIS_PORT'], 
     db=0, 
     password= os.environ['ENV_REDIS_KEY'], 
     ssl=True)
