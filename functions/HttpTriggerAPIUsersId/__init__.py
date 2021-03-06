@@ -44,18 +44,21 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             user_req_body = get_user_req_body(req)
 
             logging.info('Attempting to update (PUT) user...')
+            updateUser = update_user(user_req_body, conn, user_id, _redis)
 
-            return update_user(user_req_body, conn, user_id, _redis)
+            return updateUser
         elif req.method == 'PATCH':
             user_req_body = get_user_req_body(req)
 
             logging.info('Attempting to update (PATCH) user...')
+            patchUser = patch_user(user_req_body, conn, user_id, _redis)
 
-            return patch_user(user_req_body, conn, user_id, _redis)
+            return patchUser
         elif method == 'DELETE':
             logging.info('Attempting to delete user...')
+            deleteUser = delete_user(conn, user_id, _redis)
 
-            return delete_user(conn, user_id, _redis)
+            return deleteUser
         else:
             logging.warn('''
               Request with method {} has been recieved,
