@@ -5,6 +5,8 @@ import azure.functions as func
 import json
 import redis
 
+#Global value to be used to invalidate GET,PUT, and DELETE for Redis Cache
+ALL_USERS_KEY = b'users:all'
 
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
@@ -42,18 +44,21 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             user_req_body = get_user_req_body(req)
 
             logging.info('Attempting to update (PUT) user...')
+            updateUser = update_user(user_req_body, conn, user_id, _redis)
 
-            return update_user(user_req_body, conn, user_id, _redis)
+            return updateUser
         elif req.method == 'PATCH':
             user_req_body = get_user_req_body(req)
 
             logging.info('Attempting to update (PATCH) user...')
+            patchUser = patch_user(user_req_body, conn, user_id, _redis)
 
-            return patch_user(user_req_body, conn, user_id, _redis)
+            return patchUser
         elif method == 'DELETE':
             logging.info('Attempting to delete user...')
+            deleteUser = delete_user(conn, user_id, _redis)
 
-            return delete_user(conn, user_id, _redis)
+            return deleteUser
         else:
             logging.warn('''
               Request with method {} has been recieved,
@@ -62,7 +67,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             return func.HttpResponse('invalid request method', status_code=405)
 
-    # displays erros encountered when API methods were called
+    # displays errors encountered when API methods were called
     except Exception as e:
         return func.HttpResponse('Error: %s' % str(e), status_code=500)
     finally:
@@ -78,20 +83,29 @@ def get_db_connection():
 
 
 def init_redis():
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    REDIS_HOST = os.environ['ENV_REDIS_HOST']
+    REDIS_PORT = os.environ['ENV_REDIS_PORT']
     REDIS_KEY = os.environ['ENV_REDIS_KEY']
 
     return redis.StrictRedis(
-      host=REDIS_HOST, port=6380, db=0, password=REDIS_KEY, ssl=True
+      host=REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_KEY, ssl=True
     )
 
 
 def get_user(conn, user_id, _redis):
-    try:
+    is_cachable = False
+    try: 
         cache = get_user_cache(_redis)
         user = json.loads(cache)
         user_user_id = user['userId']
-        is_cachable = cache is not None and int(user_user_id) == int(user_id)
+
+        #Calls invalidate method to see if data is cachable
+        is_cachable = canInvalidate(cache, user_user_id, user_id)
+
+        #Clears cache if data was not cachable
+        if not is_cachable:
+            clear_cache(_redis)
+
     except TypeError as e:
         logging.info(e.args[0])
 
@@ -128,7 +142,7 @@ def get_user(conn, user_id, _redis):
                 respond = json.dumps(user)
                 statuse_code = 200
 
-        if cache is not None:
+        elif cache is not None:
             respond = cache.decode('utf-8')
             statuse_code = 200
 
@@ -147,21 +161,20 @@ def get_user(conn, user_id, _redis):
 
 def get_user_cache(_redis):
     try:
-        cache = _redis.get('user')
+        cache = _redis.get(ALL_USERS_KEY)
         return cache
     except TypeError as e:
         logging.critical('Failed to fetch user from cache: ' + e.args[1])
         return None
 
 
-def set_user_cache(_redis, clear_cache):
-    if clear_cache:
-        _redis.flushdb()
+def clear_cache(_redis):
+    _redis.flushdb()
 
 
 def cache_user(_redis, user):
     try:
-        _redis.set('user', json.dumps(user), ex=1200)
+        _redis.set(ALL_USERS_KEY, json.dumps(user), ex=1200)
         logging.info('Caching complete')
     except TypeError as e:
         logging.info('Caching failed')
@@ -176,6 +189,7 @@ def update_user(user_req_body, conn, user_id, _redis):
         assert 'lastName' in user_req_body, 'User request body did not contain field: "lastName"'
         assert 'email' in user_req_body, 'User request body did not contain field: "email"'
     except AssertionError as user_req_body_content_error:
+        logging.error(user_req_body_content_error.args[0])
         logging.error(
             'User request body did not contain the necessary fields!'
         )
@@ -206,7 +220,7 @@ def update_user(user_req_body, conn, user_id, _redis):
 
             logging.debug('User was updated successfully!.')
 
-            set_user_cache(_redis, True)
+            clear_cache(_redis)
 
             respond = 'User updated'
             statuse_code = 200
@@ -259,7 +273,7 @@ def patch_user(user_req_body, conn, user_id, _redis):
 
                 cursor.execute(sql_query, tuple(params))
 
-                set_user_cache(_redis, True)
+                clear_cache(_redis)
 
                 respond = 'user updated successfully'
                 statuse_code = 200
@@ -297,10 +311,12 @@ def delete_user(conn, user_id, _redis):
 
             cache = get_user_cache(_redis)
             user = json.loads(cache)
-            is_clearable = cache is not None and int(user['userId']) == int(user_id)
+
+            #calls canInvalidate method
+            is_clearable = canInvalidate(cache, user['userId'], user_id)
 
             if is_clearable:
-                set_user_cache(_redis, True)
+                clear_cache(_redis)
 
             respond = 'User deleted'
             statuse_code = 200
@@ -323,3 +339,7 @@ def get_user_req_body(req):
         pass
 
     return user_req_body
+
+def canInvalidate(cache, user_user_id, user_id):
+    return cache is not None and int(user_user_id) == int(user_id)
+    
