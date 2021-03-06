@@ -1,5 +1,8 @@
 name: Performance-Test serverless-artillery-action-users-id-api
-on: [push]
+on:  
+  push:
+    branches:
+      - development
     
 jobs:
   slsart-perf:
