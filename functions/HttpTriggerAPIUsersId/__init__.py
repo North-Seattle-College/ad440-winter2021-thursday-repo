@@ -5,7 +5,7 @@ import azure.functions as func
 import json
 import redis
 
-
+ALL_USERS_KEY = b'users:all'
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -78,25 +78,27 @@ def get_db_connection():
 
 
 def init_redis():
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    REDIS_HOST = os.environ['ENV_REDIS_HOST']
+    REDIS_PORT = os.environ['ENV_REDIS_PORT']
     REDIS_KEY = os.environ['ENV_REDIS_KEY']
 
     return redis.StrictRedis(
-      host=REDIS_HOST, port=6380, db=0, password=REDIS_KEY, ssl=True
+      host=REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_KEY, ssl=True
     )
 
 
 def get_user(conn, user_id, _redis):
-    try:
+    is_cachable = False
+    try: 
         cache = get_user_cache(_redis)
         user = json.loads(cache)
         user_user_id = user['userId']
-        is_cachable = cache is not None and int(user_user_id) == int(user_id)
+        is_cachable = canInvalidate(user, user_id)
     except TypeError as e:
         logging.info(e.args[0])
 
     try:
-        if (cache is None) or not is_cachable:
+        if (cache is None) or is_cachable:
             with conn.cursor() as cursor:
                 logging.debug(
                     '''
@@ -147,7 +149,7 @@ def get_user(conn, user_id, _redis):
 
 def get_user_cache(_redis):
     try:
-        cache = _redis.get('user')
+        cache = _redis.get(ALL_USERS_KEY)
         return cache
     except TypeError as e:
         logging.critical('Failed to fetch user from cache: ' + e.args[1])
@@ -161,7 +163,7 @@ def set_user_cache(_redis, clear_cache):
 
 def cache_user(_redis, user):
     try:
-        _redis.set('user', json.dumps(user), ex=1200)
+        _redis.set(ALL_USERS_KEY, json.dumps(user), ex=1200)
         logging.info('Caching complete')
     except TypeError as e:
         logging.info('Caching failed')
@@ -176,6 +178,7 @@ def update_user(user_req_body, conn, user_id, _redis):
         assert 'lastName' in user_req_body, 'User request body did not contain field: "lastName"'
         assert 'email' in user_req_body, 'User request body did not contain field: "email"'
     except AssertionError as user_req_body_content_error:
+        logging.error(e.args[0])
         logging.error(
             'User request body did not contain the necessary fields!'
         )
@@ -323,3 +326,10 @@ def get_user_req_body(req):
         pass
 
     return user_req_body
+
+def canInvalidate(cache, user_id):
+    if (cache is not None) and user_id in cache:
+        return true
+    else:
+        return false
+    
