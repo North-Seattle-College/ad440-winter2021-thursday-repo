@@ -40,7 +40,7 @@ jobs:
       # Attempt update injection on email and update results file
       - name: "Delete user with userId ${{ steps.userDeleteId.outputs.prop }}"
         run: |
-          curl -v -X DELETE -d '{ "userId": "'${{ steps.userDeleteId.outputs.prop }}'); or 1=1; UPDATE users SET email='attacked email' WHERE userId = ${{ steps.userUpdateId.outputs.prop }}; --" }' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{ steps.userDeleteId.outputs.prop }} > test/security/sql-injection/delete-users-userid.json
+          curl -v -X DELETE -d "{ \"userId\": \"'${{ steps.userDeleteId.outputs.prop }}'); UPDATE users SET email='attacked email' WHERE userId = ${{ steps.userUpdateId.outputs.prop }}; --\" }" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{ steps.userDeleteId.outputs.prop }} > test/security/sql-injection/delete-users-userid.json
       
       # GET userUpdateId email into results file
       - name: 'Get userUpdateteId email'
@@ -57,8 +57,8 @@ jobs:
       
       # Check for userUpdateId email changes in results file
       - name: "Compare current email to original"
-        if: ${{ steps.getEmail.outputs.prop }} == {{ 'inject-update-email' }}
-        run: echo "Injection unsuccessful; email remains unaltered:"" ${{ steps.getEmail.outputs.prop }} = ${{ 'inject-update-email' }}" 
+        if: ${{ steps.getEmail.outputs.prop ==  'inject-update-email' }}
+        run: echo "Injection unsuccessful; email remains unaltered:"" ${{ steps.getEmail.outputs.prop }} = ${{ 'inject-update-email' }}"
       
       # Remove test results file
       - name: 'Remove Test Results File'
