@@ -1,0 +1,43 @@
+name: UI Test /users/{userid}/tasks/{taskid}
+
+on: 
+  push:
+    branches:
+      - development
+
+jobs:
+
+  ui-test-taskid:
+    runs-on: ubuntu-latest
+    
+    env:
+      NODE_VERSION: '14'
+      UI_TESTS_PATH: './test/ui'
+      UI_RESULTS_TASKID_FILE_PATH: './test/results/ui-test-results/users-id-tasks-id/'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          check-latest: true
+
+      - name: Run the ui test-taskid
+        run: |
+          pushd ${{ env.UI_TESTS_PATH }}
+          npm install
+          npm run ui-test-taskid
+          popd
+
+      - name: Upload screenshots to Azure Blob Storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+            --destination screenshots \
+            --source ${{ env.UI_RESULTS_TASKID_FILE_PATH }} \
+            --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}" \
+            --pattern "*.png"

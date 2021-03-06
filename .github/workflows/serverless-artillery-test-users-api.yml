@@ -17,9 +17,7 @@ jobs:
       - name: setup Node
         uses: actions/setup-node@v1
         with:
-
           node-version: '14'
-
           check-latest: true
       - name: install dependencies
         run: npm install
