@@ -54,11 +54,22 @@ jobs:
         with: 
           path: test/security/sql-injection/delete-users-userid.json
           prop_path: 'email'
-      
+
+      # TO DO: Once email is accurately returned by a get request this test should be used instead to cause an error when emails don't match
+      # - name: "Compare current email to original"
+      #   run: echo ${{ steps.getEmail.outputs.prop == 'inject-update-email' }} ${{'Injection unsuccessful; email remains unaltered.'}}
+
+      # TO DO: Delete later
       # Check for userUpdateId email changes in results file
       - name: "Compare current email to original"
         if: ${{ steps.getEmail.outputs.prop ==  'inject-update-email' }}
         run: echo "Injection unsuccessful; email remains unaltered:"" ${{ steps.getEmail.outputs.prop }} = ${{ 'inject-update-email' }}"
+
+      # TO DO: Delete later
+      # Emails don't match; display them with an error message for now
+      - name: "ERROR - Compare current email to original"
+        if: ${{ steps.getEmail.outputs.prop != 'inject-update-email' }}
+        run: echo "ERROR - Injection successful; email isn't the same:"" ${{ steps.getEmail.outputs.prop }} = ${{ 'inject-update-email' }}"
       
       # Remove test results file
       - name: 'Remove Test Results File'
