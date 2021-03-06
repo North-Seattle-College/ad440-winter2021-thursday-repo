@@ -45,7 +45,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if(redisFeature):
         try:
-            rDBpassword = os.enviorn["ENV_REDIS_KEY"]
+            rDBpassword = os.environ["ENV_REDIS_KEY"]
             rDBhost = os.environ["ENV_REDIS_HOST"]
             rDBport = os.environ["ENV_REDIS_PORT"]
             rDB = redis.Redis(host=rDBhost, port=rDBport, db=0, password=rDBpassword, ssl=True) 
