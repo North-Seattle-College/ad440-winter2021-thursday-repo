@@ -51,27 +51,39 @@ export const getSelectorContent = async (url, page, endpoint, selector) => {
   *  being tested. 
   */
   await page.evaluate(async ({endpoint, idArr}) => {
+    setTimeout(() => {
     elemArr = [];
     idArr.forEach((id) => {
       let inputElem = document.getElementById(endpoint + '-' + id);
       elemArr.push(inputElem);
     });
     elemArr.forEach((element) => {
-      element.click();
-      element.value = Math.floor(Math.random() * Math.floor(1000));
+      let event = new Event('change');
+      element.addEventListener('change', (e) => e.target.value = Math.floor(Math.random() * Math.floor(1000)))
+      triggerEvent = element.dispatchEvent(event);
+      //element.value = Math.floor(Math.random() * Math.floor(1000));
     });
-    
-    let titles = document.querySelectorAll('.endpoint-title')
+  
+    let titles = document.querySelectorAll('.endpoint-title');
 
     titles.forEach((title) => {
-      console.log(endpoint);
-      console.log(title.innerText);
-      console.log(typeof endpoint);
-      console.log(typeof title.innerText);
-      console.log(endpoint == title.innertext);
+      if(endpoint.trim() === title.textContent.trim()) {
+        title.click();
+      }
     });
 
+  }, 10000);
+
   }, {endpoint, idArr});
+
+
+
+  // await page.$eval(`input[placeholder="${idArr[0]}"]`, (element) => {
+  //   element.click();
+  //   element.value = Math.floor(Math.random() * Math.floor(1000));
+  //   let event = new Event('change');
+  //   triggerEvent = element.dispatchEvent(event);
+  // });
 
   console.log(`Getting Contents of ${selector}`);
   await page.waitForSelector(selector);

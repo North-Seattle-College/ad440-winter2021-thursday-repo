@@ -1,6 +1,7 @@
 import {startBrowser, getSelectorContent} from './ui-test-tasks.js';
 
-const baseUrl = 'https://nscstrdevusw2thucommon.z5.web.core.windows.net';
+//const baseUrl = 'https://nscstrdevusw2thucommon.z5.web.core.windows.net';
+const baseUrl = 'http://localhost:3000'
 const endPoints = {
     'users': '/users',
     'userId': '/users/{userId}',

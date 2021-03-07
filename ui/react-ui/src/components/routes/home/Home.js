@@ -44,7 +44,7 @@ class Home extends React.Component {
     }
     else {
       param.value = param.type === 'number' ? parseInt(value) : value;
-
+      console.log("Logging Paran.value: ", param.value);
       this.setState({endpointsByMethods});
     }
   }
@@ -62,7 +62,7 @@ class Home extends React.Component {
       params.forEach(param => {
         if (param.value) updatedEndpoint = updatedEndpoint.replace(param.regex, param.value);
         else {
-          readyToTrigger = false;
+          readyToTrigger = true;
           this.setState({emptyInputAlert: 'make sure you fill in all required params!!'});
   
           return;
