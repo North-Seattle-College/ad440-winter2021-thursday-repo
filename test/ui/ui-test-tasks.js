@@ -76,15 +76,6 @@ export const getSelectorContent = async (url, page, endpoint, selector) => {
 
   }, {endpoint, idArr});
 
-
-
-  // await page.$eval(`input[placeholder="${idArr[0]}"]`, (element) => {
-  //   element.click();
-  //   element.value = Math.floor(Math.random() * Math.floor(1000));
-  //   let event = new Event('change');
-  //   triggerEvent = element.dispatchEvent(event);
-  // });
-
   console.log(`Getting Contents of ${selector}`);
   await page.waitForSelector(selector);
   const element = await page.$(selector);
