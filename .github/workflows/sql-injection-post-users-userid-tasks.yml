@@ -40,7 +40,7 @@ jobs:
           path: test/security/sql-injection/sql-injection-users-userid-tasks-post.json
           prop_path: 'userId'
       - name: "user with id: ${{steps.getUserId.outputs.prop}} retrieved from database"
-        run: echo "user retrieved from database with id:" ${{steps.getUserId.outputs.prop}} 
+        run: echo "user retrieved from database with id:" ${{steps.taskId.getUserId.prop}} 
       - name: Remove the output file
         uses: JesseTG/rm@v1.0.2
         with:
