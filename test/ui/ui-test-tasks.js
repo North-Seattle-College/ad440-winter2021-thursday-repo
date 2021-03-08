@@ -1,7 +1,6 @@
 import puppeteer from 'puppeteer';
 import browser from 'puppeteer';
 import page from 'puppeteer';
-//const puppeteer = require('puppeteer');
 
 /**
  * Starts instance of headless chrome.
@@ -13,10 +12,8 @@ import page from 'puppeteer';
  * @return {PuppetInstance} - The puppeteer intance
  */
 export const startBrowser = async () => {
-  console.log(`Launching Headless Chrome`)
-  const browser = await puppeteer.launch({
-    headless: false,
-  });
+  console.log(`Launching Headless Chrome`);
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
   return {browser, page};
 };
@@ -28,24 +25,20 @@ export const startBrowser = async () => {
  * @return {void} - void
  */
 export const goToHomePage = async (url, page) => {
-  console.log(`Making request to ${url}`)
-  await page.goto(url)
+  console.log(`Making request to ${url}`);
+  await page.goto(url);
   await page.setViewport({
     width: 1920,
     height: 1080,
   });
   await page.waitForSelector('.container');
-}
+};
 
 /**
  * Fills in forms for endpoint that is being tested 
- * 
- * @param {page} page
- *        The puppeteer page object
- * @param {String} endpoint
- *        The endpoint to test     
- * @param {String} selector
- *        the document selector to retreive contents of
+ * @param {page} page - The puppeteer page object
+ * @param {String} endpoint - The endpoint to test     
+ * @param {String} selector - the document selector to retreive contents of
  * @return {void} void
  */
 export const fillInputs = async (page, endpoint) => {
@@ -95,7 +88,7 @@ export const goToEndpointPage = async (page, endpoint) => {
     let titles = document.querySelectorAll('.endpoint-title');
     titles.forEach((title) => {
       if(endpoint.trim() === title.textContent.trim()) {
-        console.log(`Submitting Values For ${endpoint}`)
+        console.log(`Submitting Values For ${endpoint}`);
         title.click();
       };
     });
@@ -142,7 +135,7 @@ export const getSelectorContent = async (page, selector) => {
       };
       waitForMutatedValue(body, elem);
       setTimeout(() => {
-        reject('Timeout')
+        reject('Timeout');
       }, 30000);
     });
   });
@@ -152,13 +145,12 @@ export const getSelectorContent = async (page, selector) => {
 /**
  * splits and filters the endpoint string. Returns an array 
  * of the endpoints that need integers as a parameter.
- * 
  * @param {string} endpoint - the endpoint string
  * @return {Array} - An array with endpoint params that need an integer value
  */
 const getIdParams = (endpoint) => {
   let epArr = endpoint.split(/[{}]/);
-  epArr.pop()
+  epArr.pop();
   const idArr = epArr.filter((str) => {
     return !str.includes('/');
   });
