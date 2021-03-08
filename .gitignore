@@ -111,8 +111,8 @@ test/artillery/report.json
 # Vscode
 
 
-.DS_Store
-DS_Store
+# .DS_Store
+# DS_Store
 
 # ignore .vscode
 package-lock.json
