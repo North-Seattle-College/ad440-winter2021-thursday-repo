@@ -1,0 +1,50 @@
+name: sql injection test for users/ post
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  POST-test-case:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: create a test-user to run the post request on it
+        run: |
+          curl -v -X POST -d "{\"firstName\": \"injection-user-test2\", \"lastName\": \"injection-user-test2\", \"email\": \"injection-user-test2\"}" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/sql-injection-users-userId1-post.json
+      - name: reading the created userId1
+        id: userId1
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: test/security/sql-injection/sql-injection-users-userId1-post.json
+          prop_path: "userId"
+      - name: "create a user with this sql injection input: 'oops'); DELETE FROM users WHERE userId = ${{steps.userId1.outputs.prop}}; -- "
+        run: |
+          curl -v -X POST -d '{"firstName": "sqlINJ","email": "test", "lastName": "'oops'); DELETE FROM users WHERE userId = ${{steps.userId1.outputs.prop}}; -- "}' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users > test/security/sql-injection/sql-injection-users-userId2-post.json
+      - name: reading the output of POST request
+        id: userId2
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: test/security/sql-injection/sql-injection-users-userId2-post.json
+          prop_path: "userId"
+      - name: "user created with id: ${{steps.userId2.outputs.prop}}"
+        run: echo "user created with id:" ${{steps.userId2.outputs.prop}}
+      - name: making sure that sql injection statement wasn't successfully injected. get user ${{steps.userId1.outputs.prop}}
+        run: |
+          curl -v -X GET https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/${{steps.userId1.outputs.prop}} > test/security/sql-injection/sql-injection-users-userId1-post.json
+      - name: read the output of GET request
+        id: getUserId
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: test/security/sql-injection/sql-injection-users-userId1-post.json
+          prop_path: "userId"
+      - name: "user with id: ${{steps.getUserId.outputs.prop}} retrieved from database"
+        run: echo "user retrieved from database with id:" ${{steps.getUserId.outputs.prop}}
+      - name: Remove the output file
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: "test/security/sql-injection/sql-injection-users-userId1-post.json"
+      - name: Remove the output file
+        uses: JesseTG/rm@v1.0.2
+        with:
+          path: "test/security/sql-injection/sql-injection-users-userId2-post.json"
