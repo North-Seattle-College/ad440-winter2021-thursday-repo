@@ -3,12 +3,21 @@ import pyodbc
 import logging
 import os
 import redis
+import urllib.parse as urlparse
+from urllib.parse import parse_qs
 import azure.functions as func
 
 USERS_CACHE_KEY = b'users:all'
 CACHE_TOGGLE = os.environ["CACHE_TOGGLE"]
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    url = urlparse.urlparse(req.url)
+    count = parse_qs(url.query)['count']
+    page = parse_qs(url.query)['page']
+    logging.debug("Count: %s", count)
+    logging.debug("Page: %s", page)
+
+
     logging.info(
         'Python HTTP trigger for /users function is processing a request.')
 
