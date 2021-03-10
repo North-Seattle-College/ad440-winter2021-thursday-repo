@@ -58,16 +58,12 @@ def lambda_handler(event, context):
             'statusCode': 500
         }
     
-    # finally: 
-    #     conn.close()
-    #     logging.debug('Connection to DB closed')
+    finally: 
+        conn.close()
+        logging.debug('Connection to DB closed')
             
     logger.info('Function execution completed successfully!')
-    return {
-        'statusCode': 200,
-        'body': json.dumps(method)
-    }
-
+    
 def get_db_connection():
     conn = pymysql.connect(
         host            = os.environ['rds_hostname'],
