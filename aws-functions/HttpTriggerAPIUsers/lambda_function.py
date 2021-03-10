@@ -63,7 +63,7 @@ def lambda_handler(event, context):
         logging.debug('Connection to DB closed')
             
     logger.info('Function execution completed successfully!')
-    
+
 def get_db_connection():
     conn = pymysql.connect(
         host            = os.environ['rds_hostname'],
@@ -139,11 +139,10 @@ def add_user(conn, user_req_body):
         )
         
         cursor.execute(add_user_query, user_params)
-        count = cursor.execute('SELECT LAST_INSERT_ID();')
+        conn.commit()
         
-
         # Get the user id from cursor
-        user_id = cursor.fetchone()[0]
+        user_id = cursor.lastrowid
 
         logging.info(
             f'User added and new user id ({user_id}) retrieved, returning information from add_user function'
