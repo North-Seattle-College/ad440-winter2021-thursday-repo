@@ -153,7 +153,7 @@ def add_user(conn, user_req_body, r):
         return func.HttpResponse(json.dumps({"userId": user_id}), status_code=200, mimetype="application/json")
 
 def init_redis():
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    REDIS_HOST = os.environ['ENV_REDIS_HOSTS']
     REDIS_KEY = os.environ['ENV_REDIS_KEY']
 
     return redis.StrictRedis(host=REDIS_HOST,

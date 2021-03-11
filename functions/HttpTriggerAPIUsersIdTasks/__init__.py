@@ -6,21 +6,7 @@ import azure.functions as func
 import datetime
 import redis 
 
-
-
-redisFeature = 'true';
-
-# to handle datetime with JSON
-# It serialize datetime by converting it into string
-def default(dateHandle):
-  if isinstance(dateHandle, (datetime.datetime, datetime.date)):
-    return dateHandle.isoformat()
-
-# to handle datetime with JSON
-# It serialize datetime by converting it into string
-def default(o):
-  if isinstance(o, (datetime.datetime, datetime.date)):
-    return o.isoformat()
+redisFeature = 'true'
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
@@ -28,10 +14,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     method = req.method
     user_id = req.route_params.get('userId')
-
-    
-
-
 
     try:
         conn = connect_to_db()
@@ -45,7 +27,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     if(redisFeature):
         try:
-            rDBpassword = os.enviorn["ENV_REDIS_KEY"]
+            rDBpassword = os.environ["ENV_REDIS_KEY"]
             rDBhost = os.environ["ENV_REDIS_HOST"]
             rDBport = os.environ["ENV_REDIS_PORT"]
             rDB = redis.Redis(host=rDBhost, port=rDBport, db=0, password=rDBpassword, ssl=True) 
@@ -173,3 +155,15 @@ def add_tasks(conn, task_req_body, user_id, rDB):
         logging.debug("task with id {} added!".format(task_id))
         
         return func.HttpResponse(json.dumps({task_id}, default=default), status_code=200, mimetype="application/json")
+
+# to handle datetime with JSON
+# It serialize datetime by converting it into string
+def default(dateHandle):
+  if isinstance(dateHandle, (datetime.datetime, datetime.date)):
+    return dateHandle.isoformat()
+
+# to handle datetime with JSON
+# It serialize datetime by converting it into string
+def default(o):
+  if isinstance(o, (datetime.datetime, datetime.date)):
+    return o.isoformat()
