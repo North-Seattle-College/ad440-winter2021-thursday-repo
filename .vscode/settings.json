@@ -3,6 +3,5 @@
   "azureFunctions.scmDoBuildDuringDeployment": true,
   "azureFunctions.pythonVenv": ".venv",
   "azureFunctions.projectLanguage": "Python",
-  "azureFunctions.projectRuntime": "~2",
-  "python.pythonPath": "/Users/farhadbahrehmand/opt/anaconda3/bin/python"
+  "azureFunctions.projectRuntime": "~2"
 }
