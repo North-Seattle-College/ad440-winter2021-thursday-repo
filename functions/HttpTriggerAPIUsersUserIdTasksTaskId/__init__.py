@@ -159,7 +159,7 @@ def connect():
     try:
         #creates connection string
         conn_string = os.environ['ENV_DATABASE_CONNECTION_STRING']
-
+     
         #creates and returns connection variable
         try:         
             logging.debug('Attempting DB connection')
@@ -192,19 +192,19 @@ def parse(req_body):
             return func.HttpResponse(req_body_content_error.args[0], status_code=400)
         #adds 'completed' to the dictionary
         task_fields['completed'] = req_body.get('completed')     
-
+  
     if req_body.get('title'):
         task_fields['title'] = req_body.get('title')
-
+ 
     if req_body.get('description'):
         task_fields['description'] = req_body.get('description')
-
+ 
     dueDate = None
     #accounts for instances when the dueDate value passed is null, to avoid datetime conversion error
     if req_body.get('dueDate') is not None:
         dueDate = datetime.strptime(req_body.get('dueDate'), '%d/%m/%y %H:%M:%S')  
     task_fields['dueDate'] = dueDate
-
+    
     completedDate = None
     #account for instances when the completedDate value passed is null, to avoid datetime conversion error
     if req_body.get('completedDate') is not None:
