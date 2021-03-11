@@ -56,29 +56,6 @@ def connect_to_db():
     connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
     return pyodbc.connect(connection_string)
 
-# Kieran's Cache Query
-# def get_user_tasks_cache(conn, userId, rDB):
-#     if(redisFeature):
-#         if(rDB.get('users:{userId}:tasks:all')):
-#             logging.info("Querying cache...")
-#             unpacked_tasks = json.loads(rDB.get('users:{userId}:tasks:all'))
-#             tasks = unpacked_tasks
-#             logging.debug('Tasks loaded from Redis')
-
-#         else:
-#             logging.debug('No tasks in Redis')
-
-#             for task in task_data:
-#                 tasks.append(dict(zip(columns, task)))
-
-#             logging.debug("tasks received!!")
-
-#             #RedisLoad
-#             json_tasks = json.dumps(tasks);   
-#             rDB.set('users:{userId}:tasks:all', json_tasks)
-
-#         return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
-
 def get_user_tasks(conn, userId, r):
     if (redisFeature): # Check cache first
         try:
@@ -118,19 +95,39 @@ def get_user_tasks(conn, userId, r):
 
 def cache_user_tasks(r, userId, tasks):
     if (redisFeature):
+        redis_key = "users:" + str(userId) + ":tasks:all"
         try: 
             logging.info("Caching results...")
-            r.set("users:{userId}:tasks:all", json.dumps(tasks), ex=1200)   
+            r.set(redis_key, json.dumps(tasks), ex=1200)   
             logging.info("Caching complete")
+        except TypeError as e:
+           #serializeTasks(tasks)    
+           logging.debug("Caching failed, serializing data and trying again...")
+           r.set(redis_key, json.dumps(tasks, indent=4, sort_keys=True, default=str), ex=1200)
         except Exception as e:
             logging.info("Caching failed")
             logging.info(e.args[0])
 
+# def serializeTasks(tasks): 
+#     for task in tasks:
+#         #task = serializeTask(task)  
+
+# def serializeTask(task):
+#     for key in task:
+#         if "Date" in key and task[key]:
+#             try:
+#                 dateString = "hi"
+#             except Exception as e:
+#                 dateString = "bye"
+#     return task
+    #logging.info(task)                  
+
 def get_user_tasks_cache(userId, r):  
     if (redisFeature):
         logging.info("Querying cache...")
+        redis_key = "users:" + str(userId) + ":tasks:all"
         try:
-            cache = r.get("users:{userId}:tasks:all")
+            cache = r.get(redis_key)
             return cache
         except Exception as e:
             logging.critical("Failed to fetch from cache: " + e.args[1])
@@ -148,7 +145,8 @@ def add_tasks(conn, task_req_body, user_id, r):
     logging.debug("New task request body contains all the necessary fields!")
 
     if(redisFeature):
-        r.expire('users:{user_id}:tasks:all')
+        redis_key = "users:" + str(user_id) + ":tasks:all"
+        r.expire(redis_key)
 
     with conn.cursor() as cursor:
         # get task data
