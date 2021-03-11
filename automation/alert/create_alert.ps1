@@ -7,8 +7,8 @@ param(
         [string] [Parameter(Mandatory=$true)] $SPSecret,            #password for SP
         [string] [Parameter(Mandatory=$true)] $SubscriptionId,
         [string] [Parameter(Mandatory=$true)] $AlertName,
-        [string] [Parameter (Mandatory=$false)] $TargetResourceGroupName = "nsc-functions-team1",   # RG for target Function App
-        [string] [Parameter (Mandatory=$false)] $TargetResourceId = "nsc-functionsapp-team1",       # name of target Function App
+        [string] [Parameter (Mandatory=$false)] $TargetResourceGroupName = "nsc-rg-dev-usw2-thursday",   # RG for target Function App
+        [string] [Parameter (Mandatory=$false)] $TargetResourceId = "nsc-fun-dev-usw2-thursday",       # name of target Function App
         [string] [Parameter (Mandatory=$false)] $AlertDescription = "Check every 5 minutes to see if more than 30 5xx responses have been generated",
         [int]    [Parameter (Mandatory=$false)] $AlertSeverity = 3,
         [string] [Parameter (Mandatory=$false)] $MetricName = "Http5xx",       # to get possible metric names: Get-AzMetricDefinition [resourceId]
@@ -17,8 +17,8 @@ param(
         [string] [Parameter (Mandatory=$false)] $TimeAggregation = "Count",
         [string] [Parameter (Mandatory=$false)] $WindowSize = "PT5M",
         [string] [Parameter (Mandatory=$false)] $EvaluationFrequency = "PT5M",
-        [string] [Parameter (Mandatory=$false)] $ActionResourceGroupName = "nataliasprint1test",        # RG for Action
-        [string] [Parameter (Mandatory=$false)] $ActionGroupId = "application insights smart detection" # name of Action
+        [string] [Parameter (Mandatory=$false)] $ActionResourceGroupName = "nsc-rg-dev-usw2-thursday",        # RG for Action
+        [string] [Parameter (Mandatory=$false)] $ActionGroupId = "action_email_nsc_fun_dev_usw2_thursday_HttpTriggerAPIUsers" # name of Action
       )
 
 $pathToAlertTemplate = "./alert_template.json"   
