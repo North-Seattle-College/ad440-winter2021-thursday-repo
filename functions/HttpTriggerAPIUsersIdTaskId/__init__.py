@@ -12,15 +12,18 @@ import redis
 r = redis.StrictRedis(
     host= os.environ['ENV_REDIS_HOST'], 
     port=os.environ['ENV_REDIS_PORT'], 
-    db=0, 
+    db=0,
     password= os.environ['ENV_REDIS_KEY'], 
     ssl=True)
 
+CACHE_TOGGLE = os.environ["CACHE_TOGGLE"],
 USERS_USERID_TASKS_ALL_CACHE = b'users:{user_id}:tasks:all'
 USERS_USERID_TASKS_TASKSID_CACHE= b'users:{user_id}/tasks/{task_id}'
 
 # Set Message in the Redis Server for testing
 r.set("Message01", "Hello World")
+r.set("Message02", "Hello World2")
+
 
 
 #GET API method function
@@ -42,7 +45,6 @@ def get(userId, taskId, r):
 
         if cache:
             logging.info("Returned data from cache")
-            r.ping()
             return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
 
         else:
@@ -193,6 +195,7 @@ def delete(userId, taskId):
 #connect to db function
 def connect():
     try:
+        # Connects to the 
         conn_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
      
         #creates and returns connection variable
@@ -323,7 +326,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 def get_taskID_cache(r, userId, taskId):
     logging.info("Querying cache...")
     key = "users:" + userId + ":tasks:" + taskId
-
+    # if (CACHE_TOGGLE == "On"):
     try:
         cache = r.get(key)
         return cache
@@ -333,13 +336,13 @@ def get_taskID_cache(r, userId, taskId):
 
 def cache_users(r, task, userId, taskId):
     key = "users:" + userId + ":tasks:" + taskId
-    if (USERS_USERID_TASKS_TASKSID_CACHE != key):
-        try: 
-            r.set(key, json.dumps(task, default=str), ex=1200)   
-            logging.info("Caching complete")
-        except TypeError as e:
-            logging.info("Caching failed")
-            logging.info(e.args[0])
+    #if(CACHE_TOGGLE == "On" and USERS_USERID_TASKS_TASKSID_CACHE != key):
+    try: 
+        r.set(key, json.dumps(task, default=str), ex=1200)   
+        logging.info("Caching complete")
+    except TypeError as e:
+        logging.info("Caching failed")
+        logging.info(e.args[0])
 
 # Invalidate users tasks all method
 def invalidate_users_tasks_all_cache(r):
