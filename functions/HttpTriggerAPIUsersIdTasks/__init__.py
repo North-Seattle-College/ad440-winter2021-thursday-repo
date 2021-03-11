@@ -14,6 +14,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     method = req.method
     user_id = req.route_params.get('userId')
+    count = req.params.get('count')
+    page = req.params.get('page')
+    redis_key = "users:" + user_id + ":tasks&count=" + count + "&page=" + page
 
     try:
         conn = connect_to_db()
@@ -28,14 +31,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
-            all_tasks_by_userId = get_user_tasks(conn, user_id, r)
+            all_tasks_by_userId = get_user_tasks(conn, user_id, count, page, r, redis_key)
             logging.debug("tasks retrieved successfully!")
             return all_tasks_by_userId
 
         elif method == "POST":
             logging.debug("trying to add one task to tasks")
             task_req_body = req.get_json()
-            new_task_id = add_tasks(conn, task_req_body, user_id, r)
+            new_task_id = add_tasks(conn, task_req_body, user_id, r, redis_key)
             logging.debug("task added successfully!")
             return new_task_id
 
@@ -56,10 +59,10 @@ def connect_to_db():
     connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
     return pyodbc.connect(connection_string)
 
-def get_user_tasks(conn, userId, r):
+def get_user_tasks(conn, userId, count, page, r, redis_key):
     if (redisFeature): # Check cache first
         try:
-            cache = get_user_tasks_cache(userId, r)
+            cache = get_user_tasks_cache(redis_key, r)
         except Exception as e:
             logging.info(e.args[0]) 
 
@@ -71,7 +74,13 @@ def get_user_tasks(conn, userId, r):
 
     with conn.cursor() as cursor:
         logging.info("Querying database...")
-        cursor.execute("SELECT * FROM tasks WHERE userId=?", userId)
+        lower_limit = (int(page) - 1) * int(count) 
+        sql_query = "SELECT * FROM tasks WHERE userId=" + str(userId) + " ORDER BY taskId OFFSET " + str(lower_limit) + " ROWS FETCH NEXT " + str(count) + " ROWS ONLY"
+        
+        try:
+            cursor.execute(sql_query)
+        except Exception as e:
+            logging.info("Error: " + e.args[1])
 
         tasks = list(cursor.fetchall())
 
@@ -89,43 +98,27 @@ def get_user_tasks(conn, userId, r):
             "User data retrieved and processed, returning information from get_user_tasks function")
 
         if (redisFeature):
-            cache_user_tasks(r, userId, tasks)
+            cache_user_tasks(r, redis_key, tasks)
 
         return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
 
-def cache_user_tasks(r, userId, tasks):
+def cache_user_tasks(r, redis_key, tasks):
     if (redisFeature):
-        redis_key = "users:" + str(userId) + ":tasks:all"
         try: 
             logging.info("Caching results...")
             r.set(redis_key, json.dumps(tasks), ex=1200)   
             logging.info("Caching complete")
-        except TypeError as e:
-           #serializeTasks(tasks)    
+        except TypeError as e:    
            logging.debug("Caching failed, serializing data and trying again...")
            r.set(redis_key, json.dumps(tasks, indent=4, sort_keys=True, default=str), ex=1200)
         except Exception as e:
             logging.info("Caching failed")
             logging.info(e.args[0])
+              
 
-# def serializeTasks(tasks): 
-#     for task in tasks:
-#         #task = serializeTask(task)  
-
-# def serializeTask(task):
-#     for key in task:
-#         if "Date" in key and task[key]:
-#             try:
-#                 dateString = "hi"
-#             except Exception as e:
-#                 dateString = "bye"
-#     return task
-    #logging.info(task)                  
-
-def get_user_tasks_cache(userId, r):  
+def get_user_tasks_cache(redis_key, r):  
     if (redisFeature):
         logging.info("Querying cache...")
-        redis_key = "users:" + str(userId) + ":tasks:all"
         try:
             cache = r.get(redis_key)
             return cache
@@ -133,7 +126,7 @@ def get_user_tasks_cache(userId, r):
             logging.critical("Failed to fetch from cache: " + e.args[1])
             return None
 
-def add_tasks(conn, task_req_body, user_id, r):
+def add_tasks(conn, task_req_body, user_id, r, redis_key):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
     try:
@@ -145,7 +138,6 @@ def add_tasks(conn, task_req_body, user_id, r):
     logging.debug("New task request body contains all the necessary fields!")
 
     if(redisFeature):
-        redis_key = "users:" + str(user_id) + ":tasks:all"
         r.expire(redis_key)
 
     with conn.cursor() as cursor:
@@ -178,12 +170,6 @@ def add_tasks(conn, task_req_body, user_id, r):
 def default(dateHandle):
   if isinstance(dateHandle, (datetime.datetime, datetime.date)):
     return dateHandle.isoformat()
-
-# # to handle datetime with JSON
-# # It serialize datetime by converting it into string
-# def default(o):
-#   if isinstance(o, (datetime.datetime, datetime.date)):
-#     return o.isoformat()
 
 def init_redis():
     try:
