@@ -20,12 +20,6 @@ CACHE_TOGGLE = os.environ["CACHE_TOGGLE"],
 USERS_USERID_TASKS_ALL_CACHE = b'users:{user_id}:tasks:all'
 USERS_USERID_TASKS_TASKSID_CACHE= b'users:{user_id}/tasks/{task_id}'
 
-# Set Message in the Redis Server for testing
-r.set("Message01", "Hello World")
-r.set("Message02", "Hello World2")
-
-
-
 #GET API method function
 def get(userId, taskId, r):
     #connects to db
