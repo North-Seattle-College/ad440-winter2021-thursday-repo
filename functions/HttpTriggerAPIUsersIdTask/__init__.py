@@ -15,7 +15,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     method = req.method
     user_id = req.route_params.get('userId')
     count = req.params.get('count')
+    if (not count):
+        count = "10"
     page = req.params.get('page')
+    if (not page):
+        page = "1"
     redis_key = "users:" + user_id + ":tasks&count=" + count + "&page=" + page
 
     try:
