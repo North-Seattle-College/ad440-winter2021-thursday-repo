@@ -5,8 +5,9 @@ import azure.functions as func
 import json
 import redis
 
-#Global value to be used to invalidate GET,PUT, and DELETE for Redis Cache
+#Global value to be used to invalidate GET, PUT, and DELETE for Redis Cache
 ALL_USERS_KEY = b'users:all'
+CACHE_TOGGLE = os.environ["CACHE_TOGGLE"]
 
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
@@ -160,25 +161,32 @@ def get_user(conn, user_id, _redis):
 
 
 def get_user_cache(_redis):
-    try:
-        cache = _redis.get(ALL_USERS_KEY)
-        return cache
-    except TypeError as e:
-        logging.critical('Failed to fetch user from cache: ' + e.args[1])
-        return None
+    if CACHE_TOGGLE:
+        try:
+            cache = _redis.get(ALL_USERS_KEY)
+            return cache
+        except TypeError as e:
+            logging.critical('Failed to fetch user from cache: ' + e.args[1])
+            return None
+    else:
+        logging.info('Caching toggle is set to false. User data not from cache.')
 
 
 def clear_cache(_redis):
     _redis.flushdb()
+    logging.info("Cache cleared")
 
 
 def cache_user(_redis, user):
-    try:
-        _redis.set(ALL_USERS_KEY, json.dumps(user), ex=1200)
-        logging.info('Caching complete')
-    except TypeError as e:
-        logging.info('Caching failed')
-        logging.info(e.args[0])
+    if CACHE_TOGGLE:
+        try:
+            _redis.set(ALL_USERS_KEY, json.dumps(user), ex=1200)
+            logging.info('Caching complete')
+        except TypeError as e:
+            logging.info('Caching failed')
+            logging.info(e.args[0])
+    else:
+        logging.info('Caching toggle is set to false. User data not cached.')
 
 
 def update_user(user_req_body, conn, user_id, _redis):
@@ -342,4 +350,3 @@ def get_user_req_body(req):
 
 def canInvalidate(cache, user_user_id, user_id):
     return cache is not None and int(user_user_id) == int(user_id)
-    
