@@ -29,14 +29,22 @@ jobs:
           aws-region: "us-west-2"
       - name: installing serverless-artillery
         run: npm install -g serverless@1.38.0 serverless-artillery
-      
+      - name: Get current date and time
+        id: date
+        run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"
       - name: deploy, invoke, remove
         run: |
           ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
-          ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --stage $STAGE_NAME --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-api.json
+          ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-api.yml --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json
           ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
-
-      - name: upload to s3
-        run: |
-          cd test/aws
-          BUCKET_NAME='usersapitest' AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} node aws-deploy.js
+      - name: Upload file to bucket
+        uses: zdurham/s3-upload-github-action@master
+        with:
+          args: --acl public-read
+        env:
+          FILE: test/results/serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json
+          AWS_REGION: 'us-west-2'
+          S3_BUCKET: 'serverless-artillery'
+          S3_KEY: 'serverless-artillery-test-users-api-${{steps.date.outputs.date}}.json'
+          AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}

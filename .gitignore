@@ -110,7 +110,7 @@ dist
 test/artillery/report.json
 # Vscode
 
-.vscode
+
 .DS_Store
 DS_Store
 

@@ -5,5 +5,3 @@
 azure-functions
 pyodbc
 redis
-
-
