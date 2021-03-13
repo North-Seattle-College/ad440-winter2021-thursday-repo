@@ -1,8 +1,9 @@
 {
-  "azureFunctions.deploySubpath": "functions",
-  "azureFunctions.scmDoBuildDuringDeployment": true,
-  "azureFunctions.pythonVenv": ".venv",
-  "azureFunctions.projectLanguage": "Python",
-  "azureFunctions.projectRuntime": "~2",
-  "python.pythonPath": "/Users/farhadbahrehmand/opt/anaconda3/bin/python"
+    "azureFunctions.deploySubpath": "functions",
+    "azureFunctions.scmDoBuildDuringDeployment": true,
+    "azureFunctions.pythonVenv": ".venv",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~3",
+    "debug.internalConsoleOptions": "neverOpen",
+    "python.pythonPath": "C:\\Users\\mixma\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
 }
