@@ -63,7 +63,7 @@ paths:
     get:
       tags:
       - "users/{user_id}"
-      summary: "Get user by user_id"
+      summary: "Get a single user by user_id"
       description: ""
       operationId: "getUserByName"
       produces:
@@ -87,7 +87,7 @@ paths:
     put:
       tags:
       - "users/{user_id}"
-      summary: "Updated user"
+      summary: "Updated single user by user_id"
       description: "This can only be done by the logged in user."
       operationId: "updateUser"
       produces:
@@ -117,7 +117,7 @@ paths:
     delete:
       tags:
       - "users/{user_id}"
-      summary: "Delete user"
+      summary: "Delete a single user by user_id"
       description: "This can only be done by the logged in user."
       operationId: "deleteUser"
       produces:
@@ -138,7 +138,7 @@ paths:
     get:
       tags:
       - "/users/{user_id}/tasks"
-      summary: "Get all users"
+      summary: "Get all tasks from a specific user by user_id"
       description: ""
       parameters:
       - in: "path"
@@ -155,14 +155,12 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Task"
-        "400":
-          description: "Invalid username supplied"
-        "404":
-          description: "User not found"
+        "500":
+          description: "Internal server error"
     post:
       tags:
       - "/users/{user_id}/tasks"
-      summary: "Add a new task to the database"
+      summary: "Add a new task for a specific user to the database"
       description: ""
       operationId: "addTask"
       consumes:
@@ -184,8 +182,14 @@ paths:
         schema:
           $ref: "#/definitions/Task"
       responses:
-        "405":
-          description: "Invalid input"
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Task"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Internal server error"
     
   /users/{user_id}/tasks/{task_id}:
     get:
@@ -200,12 +204,12 @@ paths:
       parameters:
       - name: "user_id"
         in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
+        description: "The id of the user who owns the task."
         required: true
         type: "integer"
       - name: "task_id"
         in: "path"
-        description: "The task id that needs to be fetched. Use user1 for testing. "
+        description: "The task id that needs to be fetched."
         required: true
         type: "integer"
       responses:
@@ -229,12 +233,12 @@ paths:
       parameters:
       - name: "user_id"
         in: "path"
-        description: "name that need to be updated"
+        description: "The id of the user who owns the task."
         required: true
         type: "string"
       - name: "task_id"
         in: "path"
-        description: "The task id that needs to be fetched. Use user1 for testing. "
+        description: "The task id that will be updated."
         required: true
         type: "integer"
       - in: "body"
@@ -244,10 +248,12 @@ paths:
         schema:
           $ref: "#/definitions/User"
       responses:
-        "400":
-          description: "Invalid user supplied"
+        "200":
+          description: "Successful operation"
         "404":
           description: "User not found"
+        "500":
+          description: "Internal server error"
     delete:
       tags:
       - "users/{user_id}/tasks/{task_id}"
@@ -260,19 +266,21 @@ paths:
       parameters:
       - name: "user_id"
         in: "path"
-        description: "The name that needs to be deleted"
+        description: "The user id of the owner of the task that will be deleted"
         required: true
         type: "string"
       - name: "task_id"
         in: "path"
-        description: "The task id that needs to be fetched. Use user1 for testing. "
+        description: "The id of the task that will be deleted"
         required: true
         type: "integer"
       responses:
+        "200":
+          description: "Successful operation"
         "400":
-          description: "Invalid username supplied"
-        "404":
           description: "User not found"
+        "500":
+          description: "Internal server error"
 definitions:
   Task:
     type: "object"
