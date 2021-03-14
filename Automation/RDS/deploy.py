@@ -23,8 +23,9 @@ def deployTemplate():
 
     session = boto3.Session(
         aws_access_key_id=aws_access_key,
-        aws_secret_access_key=aws_access_secret,
+        aws_secret_access_key=aws_access_secret
     )
+    logging.info(session)
 
     try:
         rds_client = session.client('cloudformation', region_name='us-west-2')
@@ -33,7 +34,8 @@ def deployTemplate():
             TemplateURL="https://s3.us-west-2.amazonaws.com/cloudformation-templates-us-west-2/RDS_PIOPS.template"
         )
     except ClientError as e:
-        logging.error(e)
+        # logging.error(e)
+        raise e
     # return response_data
 
 def main():
