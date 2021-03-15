@@ -4,7 +4,11 @@ import logging
 import os
 import azure.functions as func
 import datetime
+import redis 
 
+
+
+redisFeature = 'true';
 
 # to handle datetime with JSON
 # It serialize datetime by converting it into string
@@ -25,6 +29,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     method = req.method
     user_id = req.route_params.get('userId')
 
+    
+
+
+
     try:
         conn = connect_to_db()
     except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
@@ -33,17 +41,30 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=500)
     logging.debug("Connected to DB successfuly!")
 
+    #Redis Sever
+
+    if(redisFeature):
+        try:
+            rDBpassword = os.enviorn["ENV_REDIS_KEY"]
+            rDBhost = os.environ["ENV_REDIS_HOST"]
+            rDBport = os.environ["ENV_REDIS_PORT"]
+            rDB = redis.Redis(host=rDBhost, port=rDBport, db=0, password=rDBpassword, ssl=True) 
+            rDB.ping()
+            logging.debug("Connected to Redis!")
+        except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
+                logging.error("Redis connection error!" + e.args[0])
+    
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
-            all_tasks_by_userId = get_user_tasks(conn, user_id)
+            all_tasks_by_userId = get_user_tasks(conn, user_id, rDB)
             logging.debug("tasks retrieved successfully!")
             return all_tasks_by_userId
 
         elif method == "POST":
             logging.debug("trying to add one task to tasks")
             task_req_body = req.get_json()
-            new_task_id = add_tasks(conn, task_req_body, user_id)
+            new_task_id = add_tasks(conn, task_req_body, user_id, rDB)
             logging.debug("task added successfully!")
             return new_task_id
 
@@ -61,6 +82,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 def connect_to_db():
     # Database credentials.
+    redisFeature = os.environ["CACHE_TOGGLE"]
     server = os.environ["ENV_DATABASE_SERVER"]
     database = os.environ["ENV_DATABASE_NAME"]
     username = os.environ["ENV_DATABASE_USERNAME"]
@@ -72,7 +94,7 @@ def connect_to_db():
     return pyodbc.connect(connection_string)
 
 
-def get_user_tasks(conn, userId):
+def get_user_tasks(conn, userId, rDB):
     with conn.cursor() as cursor:
         logging.debug("execute query")
         cursor.execute("SELECT * FROM tasks WHERE userId=?", userId)
@@ -86,15 +108,34 @@ def get_user_tasks(conn, userId):
         tasks = []
         columns = [column[0] for column in cursor.description]
 
+    if(redisFeature):
+        if(rDB.get('users:user_id:tasks:all')):
+            unpacked_tasks = json.loads(rDB.get('tasks'))
+            tasks = unpacked_tasks
+            logging.debug('Tasks loaded from Redis')
+
+        else:
+            logging.debug('No tasks in Redis')
+
+            for task in task_data:
+                tasks.append(dict(zip(columns, task)))
+
+            logging.debug("tasks received!!")
+
+            #RedisLoad
+            json_tasks = json.dumps(tasks);   
+            rDB.set('users:user_id:tasks:all', json_tasks)
+
+            return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
+    else:
         for task in task_data:
             tasks.append(dict(zip(columns, task)))
-
+            
         logging.debug("tasks received!!")
-
         return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
 
 
-def add_tasks(conn, task_req_body, user_id):
+def add_tasks(conn, task_req_body, user_id, rDB):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
     try:
@@ -104,6 +145,9 @@ def add_tasks(conn, task_req_body, user_id):
         logging.error("New user request body did not contain the necessary fields!")
         return func.HttpResponse(task_req_body_content_error.args[0], status_code=400)
     logging.debug("New task request body contains all the necessary fields!")
+
+    if(redisFeature):
+        rDB.expire('users:user_id:tasks:all')
 
     with conn.cursor() as cursor:
         # get task data
@@ -127,4 +171,5 @@ def add_tasks(conn, task_req_body, user_id):
         task_id = cursor.fetchval()
         logging.info(task_id)
         logging.debug("task with id {} added!".format(task_id))
+        
         return func.HttpResponse(json.dumps({task_id}, default=default), status_code=200, mimetype="application/json")

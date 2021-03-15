@@ -40,7 +40,7 @@
         "targetResourceGroup": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "nsc-functions-team1",
+            "defaultValue": "nsc-rg-dev-usw2-thursday",
             "metadata": {
                 "description": "Name of resource group for target function app"
             }
@@ -48,7 +48,7 @@
         "targetResourceId": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "nsc-functionsapp-team1",
+            "defaultValue": "nsc-fun-dev-usw2-thursday",
             "metadata": {
                 "description": "Resource ID of the resource emitting the metric that will be used for the comparison. For example /subscriptions/00000000-0000-0000-0000-0000-00000000/resourceGroups/ResourceGroupName/providers/Microsoft.compute/virtualMachines/VM_xyz"
             }
@@ -120,14 +120,14 @@
         },
         "actionResourceGroup": {
             "type": "string",
-            "defaultValue": "nataliasprint1test",
+            "defaultValue": "nsc-rg-dev-usw2-thursday",
             "metadata": {
                 "description": "The Resource Group containing the Action for Alert"
             }
         },
         "actionGroupId": {
             "type": "string",
-            "defaultValue": "application insights smart detection",
+            "defaultValue": "action_email_nsc_fun_dev_usw2_thursday_HttpTriggerAPIUsers",
             "metadata": {
                 "description": "The ID of the action group that is triggered when the alert is activated or deactivated"
             }
