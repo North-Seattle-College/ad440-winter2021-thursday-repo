@@ -40,3 +40,11 @@
   margin-left: 0.2rem;
   padding-left: 0.5rem;
 }
+
+.usertasksbuttons {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10px;
+
+  opacity: 0.9;
+}
