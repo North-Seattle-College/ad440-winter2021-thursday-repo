@@ -130,11 +130,9 @@ def add_user(conn, user_req_body, r):
         add_user_query = """
                          SET NOCOUNT ON;
                          DECLARE @NEWID TABLE(ID INT);
-
                          INSERT INTO dbo.users (firstName, lastName, email)
                          OUTPUT inserted.userId INTO @NEWID(ID)
                          VALUES(?, ?, ?);
-
                          SELECT ID FROM @NEWID
                          """
 

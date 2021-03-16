@@ -342,4 +342,3 @@ def get_user_req_body(req):
 
 def canInvalidate(cache, user_user_id, user_id):
     return cache is not None and int(user_user_id) == int(user_id)
-    
