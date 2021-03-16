@@ -1,6 +1,9 @@
 name: Artillery test for Lambda users api
 
-on: push
+on:
+  push:
+    branches:
+      - development
 
 jobs:
   art-aws-users-test:
