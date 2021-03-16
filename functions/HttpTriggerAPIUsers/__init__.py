@@ -68,44 +68,44 @@ def get_db_connection():
     return pyodbc.connect(connection_string)
 
 def get_users(conn, r):
-    try:
-        cache = get_users_cache(r)
-    except TypeError as e:
-        logging.info(e.args[0])    
+    if (CACHE_TOGGLE == "On"): # check cache first
+        try:
+            cache = get_users_cache(r)
+        except TypeError as e:
+            logging.info(e.args[0])    
 
-    if cache:
-        logging.info("Returned data from cache")
-        return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
-    else: 
-        if (CACHE_TOGGLE == "On"):
+        if cache:
+            logging.info("Returned data from cache")
+            return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
+        else:         
             logging.info("Cache is empty, querying database...")
-        with conn.cursor() as cursor:
-            logging.debug(
-                "Using connection cursor to execute query (select all from users)")
-            cursor.execute("SELECT * FROM users")
+           
+    with conn.cursor() as cursor:
+        logging.debug(
+            "Using connection cursor to execute query (select all from users)")
+        cursor.execute("SELECT * FROM users")
 
-            # Get users
-            logging.debug("Fetching all queried information")
-            users_table = list(cursor.fetchall())
+        # Get users
+        logging.debug("Fetching all queried information")
+        users_table = list(cursor.fetchall())
 
-            # Clean up to put them in JSON.
-            users_data = [tuple(user) for user in users_table]
+        # Clean up to put them in JSON.
+        users_data = [tuple(user) for user in users_table]
 
-            # Empty data list
-            users = []
+        # Empty data list
+        users = []
 
-            users_columns = [column[0] for column in cursor.description]
-            for user in users_data:
-                users.append(dict(zip(users_columns, user)))
+        users_columns = [column[0] for column in cursor.description]
+        for user in users_data:
+            users.append(dict(zip(users_columns, user)))
 
-            # users = dict(zip(columns, rows))
-            logging.debug(
-                "User data retrieved and processed, returning information from get_users function")
+        logging.debug(
+            "User data retrieved and processed, returning information from get_users function")
 
-            # Cache the results 
+        if (CACHE_TOGGLE == "On"): # Cache the results 
             cache_users(r, users)
 
-            return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
+        return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
         
 def add_user(conn, user_req_body, r):
     # First we want to ensure that the request has all the necessary fields
@@ -151,11 +151,12 @@ def add_user(conn, user_req_body, r):
         return func.HttpResponse(json.dumps({"userId": user_id}), status_code=200, mimetype="application/json")
 
 def init_redis():
-    REDIS_HOST = 'nsc-redis-dev-usw2-thursday.redis.cache.windows.net'
+    REDIS_HOST = os.environ['ENV_REDIS_HOST']
     REDIS_KEY = os.environ['ENV_REDIS_KEY']
+    REDIS_PORT = os.environ['ENV_REDIS_PORT']
 
     return redis.StrictRedis(host=REDIS_HOST,
-        port=6380, db=0, password=REDIS_KEY, ssl=True)
+        port=REDIS_PORT, db=0, password=REDIS_KEY, ssl=True)
 
 def cache_users(r, users):
     if (CACHE_TOGGLE == "On"):
