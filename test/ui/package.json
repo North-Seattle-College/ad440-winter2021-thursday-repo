@@ -1,0 +1,14 @@
+{
+  "name": "ui-tests",
+  "version": "1.0.0",
+  "description": "UI tests for the react portion of the cloud tasks app",
+  "scripts": {
+    "test-users": "node ui-tests-user.js",
+    "ui-test-taskid": "node ui-test-users-id-tasks-id.js"
+  },
+  "author": "Lenny Brown",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^8.0.0"
+  }
+}

@@ -22,7 +22,7 @@ jobs:
         run: |
           cd ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
           npm install
-          npm run build
+          CI='' npm run build
       - name: Upload To Azure Blob Storage
         uses: bacongobbler/azure-blob-storage-upload@v1.0.0
         with:

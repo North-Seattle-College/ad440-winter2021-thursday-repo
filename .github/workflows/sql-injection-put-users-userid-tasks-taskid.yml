@@ -1,0 +1,59 @@
+name: sql-injection-put-users-userid-tasks-taskid
+
+on: 
+  push:
+    # Action is called when a branch is merged with development
+    branches:
+      - development  
+
+jobs:
+  sql-injection-put-users-userid-tasks-taskid:
+    # Create ubuntu VM for actions
+    runs-on: ubuntu-latest 
+
+    steps:
+    #Checkout current repo
+    - name: 'Checkout Repository GitHub Action' 
+      uses: actions/checkout@v2
+
+    #Test endpoint with GET request to ensure it is still there
+    - name: 'GET curl'
+      run: | 
+        curl https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
+                        
+    #PUT Request with SQL Injection statement
+    - name: 'SQL Injection PUT on https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103'
+      run: |
+        curl -v -X PUT -d "{\"userId\": 1,
+                            \"user\": \"'OR'1'='1\",
+                            \"taskId\": 3103,
+                            \"title\": \"'; DROP TABLE users\",
+                            \"description\": \"Review and alter as needed\",
+                            \"createdDate\": \"2021-03-03 02:30:00.150000\",
+                            \"dueDate\": \"21/03/03 02:35:00\",
+                            \"completed\": 1,
+                            \"completedDate\": \"21/03/03 02:35:00\"
+                          }" https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103
+    
+    #Restores task back to normal state for next SQL Injection test.    
+    - name: 'Restore https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103'
+      run: |
+        curl -v -X PUT -d '{
+                            "userId": 1,
+                            "user": "Aidan Weber",
+                            "taskId": 3103,
+                            "title": "Alterarions",
+                            "description": "Review and alter as needed",
+                            "createdDate": "2021-03-03 02:30:00.150000",
+                            "dueDate": "21/03/03 02:35:00",
+                            "completed": 1,
+                            "completedDate": "21/03/03 02:35:00"
+                          }' https://nsc-fun-dev-usw2-thursday.azurewebsites.net/api/users/1/tasks/3103              
+
+
+ 
+
+ 
+ 
+
+ 
