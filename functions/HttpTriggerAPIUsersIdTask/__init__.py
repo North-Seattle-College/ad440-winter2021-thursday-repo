@@ -123,7 +123,7 @@ def get_user_tasks(conn, userId, rDB):
             logging.debug("tasks received!!")
 
             #RedisLoad
-            json_tasks = json.dumps(tasks);   
+            json_tasks = json.dumps(tasks, default=default);   
             rDB.set('users:user_id:tasks:all', json_tasks)
 
             return func.HttpResponse(json.dumps(tasks, default=default), status_code=200, mimetype="application/json")
