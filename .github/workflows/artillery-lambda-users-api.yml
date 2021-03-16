@@ -1,0 +1,28 @@
+name: Artillery test for Lambda users api
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  art-aws-users-test:
+    name: Artillery Lambda Users test
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_PREFIX: "~/.npm-global"
+      NODE_VERSION: '14'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          check-latest: true
+      - name: Install Artillery
+        run: npm install -g artillery
+      - name: Run Artillery Test on Lamda Users API
+        run: ~/.npm-global/bin/artillery run --output results.json ./test/artillery/artillery-test-users-api.yml
+
+      
