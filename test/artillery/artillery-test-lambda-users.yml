@@ -9,13 +9,13 @@ config:
   target: "https://mchfd7t6l4.execute-api.us-west-2.amazonaws.com"
   phases:
     - name: Warm Up
-      duration: 60
+      duration: 10
       arrivalRate: 2
     - name: Ramp up
-      duration: 120
+      duration: 10
       arrivalRate: 5
-      rampTo: 60
-      
+      rampTo: 10
+
 scenarios:
   - flow:
     - post:
