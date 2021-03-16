@@ -20,12 +20,12 @@ jobs:
       - name: Install Artillery
         run: npm install -g artillery
       - name: Run Artillery Test on Lamda Users API
-        run: ~/.npm-global/bin/artillery run --output ~/results.json ./test/artillery/artillery-test-lambda-users.yml
+        run: ~/.npm-global/bin/artillery run --output ./test/results/lambda_users_results.json ./test/artillery/artillery-test-lambda-users.yml
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
       - name: Rename results json
-        run: mv ~/results.json ~/lambda_users_${{ steps.date.outputs.date }}.json
+        run: mv ./test/results/lambda_users_results.json ./test/results/lambda_users_${{ steps.date.outputs.date }}.json
       - name: Upload report to Azure Blob Storage
         uses: azure/CLI@v1
         with:
@@ -34,7 +34,7 @@ jobs:
             pwd
             az storage blob upload \
               -c artillery \
-              -f $GITHUB_WORKSPACE/lambda_users_${{ steps.date.outputs.date }}.json \
+              -f ./test/results/lambda_users_${{ steps.date.outputs.date }}.json \
               -n lambda_users_${{ steps.date.outputs.date }}.json \
               --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}"
       
