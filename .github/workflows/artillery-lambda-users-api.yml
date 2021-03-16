@@ -32,7 +32,7 @@ jobs:
           inlineScript: |
             az storage blob upload \
               -c artillery \
-              -f ~/lambda_users_${{ steps.date.outputs.date }}.json \
+              -f $GITHUB_WORKSPACE/lambda_users_${{ steps.date.outputs.date }}.json \
               -n lambda_users_${{ steps.date.outputs.date }}.json \
               --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}"
       
