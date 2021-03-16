@@ -30,8 +30,6 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            ls
-            pwd
             az storage blob upload \
               -c artillery \
               -f ./test/results/lambda_users_${{ steps.date.outputs.date }}.json \
