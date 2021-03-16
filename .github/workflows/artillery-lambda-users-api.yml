@@ -1,9 +1,6 @@
 name: Artillery test for Lambda users api
 
-on:
-  push:
-    branches:
-      - development
+on: push
 
 jobs:
   art-aws-users-test:
@@ -23,6 +20,7 @@ jobs:
       - name: Install Artillery
         run: npm install -g artillery
       - name: Run Artillery Test on Lamda Users API
-        run: ~/.npm-global/bin/artillery run --output results.json ./test/artillery/artillery-test-users-api.yml
+        run: ~/.npm-global/bin/artillery run --output ~/results.json ./test/artillery/artillery-test-lambda-users.yml
+      - run: ls
 
       
