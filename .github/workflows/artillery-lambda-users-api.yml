@@ -25,14 +25,14 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
       - name: Rename results json
-        run: mv ~/results.json "~/lambda_users_${{ steps.date.outputs.date }}.json"
+        run: mv ~/results.json ~/lambda_users_${{ steps.date.outputs.date }}.json
       - name: Upload report to Azure Blob Storage
         uses: azure/CLI@v1
         with:
           inlineScript: |
             az storage blob upload \
               -c artillery \
-              -f "~/lambda_users_${{ steps.date.outputs.date }}.json" \
-              -n "lambda_users_${{ steps.date.outputs.date }}.json" \
+              -f ~/lambda_users_${{ steps.date.outputs.date }}.json \
+              -n lambda_users_${{ steps.date.outputs.date }}.json \
               --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}"
       
