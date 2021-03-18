@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/Kemet2016/ad440-winter2021-thursday-repo#readme",
   "dependencies": {
-    "aws-sdk": "^2.847.0",
+    "aws-sdk": "^2.853.0",
     "fs": "0.0.1-security"
   }
 }

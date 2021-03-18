@@ -169,7 +169,7 @@ def get_user_cache(_redis):
 
 
 def clear_cache(_redis):
-    _redis.flushdb()
+    _redis.delete(ALL_USERS_KEY)
 
 
 def cache_user(_redis, user):
@@ -295,6 +295,8 @@ def patch_user(user_req_body, conn, user_id, _redis):
 
 
 def delete_user(conn, user_id, _redis):
+    
+    clear_cache(_redis)
     try:
         with conn.cursor() as cursor:
             logging.debug('''
@@ -309,14 +311,6 @@ def delete_user(conn, user_id, _redis):
 
             logging.debug('User was deleted successfully!.')
 
-            cache = get_user_cache(_redis)
-            user = json.loads(cache)
-
-            #calls canInvalidate method
-            is_clearable = canInvalidate(cache, user['userId'], user_id)
-
-            if is_clearable:
-                clear_cache(_redis)
 
             respond = 'User deleted'
             statuse_code = 200
@@ -342,4 +336,3 @@ def get_user_req_body(req):
 
 def canInvalidate(cache, user_user_id, user_id):
     return cache is not None and int(user_user_id) == int(user_id)
-    

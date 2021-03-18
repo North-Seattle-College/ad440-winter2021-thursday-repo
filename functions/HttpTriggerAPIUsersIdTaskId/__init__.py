@@ -6,39 +6,73 @@ import logging
 import os
 import pyodbc
 import azure.functions as func
+import redis 
+
+# Connect to the Redis Server
+r = redis.StrictRedis(
+    host= os.environ['ENV_REDIS_HOST'], 
+    port=os.environ['ENV_REDIS_PORT'], 
+    db=0,
+    password= os.environ['ENV_REDIS_KEY'], 
+    ssl=True)
+
+# Global variables for Redis cache toggle and the invalidation of tasks all 
+CACHE_TOGGLE = os.environ["CACHE_TOGGLE"],
+USERS_USERID_TASKS_ALL_CACHE = b'users:{user_id}:tasks:all'
+USERS_USERID_TASKS_TASKSID_CACHE= b'users:{user_id}/tasks/{task_id}'
 
 #GET API method function
-def get(userId, taskId):
+def get(userId, taskId, r):
     #connects to db
+
     try:
         logging.debug('Attempting a db connection')
         cnxn = connect()
         cursor = cnxn.cursor() 
         logging.debug('opened connection')        
         logging.debug(f'Attempting to execute GET task query for task {taskId}')
-        #Get task title, description and user name by userId and taskId
-        #Avoids using SELECT * to prevent retuning unwanted unformation
-        sql_query = ("""SELECT tasks.userId, CONCAT (users.firstName, ' ', users.lastName) AS "user",
-                    tasks.taskId, tasks.title, tasks.description, tasks.createdDate, tasks.dueDate, 
-                    tasks.completed, tasks.completedDate 
-                    FROM [dbo].[tasks] JOIN [dbo].[users] 
-                    on [dbo].[tasks].userId = [dbo].[users].userId
-                    WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
-        cursor.execute(sql_query, userId, taskId)
-        logging.debug(f'Executed the GET query for {taskId}')          
-        row = cursor.fetchone()
-        logging.debug(f"Got result: {row}")
-        if not row:
-            logging.error('No record with the requested parameters')
-            return func.HttpResponse('Task not found', status_code=404)
+
+        try:
+            # Implments method to check cahce for users
+            cache = get_taskID_cache(r, userId, taskId)
+           
+        except TypeError as e:
+            logging.info(e.args[0])
+
+        if cache:
+            logging.info("Returned data from cache")
+            return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
+
         else:
-            columns = [column[0] for column in cursor.description]
-            data = dict(zip(columns, row))
-        return func.HttpResponse(json.dumps(data, default=str), status_code=200, mimetype="application/json")
+            #Get task title, description and user name by userId and taskId
+            #Avoids using SELECT * to prevent retuning unwanted unformation
+            sql_query = ("""SELECT tasks.userId, CONCAT (users.firstName, ' ', users.lastName) AS "user",
+                        tasks.taskId, tasks.title, tasks.description, tasks.createdDate, tasks.dueDate, 
+                        tasks.completed, tasks.completedDate 
+                        FROM [dbo].[tasks] JOIN [dbo].[users] 
+                        on [dbo].[tasks].userId = [dbo].[users].userId
+                        WHERE [dbo].[users].userId = ? AND [dbo].[tasks].taskId = ?""")
+            cursor.execute(sql_query, userId, taskId)
+            logging.debug(f'Executed the GET query for {taskId}')          
+            row = cursor.fetchone()
+            logging.debug(f"Got result: {row}")
+            if not row:
+                logging.error('No record with the requested parameters')
+                return func.HttpResponse('Task not found', status_code=404)
+            else:
+                columns = [column[0] for column in cursor.description]
+                data = dict(zip(columns, row))
+            
+            # Cache the data in the GET  
+            cache_users(r, data, userId, taskId)
+            return func.HttpResponse(json.dumps(data, default=str), status_code=200, mimetype="application/json")
+
     finally:
         cursor.close()
         cnxn.close()
         logging.debug('Closed the db connection')   
+
+
 
 #PUT API method function
 def update(userId, taskId, task_fields):
@@ -126,7 +160,7 @@ def patch(userId, taskId, task_fields):
         logging.debug('Closed the db connection')    
 
 #DELETE API method function
-def delete(userId, taskId):
+def delete(userId, taskId,r):
     #connects to db
     cnxn = connect()
     cursor = cnxn.cursor()
@@ -157,8 +191,8 @@ def delete(userId, taskId):
 #connect to db function
 def connect():
     try:
-        #creates connection string
-        conn_string = os.environ['ENV_DATABASE_CONNECTION_STRING']
+        # Connects to the 
+        conn_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
      
         #creates and returns connection variable
         try:         
@@ -239,13 +273,19 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
     #if GET method is selected, it executes here
         if method == "GET":  
-            logging.debug('Passed GET method')      
-            return (get(userId, taskId))
+            logging.debug('Passed GET method')  
+            # ADDED implementation of redis r=redis    
+            return (get(userId, taskId,r))
 
     #if DELETE method is selected, it executes here
         if method == "DELETE":
-            logging.debug('Passed DELETE method')   
-            return (delete(userId, taskId))
+            logging.debug('Passed DELETE method')  
+            
+            # Invalidate users tasks all call 
+            invalidate_users_tasks_all_cache(r)
+            
+            # ADDED implementation of redis r=redis 
+            return (delete(userId, taskId,r))
 
         #examines JSON passed by the client, required for PUT and PATCH execution
         req_body = {}
@@ -257,10 +297,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             pass
         task_fields = parse(req_body)
 
-        #if PUT method is selected, it executes here
+        #if PUT method is selected, it executes here 
         if method == "PUT":
-            logging.debug('Passed PUT method')   
-            return (update(userId, taskId, task_fields))
+            logging.debug('Passed PUT method')  
+            
+            # Invalidate users tasks all call 
+            invalidate_users_tasks_all_cache(r) 
+            
+            # ADDED implementation of redis r=redis
+            return (update(userId, taskId, task_fields,r))
 
         #if PATCH method is selected, it executes here
         elif method == "PATCH":
@@ -273,3 +318,33 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     #displays other erros, if any, encountered when API methods were called
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500) 
+
+# method to check if the request is already in the cache
+def get_taskID_cache(r, userId, taskId):
+    logging.info("Querying cache...")
+    key = "users:" + userId + ":tasks:" + taskId
+    # CACHE TOGGLE to turn off and on the cache for developers
+    if(CACHE_TOGGLE):
+        try:
+            cache = r.get(key)
+            return cache
+        except TypeError as e:
+            logging.critical("Failed to fetch from cache: " + e.args[1])
+            return None
+# Method to cache the users and tasks
+def cache_users(r, task, userId, taskId):
+    key = "users:" + userId + ":tasks:" + taskId
+    # CACHE TOGGLE to turn off and on the cache for developers
+    if(CACHE_TOGGLE):
+        try: 
+            r.set(key, json.dumps(task, default=str), ex=1200)   
+            logging.info("Caching complete")
+        except TypeError as e:
+            logging.info("Caching failed")
+            logging.info(e.args[0])
+
+# Invalidate users tasks all method
+def invalidate_users_tasks_all_cache(r):
+    r.delete(USERS_USERID_TASKS_ALL_CACHE)
+    logging.info("Cache Invalidated")
+
