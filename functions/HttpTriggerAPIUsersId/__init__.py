@@ -135,7 +135,7 @@ def get_user(conn, user_id, _redis):
                     '''
                   )
 
-                logging.info('Caching results...')
+                logging.info('Attempting to cache results...')
 
                 # Cache the results
                 cache_user(_redis, user)
@@ -161,7 +161,7 @@ def get_user(conn, user_id, _redis):
 
 
 def get_user_cache(_redis):
-    if CACHE_TOGGLE:
+    if CACHE_TOGGLE == "true":
         try:
             cache = _redis.get(ALL_USERS_KEY)
             return cache
@@ -178,7 +178,7 @@ def clear_cache(_redis):
 
 
 def cache_user(_redis, user):
-    if CACHE_TOGGLE:
+    if CACHE_TOGGLE == "true":
         try:
             _redis.set(ALL_USERS_KEY, json.dumps(user), ex=1200)
             logging.info('Caching complete')
