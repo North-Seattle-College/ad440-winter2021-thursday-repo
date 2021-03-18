@@ -6,6 +6,7 @@ import BackButton from '../../bootstrapBackButton/BootstrapBackButton.js';
 import PageTitle from '../../PageTitle/PageTitle.js'
 import {fetchSetTblState} from '../../../utils.js' 
 
+
 const UserTasks = () => {
   let state = [{
     title: '...Loading', 
@@ -14,11 +15,20 @@ const UserTasks = () => {
   let [userTasks, setUserTasks] = useState(state);
   let {userId} = useParams();
 
+
+
   useEffect(() => {
     const response = fetchSetTblState(`users/${userId}/tasks`, setUserTasks)
     .catch((error) => console.error(error))
   }, [userId]);
 
+  function deleteTask(taskId){
+    const messages = this.state.messages.filter((_, index) => index !== i)
+    this.setState({ messages });
+
+  }
+
+  let deleteTask = deleteTask(taskId);
   return (
     <>
       <BackButton />
@@ -28,9 +38,12 @@ const UserTasks = () => {
         ? <BootstrapTable heatherItems={Object.keys(userTasks[2][0])} rows={userTasks[2]} /> 
         : <h3>User {userId} Tasks Not Found</h3>
       }
+      <button onClick={this.deleteTask.bind(this)}>Delete Task</button>
       </Container>
     </>
   )
 }
+
+
 
 export default UserTasks;
