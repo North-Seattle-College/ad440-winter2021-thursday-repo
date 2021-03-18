@@ -28,7 +28,6 @@ const UserTasks = () => {
 
   }
 
-  let deleteTask = deleteTask(taskId);
   return (
     <>
       <BackButton />
@@ -38,7 +37,7 @@ const UserTasks = () => {
         ? <BootstrapTable heatherItems={Object.keys(userTasks[2][0])} rows={userTasks[2]} /> 
         : <h3>User {userId} Tasks Not Found</h3>
       }
-      <button onClick={this.deleteTask.bind(this)}>Delete Task</button>
+      <button onClick={() => this.deleteTask()}>Delete Task</button>
       </Container>
     </>
   )
