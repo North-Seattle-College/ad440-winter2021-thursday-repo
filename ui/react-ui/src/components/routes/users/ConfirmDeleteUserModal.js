@@ -5,14 +5,19 @@ import Button from 'react-bootstrap/Button';
 export function ConfirmDeleteUserModal(props) {
 
   const [user, setUser] = useState(props.user);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    setUser(props.user);
+    if (props.user)
+    {
+      setUser(props.user);
+      setShow(true);
+    }
   }, [props.user]);
 
   return (
     <>
-      <Modal show={user} onHide={props.handleClose}>
+      <Modal show={show} onHide={props.handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Delete User: </Modal.Title>
         </Modal.Header>
