@@ -5,6 +5,18 @@ on:
     branches:
       - development
 
+#   upload:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: bacongobbler/azure-blob-storage-upload@v1.1.1
+#         with:
+#           source_dir: _dist
+#           container_name: www
+#           connection_string: ${{ secrets.ConnectionString }}
+#           extra_args: '--pattern *.tar.gz'
+#           sync: false
+
 jobs:
   art-aws-users-test:
     name: Artillery Lambda Users id test
@@ -24,25 +36,17 @@ jobs:
         run: npm install -g artillery
       - name: Artillery Test with Lamda Users ID API
         run: ~/.npm-global/bin/artillery run --output ./test/results/lambda_users_results.json ./test/artillery/artillery-user-id-lambda.yml
+      - name: Grab current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
       - name: Rename results json
-        run: mv ./test/results/lambda_users_results.json ./test/results/lambda_users_${{ steps.outputs }}.json
+        run: mv ./test/results/lambda_users_results.json ./test/results/lambda_users_${{ steps.date.outputs.date }}.json
       - name: Upload report to Azure Blob Storage
         uses: azure/CLI@v1
         with:
           inlineScript: |
             az storage blob upload \
               -c artillery \
-              -f ./test/results/lambda_users_id_${{ steps.outputs }}.json \
-              -n lambda_users_id_${{ steps.outputs }}.json \
+              -f ./test/results/lambda_users_id_${{ steps.date.outputs.date }}.json \
+              -n lambda_users_id_${{ steps.date.outputs.date }}.json \
               --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}"
-
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#       - uses: bacongobbler/azure-blob-storage-upload@v1.1.1
-#         with:
-#           source_dir: _dist
-#           container_name: www
-#           connection_string: ${{ secrets.ConnectionString }}
-#           extra_args: '--pattern *.tar.gz'
-#           sync: false
