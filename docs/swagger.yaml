@@ -49,7 +49,7 @@ paths:
         description: "User object that will be submitted to create new user"
         required: true
         schema:
-          $ref: "#/definitions/User"
+          $ref: "{\"userId}\": 1759"
       responses:
         "200":
           description: "successful operation"
@@ -104,7 +104,7 @@ paths:
           $ref: "#/definitions/User"
       responses:
         "200":
-          description: "User successfully updated"
+          description: "User updated"
           schema:
             $ref: "#/definitions/User"
         "404":
@@ -133,7 +133,7 @@ paths:
           $ref: "#/definitions/User"
       responses:
         "200":
-          description: "User successfully updated"
+          description: "user updated successfully"
           schema:
             $ref: "#/definitions/User"
         "404":
@@ -156,7 +156,7 @@ paths:
         type: "string"
       responses:
         "200":
-          description: "User Successfully Deleted"
+          description: "User deleted"
         "400":
           description: "Delete Failed"
         "404":
@@ -204,10 +204,11 @@ paths:
         type: 'integer'
       - in: "body"
         name: "body"
-        description: "Task object that needs to be added to the store"
+        description: "\"title\" of task, and \"description\" of task are required"
         required: true
         schema:
           $ref: "#/definitions/Task"
+        
       responses:
         "200":
           description: "successful operation"
@@ -274,7 +275,7 @@ paths:
           $ref: "#/definitions/User"
       responses:
         "200":
-          description: "Successful operation"
+          description: "1"
         "404":
           description: "User not found"
         "500":
@@ -300,13 +301,13 @@ paths:
         type: "integer"
       - in: "body"
         name: "body"
-        description: "Updated user object"
+        description: "Updated task object. Note: All fields are optional."
         required: true
         schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/Task"
       responses:
         "200":
-          description: "Successful operation"
+          description: "1"
         "404":
           description: "User not found"
         "500":
@@ -332,7 +333,7 @@ paths:
         type: "integer"
       responses:
         "200":
-          description: "Successful operation"
+          description: "1"
         "400":
           description: "User not found"
         "500":
@@ -362,8 +363,7 @@ definitions:
         type: "string"
         format: "date-time"
       completed:
-        type: "integer"
-        format: "int32"
+        type: "string"
       completedDate:
         type: "string"
         format: "date-time"
