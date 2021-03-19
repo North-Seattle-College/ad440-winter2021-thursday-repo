@@ -1,4 +1,4 @@
-name: Lambda users-userid api
+name: Artillery-Test serverless-artillery-action-users-id-Lambda function
 
 on:
   push:
