@@ -51,7 +51,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return new_user_id_http_response
 
         else:
-            logging.warn(f"Request with method {method} has been recieved, but that is not allowed for this endpoint")
+            logging.warn(f"Request with method {method} has been received, but that is not allowed for this endpoint")
             return func.HttpResponse(status_code=405)
 
     #displays erros encountered when API methods were called
@@ -68,7 +68,7 @@ def get_db_connection():
     return pyodbc.connect(connection_string)
 
 def get_users(conn, r):
-    if (CACHE_TOGGLE == "On"): # check cache first
+    if (CACHE_TOGGLE): # check cache first
         try:
             cache = get_users_cache(r)
         except TypeError as e:
@@ -102,7 +102,7 @@ def get_users(conn, r):
         logging.debug(
             "User data retrieved and processed, returning information from get_users function")
 
-        if (CACHE_TOGGLE == "On"): # Cache the results 
+        if (CACHE_TOGGLE): # Cache the results 
             cache_users(r, users)
 
         return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
@@ -159,7 +159,7 @@ def init_redis():
         port=REDIS_PORT, db=0, password=REDIS_KEY, ssl=True)
 
 def cache_users(r, users):
-    if (CACHE_TOGGLE == "On"):
+    if (CACHE_TOGGLE):
         try: 
             logging.info("Caching results...")
             r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
@@ -169,7 +169,7 @@ def cache_users(r, users):
             logging.info(e.args[0])
 
 def get_users_cache(r):  
-    if (CACHE_TOGGLE == "On"):
+    if (CACHE_TOGGLE):
         logging.info("Querying cache...")
         try:
             cache = r.get(USERS_CACHE_KEY)
