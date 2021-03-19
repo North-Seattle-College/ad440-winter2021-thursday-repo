@@ -1,5 +1,6 @@
 config:
-
+  payload:
+    path: "./payloads/usersIdPayload.csv"
     fields:
       - "firstName"
       - "lastName"
@@ -7,8 +8,8 @@ config:
     skipHeader: true
   target: "https://mchfd7t6l4.execute-api.us-west-2.amazonaws.com"
   phases:
-    -
-      duration: 100
+    - name: Start
+      duration: 300
       arrivalRate: 10
 scenarios:
   - flow:
