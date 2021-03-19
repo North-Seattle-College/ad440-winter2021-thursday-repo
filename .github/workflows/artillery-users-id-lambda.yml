@@ -1,4 +1,4 @@
-name: Artillery test for Lambda users api
+name: Lambda users-id artillery test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   art-aws-users-test:
-    name: Artillery Lambda Users test
+    name: Lambda users-id artillery test
     runs-on: ubuntu-latest
     env:
       NPM_CONFIG_PREFIX: "~/.npm-global"
@@ -22,8 +22,8 @@ jobs:
           check-latest: true
       - name: Install Artillery
         run: npm install -g artillery
-      - name: Run Artillery Test on Lamda Users API
-        run: ~/.npm-global/bin/artillery run --output ./test/results/lambda_users_results.json ./test/artillery/artillery-user-id-lambda.yml
+      - name: Run the artillery-test on the users-is Lamda API
+        run: ~/.npm-global/bin/artillery run --output ./test/results/lambda_users_id_results.json ./test/artillery/artillery-user-id-lambda.yml
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
@@ -36,7 +36,7 @@ jobs:
             az storage blob upload \
               -c artillery \
               -f ./test/results/lambda_users_${{ steps.date.outputs.date }}.json \
-              -n lambda_users_${{ steps.date.outputs.date }}.json \
+              -n lambda_users_id_${{ steps.date.outputs.date }}.json \
               --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}"
 
 # name: Upload To Azure Blob Storage
