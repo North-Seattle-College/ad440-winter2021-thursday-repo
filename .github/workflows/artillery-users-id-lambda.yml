@@ -22,7 +22,7 @@ jobs:
           check-latest: true
       - name: Install Artillery
         run: npm install -g artillery
-      - name: Run Artillery Test on Lamda Users ID API
+      - name: Artillery Test with Lamda Users ID API
         run: ~/.npm-global/bin/artillery run --output ./test/results/lambda_users_results.json ./test/artillery/artillery-user-id-lambda.yml
       - name: Grab current date
         id: date
