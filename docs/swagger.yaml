@@ -13,7 +13,7 @@ host: "nsc-fun-dev-usw2-thursday.azurewebsites.net"
 
 schemes:
 - "https"
-- "http"
+
 paths:
   /users:
     get:
@@ -23,13 +23,14 @@ paths:
       description: ""
       operationId: "getUsers"
       produces:
-      - "application/xml"
       - "application/json"
       responses:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/User"
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
         "500":
           description: "Internal server error"
     post:
@@ -40,9 +41,7 @@ paths:
       operationId: "addUser"
       consumes:
       - "application/json"
-      - "application/xml"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
       - in: "body"
@@ -67,7 +66,6 @@ paths:
       description: ""
       operationId: "getUserByName"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
       - name: "user_id"
@@ -77,7 +75,7 @@ paths:
         type: "string"
       responses:
         "200":
-          description: "successful operation"
+          description: "User successfully found"
           schema:
             $ref: "#/definitions/User"
         "404":
@@ -87,16 +85,15 @@ paths:
     put:
       tags:
       - "users/{user_id}"
-      summary: "Updated single user by user_id"
-      description: "This can only be done by the logged in user."
+      summary: "Update single user by user_id"
+      description: "Update a user in the database by user_id"
       operationId: "updateUser"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
       - name: "user_id"
         in: "path"
-        description: "name that need to be updated"
+        description: "user that need to be updated"
         required: true
         type: "string"
       - in: "body"
@@ -107,7 +104,36 @@ paths:
           $ref: "#/definitions/User"
       responses:
         "200":
-          description: "successful operation"
+          description: "User successfully updated"
+          schema:
+            $ref: "#/definitions/User"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Internal Server Error"
+    patch:
+      tags:
+      - "users/{user_id}"
+      summary: "Update single user by user_id"
+      description: "Update a user in the database by user_id"
+      operationId: "patchUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "path"
+        description: "user that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: "User successfully updated"
           schema:
             $ref: "#/definitions/User"
         "404":
@@ -121,7 +147,6 @@ paths:
       description: "This can only be done by the logged in user."
       operationId: "deleteUser"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
       - name: "user_id"
@@ -131,9 +156,12 @@ paths:
         type: "string"
       responses:
         "200":
-          description: "User Deleted"
+          description: "User Successfully Deleted"
         "400":
           description: "Delete Failed"
+        "404":
+          description: "User Not Found"
+  
   /users/{user_id}/tasks:
     get:
       tags:
@@ -143,18 +171,19 @@ paths:
       parameters:
       - in: "path"
         name: "user_id"
-        description: "The user that needs to be fetched. Use user1 for testing. "
+        description: "The user that needs to be fetched. "
         required: true
         type: 'integer'
       operationId: "getTasks"
       produces:
-      - "application/xml"
       - "application/json"
       responses:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Task"
+            type: "array"
+            items:
+              $ref: "#/definitions/Task"
         "500":
           description: "Internal server error"
     post:
@@ -165,9 +194,7 @@ paths:
       operationId: "addTask"
       consumes:
       - "application/json"
-      - "application/xml"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
       - in: "path"
@@ -199,7 +226,6 @@ paths:
       description: ""
       operationId: "getTaskByName"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
       - name: "user_id"
@@ -224,11 +250,42 @@ paths:
     put:
       tags:
       - "users/{user_id}/tasks/{task_id}"
-      summary: "Updated user"
+      summary: "Update a user's task with PUT method"
       description: "This can only be done by the logged in user."
       operationId: "updateTask"
       produces:
-      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "path"
+        description: "The id of the user who owns the task."
+        required: true
+        type: "string"
+      - name: "task_id"
+        in: "path"
+        description: "The task id that will be updated."
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: "Successful operation"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Internal server error"
+    patch:
+      tags:
+      - "users/{user_id}/tasks/{task_id}"
+      summary: "Update a user's task with PATCH method"
+      description: "This can only be done by the logged in user."
+      operationId: "patchTask"
+      produces:
       - "application/json"
       parameters:
       - name: "user_id"
@@ -257,11 +314,10 @@ paths:
     delete:
       tags:
       - "users/{user_id}/tasks/{task_id}"
-      summary: "Delete user"
+      summary: "Delete a user"
       description: "This can only be done by the logged in user."
       operationId: "deleteTask"
       produces:
-      - "application/xml"
       - "application/json"
       parameters:
       - name: "user_id"
@@ -281,6 +337,7 @@ paths:
           description: "User not found"
         "500":
           description: "Internal server error"
+
 definitions:
   Task:
     type: "object"
@@ -310,9 +367,6 @@ definitions:
       completedDate:
         type: "string"
         format: "date-time"
-    xml:
-      name: "Task"
-      
   User:
     type: "object"
     properties:
@@ -325,5 +379,3 @@ definitions:
         type: "string"
       email:
         type: "string"
-    xml:
-      name: "User"
