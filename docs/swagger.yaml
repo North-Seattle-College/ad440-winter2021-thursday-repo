@@ -98,15 +98,13 @@ paths:
         type: "string"
       - in: "body"
         name: "body"
-        description: "Updated user object"
+        description: "Updated user object. required fields: firstName, lastName, email."
         required: true
         schema:
           $ref: "#/definitions/User"
       responses:
         "200":
           description: "User updated"
-          schema:
-            $ref: "#/definitions/User"
         "404":
           description: "User not found"
         "500":
@@ -133,9 +131,7 @@ paths:
           $ref: "#/definitions/User"
       responses:
         "200":
-          description: "user updated successfully"
-          schema:
-            $ref: "#/definitions/User"
+          description: "user updated successfully. Note: fields optional - only fields provided will be updated"
         "404":
           description: "User not found"
         "500":
