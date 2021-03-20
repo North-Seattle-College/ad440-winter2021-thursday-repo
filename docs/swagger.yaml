@@ -54,7 +54,7 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/CreateUser"
         "500":
           description: "Internal server error"
 
@@ -207,13 +207,12 @@ paths:
         description: "\"title\" of task, and \"description\" of task are required"
         required: true
         schema:
-          $ref: "#/definitions/Task"
-        
+          $ref: "#/definitions/CreateTask"
       responses:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Task"
+            $ref: "#/definitions/CreateTask"
         "404":
           description: "User not found"
         "500":
@@ -351,11 +350,10 @@ definitions:
       taskId:
         type: "integer"
         format: "int64"
+      title:
+        type: "string"
       description:
         type: "string"        
-      quantity:
-        type: "integer"
-        format: "int32"
       createdDate:
         type: "string"
         format: "date-time"
@@ -379,3 +377,21 @@ definitions:
         type: "string"
       email:
         type: "string"
+  CreateTask:
+    type: "object"
+    properties:
+      title:
+        type: "string"
+      description:
+        type: "string"   
+  CreateUser:
+    type: "object"
+    properties:
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"  
+      
+  
