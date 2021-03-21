@@ -68,6 +68,7 @@ def get_db_connection():
     
     return pyodbc.connect(connection_string)
 
+
 def get_users(conn, r, req):
     #instantate pagination variables 
     count = req.params.get('count')
@@ -78,6 +79,7 @@ def get_users(conn, r, req):
         page = "1"
     
     USERS_CACHE_KEY = "users:" + "&count=" + count + "&page=" + page
+
 
 
     if (CACHE_TOGGLE == "On"): # check cache first
@@ -91,6 +93,7 @@ def get_users(conn, r, req):
             return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
         else:         
             logging.info("Cache is empty, querying database...")
+
 
     #query database based on pagination variables
     start_index = (int(count) * int(page) - int(count))
@@ -120,13 +123,16 @@ def get_users(conn, r, req):
         for user in users_data:
             users.append(dict(zip(users_columns, user)))
 
+
         logging.debug(
             "User data retrieved and processed, returning information from get_users function")
 
         if (CACHE_TOGGLE == "On"): # Cache the results 
             cache_users(r, users)
 
+
         return func.HttpResponse(json.dumps(users, default=default), status_code=200, mimetype="application/json" )
+
         
 def add_user(conn, user_req_body, r):
     # First we want to ensure that the request has all the necessary fields

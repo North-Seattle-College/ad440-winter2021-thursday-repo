@@ -1,10 +1,9 @@
 import React from 'react';
-import Container from 'react-bootstrap/esm/Container';
 import Alert from 'react-bootstrap/esm/Alert';
 import Button from 'react-bootstrap/Button';
-import ReactTooltip from 'react-tooltip';
 import { withRouter, NavLink} from "react-router-dom";
 import './Home.css';
+import logo from '../home/collaborating.png';
 
 class Home extends React.Component {
   state = {
@@ -12,16 +11,23 @@ class Home extends React.Component {
     // every thing will be done automatically for you. ;)
     endpointsByMethods: {
       GET: [
-        {key: '/users', params: []}, 
-        {key: '/users/{userId}', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]},
-        {key: '/users/{userId}/tasks', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}]},
+        {key: '/users', params: [], renderType: ['/users']}, 
+        {key: '/users/{userId}', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}], renderType: ['/users/', '{userId}']},
+        {key: '/users/{userId}/tasks', params: [{key: 'userId', value: 0, type: 'number', regex: /{userId}/g}], renderType: ['/users/', '{userId}', '/tasks/']},
         {
           key: '/users/{userId}/tasks/{taskId}', 
           params: [
             {key: 'userId', value: 0, type: 'number', regex: /{userId}/g},
             {key: 'taskId', value: 0, type: 'number', regex: /{taskId}/g},
-          ]
+          ],
+          renderType: ['/users/', '{userId}', '/tasks', '{taskId}']
         }
+      ],
+      REPORTS: [
+        {key: '/reports/userId', params: [], renderType: ['/reports/userId']}, 
+        {key: '/reports/taskId', params: [], renderType: ['/reports/taskId']}, 
+        {key: '/reports/users', params: [], renderType: ['/reports/users']}, 
+        {key: '/reports/tasks', params: [], renderType: ['/reports/tasks']}
       ]
     },
     badInputAlert: '',
@@ -77,66 +83,66 @@ class Home extends React.Component {
   render() {
     var {endpointsByMethods, badInputAlert, emptyInputAlert} = this.state;
     var methods = Object.keys(endpointsByMethods);
-  //test results endpoints
-  let reportUserId = '/reports/userId';
-  let reportTaskId = '/reports/taskId';
-
-
-  let reportUsers = '/reports/users';
-  let reportTasks = '/reports/tasks';
-
 
     // what happens here is basically mapping over endpointsByMethods and rendering a method title, endpoints, and params
     return (
-      <Container className="text-center mt-5">
-        <h2 className='main-header'>Supported Endpoints:</h2>
-        <hr className='main-horizontal-rule'></hr>
-        {badInputAlert && <Alert variant="danger" onClose={() => this.setState({badInputAlert: ''})} dismissible>{badInputAlert}</Alert>}
-        {emptyInputAlert && <Alert variant="danger" onClose={() => this.setState({emptyInputAlert: ''})} dismissible>{emptyInputAlert}</Alert>}
-        {methods.map(method => {
-          return (
-            <div className='method-container' key={method}>
-              <h4 className='method-header'>{method}</h4>
-              {endpointsByMethods[method].map(endpoint => {
-                var triggerEndpointArgs = {method, endpointKey: endpoint.key};
-
-                return (
-                  <div className='endpoints-container' key={endpoint.key}>
-                    <ReactTooltip />
-                    <div className='endpoint-title' data-tip='Click to Trigger' onClick={() => this.triggerEndpoint(triggerEndpointArgs)}>{endpoint.key}</div>
-                    {endpoint.params.map((param, index) => {
-                      var handlePramInputChangeArgs = {method, endpointKey: endpoint.key, paramKey: param.key};
-
-                      return (
-                        <input 
-                          className='param-input' 
-                          id={`${endpoint.key}-${param.key}`} type='text' 
-                          placeholder={param.key} 
-                          key={index}
-                          onChange={(event) => this.handleParamInputChange({value: event.target.value, ...handlePramInputChangeArgs})}
-                        ></input>
-                      )
-                    })}
-                  </div>
-                )
-              })}
+      <div>
+        <div className="background"></div>
+          <h1 className='main-heading'>AD440 CLOUD COMPUTING</h1>
+            <div className="home-container">
+              <NavLink to={`/create`} onClick={null}>
+                <Button variant="success" size="lg">Create User</Button>
+              </NavLink>
+              <div className="box-wrapper">
+                <div className="box-left">
+                  <img src={logo} alt="Two people collaborating"></img>
+                </div>
+                <div className="box-right">
+                <h2 className='sub-header'>Endpoints</h2>
+                <hr></hr>
+                {badInputAlert && <Alert variant="danger" onClose={() => this.setState({badInputAlert: ''})} dismissible>{badInputAlert}</Alert>}
+                {emptyInputAlert && <Alert variant="danger" onClose={() => this.setState({emptyInputAlert: ''})} dismissible>{emptyInputAlert}</Alert>}
+                {methods.map(method => {
+                  return (
+                    <div className='method-container' key={method}>
+                      <h4 className='method-header'>{method}</h4>
+                      {endpointsByMethods[method].map(endpoint => {
+                        var triggerEndpointArgs = {method, endpointKey: endpoint.key};
+                        return (
+                          <div className='endpoints-container' key={endpoint.key}>
+                            <div className='endpoint-title'>
+                              {endpoint.renderType.map((type, index) => {
+                                if (['{userId}', '{taskId}'].includes(type)) {
+                                  var handlePramInputChangeArgs = {method, endpointKey: endpoint.key, paramKey: type.split(/([{, }])/)[2]};
+                                  return (
+                                    <input 
+                                      className='param-input' 
+                                      id={`${endpoint.key}-${type}`} type='text' 
+                                      placeholder={type} 
+                                      key={index}
+                                      onKeyDown={(event) => event.key === 'Enter' && this.triggerEndpoint(triggerEndpointArgs)}
+                                      onChange={(event) => this.handleParamInputChange({value: event.target.value, ...handlePramInputChangeArgs})}
+                                    ></input>
+                                  )
+                                }
+                                else {
+                                  return <div>{type}</div>
+                                }
+                              })}
+                            </div>
+                            <Button className='btn-send' onClick={() => this.triggerEndpoint(triggerEndpointArgs)}>Send</Button>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )
+                })}      
+              </div>
             </div>
-          )
-        })}
-        
-        <h2 style={{marginTop: '2rem'}}>Test Results Supported Endpoints</h2>
-
-        <hr/>
-        <p>{reportUserId}</p>
-        <p>{reportTaskId}</p>
-        <p>{reportUsers}</p>
-        <p>{reportTasks}</p>
-        <br />
-        <NavLink to={`/create`} onClick={null}>
-          <Button variant="primary" size="lg">Create User</Button>
-        </NavLink>
-      </Container>
-      
+            <br/>
+          <p className="copyright">&copy; 2021 | North Seattle College | Application Development | with Toddy Mladenov | <a href="https://northseattle.edu/" target="_blank">https://northseattle.edu</a></p>
+        </div>
+     </div> 
     )
   }
 }
