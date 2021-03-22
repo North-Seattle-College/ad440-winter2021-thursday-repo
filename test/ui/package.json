@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@types/puppeteer": "^5.4.3",
-    "jsdoc": "^3.6.6"
+    "jsdoc": "^3.6.6",
+    "jsdoc-to-markdown": "^7.0.0"
   }
 }
