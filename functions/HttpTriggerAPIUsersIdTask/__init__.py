@@ -48,14 +48,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
-            all_tasks_by_userId = get_user_tasks(conn, user_id, count, page, r, redis_key)
+            all_tasks_by_userId = get_user_tasks(conn, user_id, count, page, rDB, redis_key)
             logging.debug("tasks retrieved successfully!")
             return all_tasks_by_userId
 
         elif method == "POST":
             logging.debug("trying to add one task to tasks")
             task_req_body = req.get_json()
-            new_task_id = add_tasks(conn, task_req_body, user_id, r, redis_key)
+            new_task_id = add_tasks(conn, task_req_body, user_id, rDB, redis_key)
             logging.debug("task added successfully!")
             return new_task_id
 
