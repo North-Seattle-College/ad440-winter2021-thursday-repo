@@ -4,10 +4,12 @@ import * as fs from 'fs';
 
 const baseUrl = 'https://nscstrdevusw2thucommon.z5.web.core.windows.net';
 const endPoints = new Map();
-//endPoints.set('users', '/users');
+endPoints.set('users', '/users');
 endPoints.set('userId', '/users/{userId}');
 endPoints.set('tasks', '/users/{userId}/tasks');
 endPoints.set('taskId', '/users/{userId}/tasks/{taskId}');
+
+const selectors = ['h1', '.App']
 
 
 
@@ -15,22 +17,24 @@ endPoints.set('taskId', '/users/{userId}/tasks/{taskId}');
  * The Main UI test runner.
  * @param {String} url - The URL to navigate to.
  * @param {Iterable<String>} endpoints - An iterable of strings representing endpoints.
- * @param {Array<String>} selector - an array of selectors.
+ * @param {Array<String>} selectors - an array of selectors.
  * @param {Number} numRuns - Number of times to run the test. One run equal to one iteration through all endpoints.
  * @returns {PuppetInstance} - The puppeteer intance.
  */
-const runUiTest = async (url, endpoints, selector, resultDir, numRuns=10) => {
-  let errorArr = ['404', '400', '500', '401'];
+const runUiTest = async (url, endpoints, selectors, resultDir, numRuns=10) => {
+  const errorArr = ['404', '400', '500', '401', 'Failed To Render'];
   // convert Map to Object
-  let epObj = Array.from(endpoints).reduce((obj, [key,val]) => {
+  const epObj = Array.from(endpoints).reduce((obj, [key,val]) => {
     obj[key] = val;
     return obj;
   },{});
-  let resultsObj = {}
+  const resultsObj = {}
   // copy keys into resultsObj for perfLog['results']
   Object.keys(epObj).forEach((key) => {
     resultsObj[key] = [];
   });
+  //create key for home page metrics
+  resultsObj['home'] = [];
   // the main log object to be recorded.
   const perfLog = {
     'summary': {
@@ -39,10 +43,10 @@ const runUiTest = async (url, endpoints, selector, resultDir, numRuns=10) => {
       'totalTime': null,
       'avgRenderTime': null,
       'timeUnit': 'ms',
-      'errors': [],
-      'runsPerEP': numRuns,
-      'totalTests': numRuns * endpoints.size,
+      'runsPerPage': numRuns,
+      'totalTests': numRuns * endpoints.size + numRuns,
       'errorRatio': null,
+      'errors': [],
     },
     'results': resultsObj,
   };
@@ -51,37 +55,51 @@ const runUiTest = async (url, endpoints, selector, resultDir, numRuns=10) => {
   // run n amount of times equal to numRuns param
   let counter = 0;
   let epResult = {};
+  let homeDetails = {};
   let runDetails = {};
   let times = [];
   while (counter <= numRuns) {
+    let [homeTime, homeContent] = await timeRenderPerf(goToHomePage, [url, page]);
+    let homeScrShot = dateifyFileName(resultDir, 'home', 'png');
     for (let [epKey, endpoint] of endpoints) {
-      await goToHomePage(url, page);
+      await page.screenshot({path: homeScrShot});
       await fillInputs(page, endpoint);
       await goToEndpointPage(page, endpoint);
-      let [timeElapsed, selectorContent] = await timeRenderPerf(getSelectorContent, [page, selector]);
+      console.log(`Running UI Performance Test for: ${endpoint}`)
+      let [timeElapsed, selectorContent] = await timeRenderPerf(getSelectorContent, [page, ...selectors]);
+      console.log(`${endpoint} test complete`)
       let screenshotDir = dateifyFileName(resultDir, endpoint, 'png');
       await page.screenshot({path: screenshotDir});
-      //record test details
+      await goToHomePage(url, page);
+      // record endpoint metrics
       runDetails = {
         endpoint,
-        text: selectorContent.elemContent,
+        'text': selectorContent ? selectorContent.elemContent : 'Failed To Render',
         timeElapsed,
-        unit: 'ms',
-        scrshotPath: screenshotDir,
+        'unit': 'ms',
+        'scrShotPath': screenshotDir,
       };
-      // record error details if http error
-      console.log(selectorContent)
-      if (errorArr.includes(selectorContent.elemContent)) {
+      // record error details if http error or failure
+      if (errorArr.includes(runDetails.text)) {
         epResult = {
           endpoint,
-          'httpError': selectorContent.elemContent,
+          'httpError': runDetails.text,
           'runNumber': counter,
           timeElapsed,
         };
         perfLog.summary.errors.push(epResult);
       };
       perfLog.results[epKey].push(runDetails)
+      times.push(homeTime);
       times.push(timeElapsed);
+    };
+    // record home page metrics
+    homeDetails = {
+      'endpoint': '/',
+      'text': homeContent,
+      'timeElapsed': homeTime,
+      'unit': 'ms',
+      'scrShotPath': homeScrShot,  
     };
     counter += 1
   };
@@ -111,15 +129,14 @@ const timeRenderPerf = async (callback, params=[]) => {
   let endTime;
   if (params.length) {
     startTime = Date.now();
-    cbReturn = await callback(...params);
+    cbReturn = await callback(...params).catch(error => console.error(error));
     endTime = Date.now()
   } else {
     startTime = Date.now()
-    cbReturn = await callback();
+    cbReturn = await callback(error => console.error(error));
     endTime = Date.now()
 }
   timeElapsed = (endTime - startTime)
-  console.log(cbReturn)
   return [timeElapsed, cbReturn]
 };
 
@@ -151,5 +168,5 @@ const dateifyFileName = (directory, name, extension) => {
     .replace(/\//g, '-')}-${new Date(Date.now()).toISOString()}.${extension}`
 }
 
-runUiTest(baseUrl, endPoints, 'h1', `../results/ui-test-results/`, 5)
-  .catch(error => console.log(error));
+runUiTest(baseUrl, endPoints, selectors, `../results/ui-test-results/`, 40)
+  .catch(error => console.error(error));

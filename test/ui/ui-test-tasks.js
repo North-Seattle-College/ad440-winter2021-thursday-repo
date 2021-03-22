@@ -5,17 +5,15 @@ import page from 'puppeteer';
 /**
  * Starts instance of headless chrome.
  * Returns the browser and page objects.
- * @typedef {Object} PuppetInstance
+ * @typedef {object} PuppetInstance
  * @property {browser} browser - The puppeteer Browser Object
  * @property {page} page - The puppeteer Page object
  * @param {String} url - The URL to navigate to.
- * @return {PuppetInstance} - The puppeteer intance
+ * @returns {PuppetInstance} - The puppeteer intance
  */
 export const startBrowser = async () => {
   console.log(`Launching Headless Chrome`);
-  const browser = await puppeteer.launch({
-    headless: false
-  });
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
   return {browser, page};
 };
@@ -24,7 +22,7 @@ export const startBrowser = async () => {
  * Navigates to the url and waits for initial selector.
  * @param {String} url - The URL to navigate to.
  * @param {page} page - The Puppeteer Page Object.
- * @return {void} - void
+ * @returns - Void
  */
 export const goToHomePage = async (url, page) => {
   console.log(`Making request to ${url}`);
@@ -37,11 +35,12 @@ export const goToHomePage = async (url, page) => {
 };
 
 /**
- * Fills in forms for endpoint that is being tested 
- * @param {page} page - The puppeteer page object
+ * Fills in forms for endpoint that is being tested
+ * @typedef {object} Page
+ * @param {Page} page - The puppeteer page object
  * @param {String} endpoint - The endpoint to test     
  * @param {String} selector - the document selector to retreive contents of
- * @return {void} void
+ * @returns - Void
  */
 export const fillInputs = async (page, endpoint) => {
   const idArr = getIdParams(endpoint);
@@ -83,7 +82,7 @@ export const fillInputs = async (page, endpoint) => {
  * element to go the the endpoint page.
  * @param {Page} page - The puppeteer page object
  * @param {string} endpoint - The endpoint to test     
- * @return {void} void
+ * @returns {void} void
  */
 export const goToEndpointPage = async (page, endpoint) => {
   await page.evaluate((endpoint) => {
@@ -113,7 +112,6 @@ export const goToEndpointPage = async (page, endpoint) => {
     let titles = document.querySelectorAll('.endpoint-title');
     titles.forEach((title) => {
       if (lookUpArr.includes(title.textContent.trim())) {
-        console.log(`Submitting Values For ${endpoint}`);
         title.parentElement.children[1].click();
       };
     });
@@ -123,18 +121,21 @@ export const goToEndpointPage = async (page, endpoint) => {
 /**
  * Gets the innerText of the specified selector.
  * @param {Page} page - The puppeteer page object   
- * @param {String} selector - the document selector to retreive contents of
- * @return {string} - the text content of HTML element
+ * @param {String} contentSelector - the document selector to retreive contents of
+ * @param {String} targetSelector - the document selector to detect re-render on
+ * @returns {String} - the text content of HTML element
  */
-export const getSelectorContent = async (page, selector) => {
-  console.log(`Getting Contents of ${selector}`);
-  await page.waitForSelector(selector);
+export const getSelectorContent = async (page, contentSelector, targetSelector) => {
+  console.log(`Getting Contents of ${contentSelector}`);
+  await page.waitForSelector(targetSelector);
   //get the selector
-  const element = await page.$(selector);
+  const targetElement = await page.$(targetSelector);
+  const contentElement = await page.$(contentSelector);
    // evaluates callback function in browser window.
    // passes the retreived element from above as first arg.
-  const elemContent = await element.evaluate(async (elem) => {
-    
+  const elemContent = await targetElement.evaluate(async (targetElem, contentElem) => {
+    console.log(targetElem);
+    console.log(contentElem);
      // Returns Promise to await for the first page's re-render
      // then retreives the innerText of the element. This avoids
      // returning and undefined elemContent.
@@ -151,19 +152,19 @@ export const getSelectorContent = async (page, selector) => {
       const waitForMutatedValue = (mutationEl, targetEl) => {
         let elInnerText;
         const observer = new MutationObserver((mutationsList, observer) => {
-          console.log(mutationsList);
-          elInnerText = targetEl.innerText;
-          console.log(elInnerText);
+          if(targetEl) {
+            elInnerText = targetEl.innerText;
+          }
           resolve(elInnerText);
         });
         observer.observe(mutationEl, {subtree: true, childList: true});
       };
-      waitForMutatedValue(body, elem);
+      waitForMutatedValue(targetElem, contentElem);
       setTimeout(() => {
         reject('Timeout');
       }, 30000);
     });
-  });
+  }, contentElement);
   return {elemContent};
 };
 
@@ -171,7 +172,7 @@ export const getSelectorContent = async (page, selector) => {
  * splits and filters the endpoint string. Returns an array 
  * of the endpoints that need integers as a parameter.
  * @param {string} endpoint - the endpoint string
- * @return {Array} - An array with endpoint params that need an integer value
+ * @returns {Array<String>} - An array with endpoint params that need an integer value
  */
 const getIdParams = (endpoint) => {
   let epArr = endpoint.split(/[{}]/);
