@@ -2,7 +2,11 @@ import json
 import pyodbc
 import logging
 import os
+import redis
 import azure.functions as func
+
+USERS_CACHE_KEY = b'users:all'
+CACHE_TOGGLE = os.environ["CACHE_TOGGLE"]
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
@@ -20,24 +24,30 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn = get_db_connection()
     except (pyodbc.DatabaseError, pyodbc.InterfaceError) as e:
         logging.critical("Failed to connect to DB: " + e.args[0])
-        logging.debug("Error: " + e.args[1])
+        logging.info("Error: " + e.args[1])
         return func.HttpResponse(status_code=500)
         
     logging.debug("Connection to DB successful!")
 
+    # If DB doesn't already have a users table, create it
+    create_users_table(conn)
+
+    # Initiate connection to Redis Cache
+    r = init_redis()
+
     try:
         # Return results according to the method
         if method == "GET":
-            logging.debug("Attempting to retrieve users...")
-            all_users_http_response = get_users(conn)
-            logging.debug("Users retrieved successfully!")
+            logging.info("Attempting to retrieve users...")
+            all_users_http_response = get_users(conn, r)
+            logging.info("Users retrieved successfully!")
             return all_users_http_response
 
         elif method == "POST":
-            logging.debug("Attempting to add user...")
+            logging.info("Attempting to add user...")
             user_req_body = req.get_json()
-            new_user_id_http_response = add_user(conn, user_req_body)
-            logging.debug("User added successfully!")
+            new_user_id_http_response = add_user(conn, user_req_body, r)
+            logging.info("User added successfully!")
             return new_user_id_http_response
 
         else:
@@ -51,24 +61,25 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         conn.close()
         logging.debug('Connection to DB closed')
 
-
 def get_db_connection():
-    # Database credentials.
-    server = os.environ["ENV_DATABASE_SERVER"]
-    database = os.environ["ENV_DATABASE_NAME"]
-    username = os.environ["ENV_DATABASE_USERNAME"]
-    password = os.environ["ENV_DATABASE_PASSWORD"]
-
-    # Define driver
-    driver = '{ODBC Driver 17 for SQL Server}'
-
-    # Define the connection string
-    connection_string = "Driver={};Server={};Database={};Uid={};Pwd={};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;".format(
-        driver, server, database, username, password)
-
+    # Connection String
+    connection_string = os.environ["ENV_DATABASE_CONNECTION_STRING"]
+    
     return pyodbc.connect(connection_string)
 
-def get_users(conn):
+def get_users(conn, r):
+    if (CACHE_TOGGLE == "On"): # check cache first
+        try:
+            cache = get_users_cache(r)
+        except TypeError as e:
+            logging.info(e.args[0])    
+
+        if cache:
+            logging.info("Returned data from cache")
+            return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
+        else:         
+            logging.info("Cache is empty, querying database...")
+           
     with conn.cursor() as cursor:
         logging.debug(
             "Using connection cursor to execute query (select all from users)")
@@ -88,12 +99,15 @@ def get_users(conn):
         for user in users_data:
             users.append(dict(zip(users_columns, user)))
 
-        # users = dict(zip(columns, rows))
         logging.debug(
             "User data retrieved and processed, returning information from get_users function")
-        return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
 
-def add_user(conn, user_req_body):
+        if (CACHE_TOGGLE == "On"): # Cache the results 
+            cache_users(r, users)
+
+        return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
+        
+def add_user(conn, user_req_body, r):
     # First we want to ensure that the request has all the necessary fields
     logging.debug("Testing the add new user request body for necessary fields...")
     try:
@@ -101,7 +115,7 @@ def add_user(conn, user_req_body):
         assert "lastName" in user_req_body, "New user request body did not contain field: 'lastName'"
         assert "email" in user_req_body, "New user request body did not contain field: 'email'"
     except AssertionError as user_req_body_content_error:
-        logging.error("New user request body did not contain the necessary fields!")
+        logging.critical("New user request body did not contain the necessary fields!")
         return func.HttpResponse(user_req_body_content_error.args[0], status_code=400)
     
     logging.debug("New user request body contains all the necessary fields!")
@@ -116,11 +130,9 @@ def add_user(conn, user_req_body):
         add_user_query = """
                          SET NOCOUNT ON;
                          DECLARE @NEWID TABLE(ID INT);
-
                          INSERT INTO dbo.users (firstName, lastName, email)
                          OUTPUT inserted.userId INTO @NEWID(ID)
                          VALUES(?, ?, ?);
-
                          SELECT ID FROM @NEWID
                          """
 
@@ -131,7 +143,67 @@ def add_user(conn, user_req_body):
 
         # Get the user id from cursor
         user_id = cursor.fetchval()
+
+        clear_users_cache(r)
         
         logging.debug(
             "User added and new user id retrieved, returning information from add_user function")
         return func.HttpResponse(json.dumps({"userId": user_id}), status_code=200, mimetype="application/json")
+
+def init_redis():
+    REDIS_HOST = os.environ['ENV_REDIS_HOST']
+    REDIS_KEY = os.environ['ENV_REDIS_KEY']
+    REDIS_PORT = os.environ['ENV_REDIS_PORT']
+
+    return redis.StrictRedis(host=REDIS_HOST,
+        port=REDIS_PORT, db=0, password=REDIS_KEY, ssl=True)
+
+def cache_users(r, users):
+    if (CACHE_TOGGLE == "On"):
+        try: 
+            logging.info("Caching results...")
+            r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
+            logging.info("Caching complete")
+        except Exception as e:
+            logging.info("Caching failed")
+            logging.info(e.args[0])
+
+def get_users_cache(r):  
+    if (CACHE_TOGGLE == "On"):
+        logging.info("Querying cache...")
+        try:
+            cache = r.get(USERS_CACHE_KEY)
+            return cache
+        except Exception as e:
+            logging.critical("Failed to fetch from cache: " + e.args[1])
+            return None
+
+def clear_users_cache(r):
+    r.delete(USERS_CACHE_KEY)
+    logging.info("Cache cleared")
+
+def create_users_table(conn):
+    cursor = conn.cursor()
+    
+    # First check to see if the table already exists
+    tables = "tables: "
+    for row in cursor.tables(tableType="TABLE"):
+        tables += row.table_name
+        tables += " "
+    logging.debug(tables)
+
+    if "users" not in tables:
+        cursor.execute('''
+            CREATE TABLE users (
+                    userId INTEGER PRIMARY KEY IDENTITY,
+                    firstName TEXT NOT NULL,
+                    lastName  TEXT NOT NULL,
+                    email TEXT NULL,            
+            );
+               ''')
+
+    columns = "users columns: "
+    for column in cursor.columns(table="users"):
+        columns += column.column_name
+        columns += " "
+    logging.debug(columns)

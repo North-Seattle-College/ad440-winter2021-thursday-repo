@@ -1,0 +1,30 @@
+config:
+  payload:
+    path: "./payloads/usersPayload.csv"
+    fields:
+      - "firstName"
+      - "lastName"
+      - "email"
+    skipHeader: true
+  target: "https://mchfd7t6l4.execute-api.us-west-2.amazonaws.com"
+  phases:
+    - name: Warm Up
+      duration: 60
+      arrivalRate: 2
+    - name: Ramp up
+      duration: 120
+      arrivalRate: 5
+      rampTo: 60
+
+scenarios:
+  - flow:
+    - post:
+        url: "/users"
+        json:
+          firstName: "{{ firstName }}"
+          lastName: "{{ lastName }}"
+          email: "{{ email }}"
+    - get:
+        url: "/users"
+      
+
