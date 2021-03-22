@@ -2,6 +2,7 @@ import json
 import pyodbc
 import logging
 import os
+import datetime
 import redis
 import azure.functions as func
 
@@ -39,7 +40,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Return results according to the method
         if method == "GET":
             logging.info("Attempting to retrieve users...")
-            all_users_http_response = get_users(conn, r)
+            all_users_http_response = get_users(conn, r, req)
             logging.info("Users retrieved successfully!")
             return all_users_http_response
 
@@ -67,7 +68,20 @@ def get_db_connection():
     
     return pyodbc.connect(connection_string)
 
-def get_users(conn, r):
+
+def get_users(conn, r, req):
+    #instantate pagination variables 
+    count = req.params.get('count')
+    if (not count):
+        count = "10"
+    page = req.params.get('page')
+    if (not page):
+        page = "1"
+    
+    USERS_CACHE_KEY = "users:" + "&count=" + count + "&page=" + page
+
+
+
     if (CACHE_TOGGLE == "On"): # check cache first
         try:
             cache = get_users_cache(r)
@@ -79,11 +93,21 @@ def get_users(conn, r):
             return func.HttpResponse(cache.decode('utf-8'), status_code=200, mimetype="application/json")
         else:         
             logging.info("Cache is empty, querying database...")
+
+
+    #query database based on pagination variables
+    start_index = (int(count) * int(page) - int(count))
+    sql_query = "SELECT * FROM tasks ORDER BY taskId OFFSET " + str(start_index) + " ROWS FETCH NEXT " + str(count) + " ROWS ONLY"
+        
            
     with conn.cursor() as cursor:
         logging.debug(
-            "Using connection cursor to execute query (select all from users)")
-        cursor.execute("SELECT * FROM users")
+            "Using connection cursor to execute query (select " + count + " from users page " + page)
+         
+        try:
+            cursor.execute(sql_query)
+        except Exception as e:
+            logging.info("Error: " + e.args[1])
 
         # Get users
         logging.debug("Fetching all queried information")
@@ -99,13 +123,16 @@ def get_users(conn, r):
         for user in users_data:
             users.append(dict(zip(users_columns, user)))
 
+
         logging.debug(
             "User data retrieved and processed, returning information from get_users function")
 
         if (CACHE_TOGGLE == "On"): # Cache the results 
             cache_users(r, users)
 
-        return func.HttpResponse(json.dumps(users), status_code=200, mimetype="application/json")
+
+        return func.HttpResponse(json.dumps(users, default=default), status_code=200, mimetype="application/json" )
+
         
 def add_user(conn, user_req_body, r):
     # First we want to ensure that the request has all the necessary fields
@@ -150,6 +177,12 @@ def add_user(conn, user_req_body, r):
             "User added and new user id retrieved, returning information from add_user function")
         return func.HttpResponse(json.dumps({"userId": user_id}), status_code=200, mimetype="application/json")
 
+# to handle datetime with JSON
+# It serialize datetime by converting it into string
+def default(dateHandle):
+  if isinstance(dateHandle, (datetime.datetime, datetime.date)):
+    return dateHandle.isoformat()
+
 def init_redis():
     REDIS_HOST = os.environ['ENV_REDIS_HOST']
     REDIS_KEY = os.environ['ENV_REDIS_KEY']
@@ -162,7 +195,7 @@ def cache_users(r, users):
     if (CACHE_TOGGLE == "On"):
         try: 
             logging.info("Caching results...")
-            r.set(USERS_CACHE_KEY, json.dumps(users), ex=1200)   
+            r.set(USERS_CACHE_KEY, json.dumps(users ,default=default), ex=1200)   
             logging.info("Caching complete")
         except Exception as e:
             logging.info("Caching failed")

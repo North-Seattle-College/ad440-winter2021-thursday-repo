@@ -30,7 +30,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=500)
     logging.debug("Connected to DB successfuly!")
 
-    r = init_redis()
+
+    #Redis Sever
+
+    if(redisFeature):
+        try:
+            rDBpassword = os.environ["ENV_REDIS_KEY"]
+            rDBhost = os.environ["ENV_REDIS_HOST"]
+            rDBport = os.environ["ENV_REDIS_PORT"]
+            rDB = redis.Redis(host=rDBhost, port=rDBport, db=0, password=rDBpassword, ssl=True) 
+            rDB.ping()
+            logging.debug("Connected to Redis!")
+        except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
+                logging.error("Redis connection error!" + e.args[0])
+
     
     try:
         if method == "GET":
@@ -94,7 +107,9 @@ def get_user_tasks(conn, userId, count, page, r, redis_key):
         # Empty data list
         tasks = []
 
+
         columns = [column[0] for column in cursor.description]
+
         for task in task_data:
             tasks.append(dict(zip(columns, task)))
             
