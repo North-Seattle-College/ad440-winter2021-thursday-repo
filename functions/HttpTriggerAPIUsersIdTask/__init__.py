@@ -32,7 +32,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 
     #Redis Sever
-
+    rDB = None
+    
     if(redisFeature):
         try:
             rDBpassword = os.environ["ENV_REDIS_KEY"]
