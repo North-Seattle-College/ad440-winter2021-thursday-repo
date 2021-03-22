@@ -13,7 +13,9 @@ import page from 'puppeteer';
  */
 export const startBrowser = async () => {
   console.log(`Launching Headless Chrome`);
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    headless: false
+  });
   const page = await browser.newPage();
   return {browser, page};
 };
@@ -31,7 +33,7 @@ export const goToHomePage = async (url, page) => {
     width: 1920,
     height: 1080,
   });
-  await page.waitForSelector('.container');
+  await page.waitForSelector('.param-input');
 };
 
 /**
@@ -52,7 +54,7 @@ export const fillInputs = async (page, endpoint) => {
   await page.evaluate(async ({endpoint, idArr}) => {
     elemArr = [];
     idArr.forEach((id) => {
-      let inputElem = document.getElementById(endpoint + '-' + id);
+      let inputElem = document.getElementById(`${endpoint}-{${id}}`);
       elemArr.push(inputElem);
     });
     /**
@@ -66,7 +68,7 @@ export const fillInputs = async (page, endpoint) => {
      * to the event handler.
      */
     elemArr.forEach((element) => {
-      let randId = Math.floor(Math.random() * Math.floor(1000));
+      let randId = Math.floor(Math.random() * Math.floor(1000) + 1);
       const inputValSetter = Object
         .getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
       inputValSetter.call(element, randId);
@@ -85,11 +87,34 @@ export const fillInputs = async (page, endpoint) => {
  */
 export const goToEndpointPage = async (page, endpoint) => {
   await page.evaluate((endpoint) => {
+    /**
+     * split endpoint to create lookup array of different formats.
+     * Used to determine which div contains the 
+     * button to create click event on.
+     */
+    let endPointArr = endpoint.split(/[{}]/);
+    let lookUpText;
+    let lookUpArr;
+    if (endPointArr[endPointArr.length - 1] === '') {
+      endPointArr.pop();
+    }
+    // set values of lookup array
+    if (endPointArr.length < 3){
+      lookUpText = endPointArr[0];
+      lookUpArr = [lookUpText]; 
+    } else {
+      lookUpText = endPointArr[0]+endPointArr[2];
+      lookUpArr = [
+      lookUpText.trim(),
+      lookUpText.trim().substring(0, lookUpText.length - 1),
+      lookUpText.trim() + '/'
+      ];
+    }
     let titles = document.querySelectorAll('.endpoint-title');
     titles.forEach((title) => {
-      if(endpoint.trim() === title.textContent.trim()) {
+      if (lookUpArr.includes(title.textContent.trim())) {
         console.log(`Submitting Values For ${endpoint}`);
-        title.click();
+        title.parentElement.children[1].click();
       };
     });
   }, endpoint);
@@ -139,7 +164,7 @@ export const getSelectorContent = async (page, selector) => {
       }, 30000);
     });
   });
-  return elemContent;
+  return {elemContent};
 };
 
 /**
