@@ -6,7 +6,7 @@ import azure.functions as func
 import datetime
 import redis 
 
-redisFeature = os.environ["CACHE_TOGGLE"]
+redisFeature = os.environ["CACHE_TOGGLE"] == True
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
