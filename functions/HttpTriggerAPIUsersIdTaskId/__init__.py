@@ -16,15 +16,10 @@ r = redis.StrictRedis(
     password= os.environ['ENV_REDIS_KEY'], 
     ssl=True)
 
+# Global variables for Redis cache toggle and the invalidation of tasks all 
 CACHE_TOGGLE = os.environ["CACHE_TOGGLE"],
 USERS_USERID_TASKS_ALL_CACHE = b'users:{user_id}:tasks:all'
 USERS_USERID_TASKS_TASKSID_CACHE= b'users:{user_id}/tasks/{task_id}'
-
-# Set Message in the Redis Server for testing
-r.set("Message01", "Hello World")
-r.set("Message02", "Hello World2")
-
-
 
 #GET API method function
 def get(userId, taskId, r):
@@ -38,6 +33,7 @@ def get(userId, taskId, r):
         logging.debug(f'Attempting to execute GET task query for task {taskId}')
 
         try:
+            # Implments method to check cahce for users
             cache = get_taskID_cache(r, userId, taskId)
            
         except TypeError as e:
@@ -164,7 +160,7 @@ def patch(userId, taskId, task_fields):
         logging.debug('Closed the db connection')    
 
 #DELETE API method function
-def delete(userId, taskId):
+def delete(userId, taskId,r):
     #connects to db
     cnxn = connect()
     cursor = cnxn.cursor()
@@ -323,26 +319,29 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         return func.HttpResponse("Error: %s" % str(e), status_code=500) 
 
+# method to check if the request is already in the cache
 def get_taskID_cache(r, userId, taskId):
     logging.info("Querying cache...")
     key = "users:" + userId + ":tasks:" + taskId
-    # if (CACHE_TOGGLE == "On"):
-    try:
-        cache = r.get(key)
-        return cache
-    except TypeError as e:
-        logging.critical("Failed to fetch from cache: " + e.args[1])
-        return None
-
+    # CACHE TOGGLE to turn off and on the cache for developers
+    if(CACHE_TOGGLE):
+        try:
+            cache = r.get(key)
+            return cache
+        except TypeError as e:
+            logging.critical("Failed to fetch from cache: " + e.args[1])
+            return None
+# Method to cache the users and tasks
 def cache_users(r, task, userId, taskId):
     key = "users:" + userId + ":tasks:" + taskId
-    #if(CACHE_TOGGLE == "On" and USERS_USERID_TASKS_TASKSID_CACHE != key):
-    try: 
-        r.set(key, json.dumps(task, default=str), ex=1200)   
-        logging.info("Caching complete")
-    except TypeError as e:
-        logging.info("Caching failed")
-        logging.info(e.args[0])
+    # CACHE TOGGLE to turn off and on the cache for developers
+    if(CACHE_TOGGLE):
+        try: 
+            r.set(key, json.dumps(task, default=str), ex=1200)   
+            logging.info("Caching complete")
+        except TypeError as e:
+            logging.info("Caching failed")
+            logging.info(e.args[0])
 
 # Invalidate users tasks all method
 def invalidate_users_tasks_all_cache(r):

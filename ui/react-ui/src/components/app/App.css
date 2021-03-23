@@ -1,4 +1,11 @@
 .App {
-  padding-top: 2rem;
+  /* padding-top: 2rem; */
   padding-bottom: 2rem;
+}
+.table-wrapper {
+  padding: 50px;
+  
+}
+.table {
+  background-color: rgb(214, 214, 228);
 }

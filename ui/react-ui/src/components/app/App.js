@@ -3,7 +3,7 @@ import {BrowserRouter as Router, Route,} from 'react-router-dom';
 import UserTasks from '../routes/userTasks/UserTasks.js';
 import Home from '../routes/home/Home.js';
 import User from '../routes/userid/userid.js';
-import Users from '../routes/users/Users';
+import Users from '../routes/users/UsersPaginated';
 import UserSingleTask from '../routes/userSingleTask/UserSingleTask';
 import TaskIdReport from '../routes/reports/taskIdReport/TaskIdReport';
 import userIdReport from '../routes/reports/userIdReport/UserIdReport';
