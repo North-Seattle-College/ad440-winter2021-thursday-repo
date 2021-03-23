@@ -4,7 +4,8 @@
   "description": "UI tests for the react portion of the cloud tasks app",
   "scripts": {
     "test-users": "node ui-tests-user.js",
-    "ui-test-taskid": "node ui-test-users-id-tasks-id.js"
+    "ui-test-taskid": "node ui-test-users-id-tasks-id.js",
+    "test-users-load40-cache-on": "node test-users-load40-cache-on.js"
   },
   "author": "Lenny Brown",
   "license": "ISC",
