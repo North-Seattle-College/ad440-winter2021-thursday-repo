@@ -41,7 +41,7 @@ jobs:
       run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')" # get date
 
     - name: Run Artillery Test
-      run: ${{ env.artillery-executable }} run --output test/results/artillery_${{ steps.date.outputs.date }}.json ./test/artillery/Artillery-test-users-user_id-tasks.yml
+      run: artillery run --output test/results/artillery_${{ steps.date.outputs.date }}.json ./test/artillery/Artillery-test-users-user_id-tasks.yml
  
     - name: Rename results json
       run: |

@@ -3,12 +3,28 @@ import browser from 'puppeteer';
 import page from 'puppeteer';
 
 /**
+ * UI Test Module.
+ * @module ui/ui-test-tasks
+ * 
+ */
+
+/**
+ * 
+* The puppeteer instance made up of the browser and page objects.
+* Most of the functions in this module use one or the other.
+* @typedef {Object} PuppetInstance
+* @property {browser} browser - The puppeteer Browser Object
+* @property {page} page - The puppeteer Page object
+*/
+
+/**
+ * The puppeteer Page object
+ * @typedef {Object} Page
+ */
+
+/**
  * Starts instance of headless chrome.
  * Returns the browser and page objects.
- * @typedef {object} PuppetInstance
- * @property {browser} browser - The puppeteer Browser Object
- * @property {page} page - The puppeteer Page object
- * @param {String} url - The URL to navigate to.
  * @returns {PuppetInstance} - The puppeteer intance
  */
 export const startBrowser = async () => {
@@ -22,7 +38,7 @@ export const startBrowser = async () => {
  * Navigates to the url and waits for initial selector.
  * @param {String} url - The URL to navigate to.
  * @param {page} page - The Puppeteer Page Object.
- * @returns - Void
+ * @returns {Void} void
  */
 export const goToHomePage = async (url, page) => {
   console.log(`Making request to ${url}`);
@@ -36,11 +52,10 @@ export const goToHomePage = async (url, page) => {
 
 /**
  * Fills in forms for endpoint that is being tested
- * @typedef {object} Page
  * @param {Page} page - The puppeteer page object
  * @param {String} endpoint - The endpoint to test     
  * @param {String} selector - the document selector to retreive contents of
- * @returns - Void
+ * @returns {Void} void
  */
 export const fillInputs = async (page, endpoint) => {
   const idArr = getIdParams(endpoint);
@@ -82,7 +97,7 @@ export const fillInputs = async (page, endpoint) => {
  * element to go the the endpoint page.
  * @param {Page} page - The puppeteer page object
  * @param {string} endpoint - The endpoint to test     
- * @returns {void} void
+ * @returns {Void} void
  */
 export const goToEndpointPage = async (page, endpoint) => {
   await page.evaluate((endpoint) => {

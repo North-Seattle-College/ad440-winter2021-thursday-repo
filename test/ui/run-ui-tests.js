@@ -2,6 +2,13 @@ import {startBrowser, goToHomePage, fillInputs, goToEndpointPage, getSelectorCon
 import puppeteer from 'puppeteer';
 import * as fs from 'fs';
 
+/**
+ * Main UI test runner and logger.
+ * @module ui/run-ui-tests
+ * 
+ */
+
+
 const baseUrl = 'https://nscstrdevusw2thucommon.z5.web.core.windows.net';
 const endPoints = new Map();
 endPoints.set('users', '/users');
