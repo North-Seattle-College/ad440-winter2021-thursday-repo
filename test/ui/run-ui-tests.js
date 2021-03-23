@@ -108,6 +108,7 @@ const runUiTest = async (url, endpoints, selectors, resultDir, numRuns=10) => {
       'unit': 'ms',
       'scrShotPath': homeScrShot,  
     };
+    perfLog.results.home.push(homeDetails);
     counter += 1
   };
   // set total time, avg time, and error ratio
