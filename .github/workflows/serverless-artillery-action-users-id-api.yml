@@ -1,0 +1,60 @@
+name: Performance-Test serverless-artillery-action-users-id-api
+on: [push]
+    
+jobs:
+  slsart-perf:
+    name: Serverless Artillery Users API Test Performance testing
+    runs-on: ubuntu-latest
+    env:
+      AWS_SLSART_REGION: "us-west-2"
+      NPM_CONFIG_PREFIX: "~/.npm-global"
+      STAGE_NAME: Test-userid-api
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+        check-latest: true
+    - name: Get current date and time
+      id: date
+      run: echo "::set-output name=date::$(date +'%F_%H-%M-%S')"  
+      
+    - name: Install serverless and serverless-artillery
+      run: |
+        npm install -g serverless@1.38.0 
+        npm install -g serverless-artillery
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+    - name: Deploy functions
+      run: ~/.npm-global/bin/slsart deploy --stage $STAGE_NAME --region $AWS_SLSART_REGION
+    
+    - name: invoke functions
+      run: ~/.npm-global/bin/slsart invoke -o test/serverless-artillery/serverless-artillery-test-users-id-api.yml --region $AWS_SLSART_REGION | tee test/results/serverless-artillery-test-users-id-api-${{steps.date.outputs.date}}.json
+  
+        
+                                    
+          
+    - name: remove functions
+      run: ~/.npm-global/bin/slsart remove --stage $STAGE_NAME --region $AWS_SLSART_REGION
+      
+    
+    - name: Upload file to bucket
+      uses: zdurham/s3-upload-github-action@master
+      with:
+        args: --acl public-read
+      env:
+          FILE: test/results/serverless-artillery-test-users-id-api-${{steps.date.outputs.date}}.json
+          AWS_REGION: 'us-west-2'
+          S3_BUCKET: 'serverless-artillery'
+          S3_KEY: 'serverless-artillery-test-users-id-api-${{steps.date.outputs.date}}.json'
+          AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
