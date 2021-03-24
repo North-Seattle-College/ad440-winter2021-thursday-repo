@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 
-(async () => {
+const TestUserIdUI = (async () => {
     const uiUrl = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/users/1";
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -28,3 +28,5 @@ const puppeteer = require("puppeteer");
 
     await browser.close();
 })().catch(err => console.log(err)); 
+
+export default TestUserIdUI;
