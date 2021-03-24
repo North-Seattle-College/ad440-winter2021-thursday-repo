@@ -3,8 +3,9 @@ import {TestUserIdUI} from "../ui/ui-test-user-id.js";
 (async () => {
     // create time array
     const timeArray = []
-    let i;
-    
+    let i;   
+
+    // run UserId UI test 40 times & capture time 
     (() => {
         for (i = 0; i < 40; i++) {
         // start timer
