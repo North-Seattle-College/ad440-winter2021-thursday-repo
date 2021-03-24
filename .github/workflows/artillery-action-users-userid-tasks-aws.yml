@@ -1,0 +1,52 @@
+name: Artillery - test users/userid/tasks lambda
+
+on: 
+  push:
+    branches:
+      - development
+
+env:
+  artillery-executable: '~/runner/.npm-global/lib/node_modules/artillery/bin/artillery' #the artillery executable
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 'Checkout Repository GitHub Action'
+      uses: actions/checkout@v2
+
+    - name: Setup Node ${{ env.NODE_VERSION }} Environment
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+        check-latest: true
+
+    - name: 'Run npm init' #initializes npm project
+      run: npm init -y
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+
+    - name: Install artillery via npm
+      run: npm install -g artillery #install artillery
+
+    - name: Get the date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')" # get date
+
+    - name: Run Artillery Test
+      run: artillery run --output test/results/artillery_${{ steps.date.outputs.date }}.json ./test/artillery/Artillery-test-users-user_id-tasks.yml
+ 
+    - name: Rename results json
+      run: |
+        cp test/results/artillery.json "test/results/artillery_${{ steps.date.outputs.date }}.json"
+
+    - name: AWS CLI S3
+      run: |
+        aws s3 cp test/results/ s3://artillery --recursive --exclude "*" --include "Artillery-test*"
