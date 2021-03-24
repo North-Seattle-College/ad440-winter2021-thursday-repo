@@ -13,14 +13,8 @@ const puppeteer = require("puppeteer");
 
         await page.goto(uiLocation)
 
-        let universaldate = new Date(); //   capture current local date and time in universal time
-        let stringDate = universaldate.getFullYear() + "_" + (universaldate.getMonth() + 1) + "_" + universaldate.getDate() + "-" + universaldate.getHours() + "-" + universaldate.getMinutes() + '-' + universaldate.getSeconds() + '-' + universaldate.getMilliseconds();
-
-        await page.screenshot({ path: `../results/ui-test-results/users-id-tasks-id/ui_taskid_${stringDate}.png` });
-        const screenshotPath = `../results/ui-test-results/capture-time/test-users-userid-task/ui_users_task_task_id_${stringDate}.png`;
-
-        console.log(`Navigated to ${uiLocation}, taking screenshot and storing in ${screenshotPath}`);
-            await page.screenshot({ path: screenshotPath});
+        console.log(`Navigated to ${uiLocation}, taking screenshot`);
+            await page.screenshot();
             var endDate   = new Date();
         
         var seconds = (endDate.getTime() - startTime) / 1000;
