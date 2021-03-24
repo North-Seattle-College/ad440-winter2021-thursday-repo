@@ -84,7 +84,7 @@ def get_users(conn, r, req):
 
     if (CACHE_TOGGLE == "On"): # check cache first
         try:
-            cache = get_users_cache(r)
+            cache = get_users_cache(r, USERS_CACHE_KEY)
         except TypeError as e:
             logging.info(e.args[0])    
 
@@ -96,8 +96,8 @@ def get_users(conn, r, req):
 
 
     #query database based on pagination variables
-    start_index = (int(count) * int(page) - int(count))
-    sql_query = "SELECT * FROM tasks ORDER BY taskId OFFSET " + str(start_index) + " ROWS FETCH NEXT " + str(count) + " ROWS ONLY"
+    start_index = (int(page) - 1) * int(count) 
+    sql_query = "SELECT * FROM users ORDER BY userId OFFSET " + str(start_index) + " ROWS FETCH NEXT " + str(count) + " ROWS ONLY"
         
            
     with conn.cursor() as cursor:
@@ -128,7 +128,7 @@ def get_users(conn, r, req):
             "User data retrieved and processed, returning information from get_users function")
 
         if (CACHE_TOGGLE == "On"): # Cache the results 
-            cache_users(r, users)
+            cache_users(r, users, USERS_CACHE_KEY)
 
 
         return func.HttpResponse(json.dumps(users, default=default), status_code=200, mimetype="application/json" )
@@ -191,7 +191,7 @@ def init_redis():
     return redis.StrictRedis(host=REDIS_HOST,
         port=REDIS_PORT, db=0, password=REDIS_KEY, ssl=True)
 
-def cache_users(r, users):
+def cache_users(r, users, USERS_CACHE_KEY):
     if (CACHE_TOGGLE == "On"):
         try: 
             logging.info("Caching results...")
@@ -201,7 +201,7 @@ def cache_users(r, users):
             logging.info("Caching failed")
             logging.info(e.args[0])
 
-def get_users_cache(r):  
+def get_users_cache(r, USERS_CACHE_KEY):  
     if (CACHE_TOGGLE == "On"):
         logging.info("Querying cache...")
         try:
