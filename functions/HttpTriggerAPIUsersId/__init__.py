@@ -5,14 +5,12 @@ import azure.functions as func
 import json
 import redis
 
-#Global value to be used to invalidate GET,PUT, and DELETE for Redis Cache
-ALL_USERS_KEY = b'users:all'
-
 # This is the Http Trigger for Users/userId
 # It connects to the db and retrives the users added to the db by userId
 def main(req: func.HttpRequest) -> func.HttpResponse:
     method = req.method
     user_id = req.route_params.get('userId')
+    redis_user_key = 'users:' + user_id  # Redis cache key
 
     logging.info(
       '''
@@ -32,33 +30,32 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
     logging.debug('Connection to DB successful!')
 
-    try:
-        _redis = init_redis()
+    _redis = init_redis()
+    try:        
         # Return results according to the method
         if method == 'GET':
             logging.info('Attempting to retrieve user...')
-            user_http_response = get_user(conn, user_id, _redis)
+            user_http_response = get_user(conn, user_id, _redis, redis_user_key)
             logging.info('User retrieved successfully!')
             return user_http_response
+
         elif req.method == 'PUT':
             user_req_body = get_user_req_body(req)
-
             logging.info('Attempting to update (PUT) user...')
-            updateUser = update_user(user_req_body, conn, user_id, _redis)
-
+            updateUser = update_user(user_req_body, conn, user_id, _redis, redis_user_key)
             return updateUser
+
         elif req.method == 'PATCH':
             user_req_body = get_user_req_body(req)
-
             logging.info('Attempting to update (PATCH) user...')
             patchUser = patch_user(user_req_body, conn, user_id, _redis)
-
             return patchUser
+
         elif method == 'DELETE':
             logging.info('Attempting to delete user...')
-            deleteUser = delete_user(conn, user_id, _redis)
-
+            deleteUser = delete_user(conn, user_id, _redis, redis_user_key)
             return deleteUser
+
         else:
             logging.warn('''
               Request with method {} has been recieved,
@@ -92,10 +89,10 @@ def init_redis():
     )
 
 
-def get_user(conn, user_id, _redis):
+def get_user(conn, user_id, _redis, redis_user_key):
     is_cachable = False
     try: 
-        cache = get_user_cache(_redis)
+        cache = get_user_cache(_redis, redis_user_key)
         user = json.loads(cache)
         user_user_id = user['userId']
 
@@ -104,7 +101,7 @@ def get_user(conn, user_id, _redis):
 
         #Clears cache if data was not cachable
         if not is_cachable:
-            clear_cache(_redis)
+            clear_cache(_redis, redis_user_key)
 
     except TypeError as e:
         logging.info(e.args[0])
@@ -137,7 +134,8 @@ def get_user(conn, user_id, _redis):
                 logging.info('Caching results...')
 
                 # Cache the results
-                cache_user(_redis, user)
+                logging.info("Caching results...")
+                cache_user(_redis, user, redis_user_key)
 
                 respond = json.dumps(user)
                 statuse_code = 200
@@ -159,29 +157,29 @@ def get_user(conn, user_id, _redis):
     )
 
 
-def get_user_cache(_redis):
+def get_user_cache(_redis, redis_user_key):
     try:
-        cache = _redis.get(ALL_USERS_KEY)
+        cache = _redis.get(redis_user_key)
         return cache
     except TypeError as e:
-        logging.critical('Failed to fetch user from cache: ' + e.args[1])
+        logging.critical("Failed to fetch user from cache: " + e.args[1])
         return None
 
 
-def clear_cache(_redis):
-    _redis.delete(ALL_USERS_KEY)
+def clear_cache(_redis, redis_user_key):
+    _redis.delete(redis_user_key)
 
 
-def cache_user(_redis, user):
+def cache_user(_redis, user, redis_user_key):
     try:
-        _redis.set(ALL_USERS_KEY, json.dumps(user), ex=1200)
+        _redis.set(redis_user_key, json.dumps(user), ex=1200)
         logging.info('Caching complete')
     except TypeError as e:
         logging.info('Caching failed')
         logging.info(e.args[0])
 
 
-def update_user(user_req_body, conn, user_id, _redis):
+def update_user(user_req_body, conn, user_id, _redis, redis_user_key):
     # Validate request body
     logging.debug('Verifying fields in request body to update a user by ID')
     try:
@@ -220,7 +218,7 @@ def update_user(user_req_body, conn, user_id, _redis):
 
             logging.debug('User was updated successfully!.')
 
-            clear_cache(_redis)
+            clear_cache(_redis, redis_user_key)
 
             respond = 'User updated'
             statuse_code = 200
@@ -294,9 +292,9 @@ def patch_user(user_req_body, conn, user_id, _redis):
     )
 
 
-def delete_user(conn, user_id, _redis):
+def delete_user(conn, user_id, _redis, redis_user_key):
     
-    clear_cache(_redis)
+    clear_cache(_redis, redis_user_key)
     try:
         with conn.cursor() as cursor:
             logging.debug('''
