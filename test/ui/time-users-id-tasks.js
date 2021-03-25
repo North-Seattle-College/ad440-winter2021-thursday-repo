@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 
 (async () => {
-    const uiLocation = "http://localhost:3000/users/6/tasks";
+    const uiLocation = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/#/users/6/tasks ";
     const browser = await puppeteer.launch();   
     var startDate = new Date();
     var totalSeconds = 0;     
