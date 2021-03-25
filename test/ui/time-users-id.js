@@ -2,8 +2,8 @@ const mkdirp = require('mkdirp');
 const puppeteer = require('puppeteer');
 
 (async () => {
-    //const url = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/users/2";
-    const url = "https://nsc-thursday-react-app.azureedge.net/users/2";
+    const url = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/users/2";
+    //const url = "https://nsc-thursday-react-app.azureedge.net/users/2";
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setCacheEnabled(false)
@@ -63,10 +63,6 @@ const puppeteer = require('puppeteer');
         await page.screenshot({ path: screenshotPath});
     }
 
-    // let totalSeconds = 0.0;
-    // for (seconds in timeArray) {
-    //     totalSeconds = totalSeconds + seconds;
-    // }
     console.log(`Total time: ${totalSeconds} seconds`);
     avgSeconds = totalSeconds/40;
     console.log(`Average time: ${avgSeconds} seconds`);
