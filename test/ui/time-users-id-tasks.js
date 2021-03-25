@@ -1,5 +1,5 @@
 const puppeteer = require("puppeteer");
-
+var captureTime = 40;
 (async () => {
     const uiLocation = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/#/users/6/tasks ";
     const browser = await puppeteer.launch();   
@@ -7,7 +7,7 @@ const puppeteer = require("puppeteer");
     var totalSeconds = 0;     
     var startTime = startDate.getTime();
 
-    for(var i=0; i<40; i++){
+    for(var i=0; i<captureTime; i++){
         const page = await browser.newPage();
         console.log(`Page opened, going to ${uiLocation}`);
 
@@ -22,6 +22,6 @@ const puppeteer = require("puppeteer");
         totalSeconds = totalSeconds + seconds;
         startTime = new Date();
 }
-    console.log(`Average time to load ${(totalSeconds/40)}`)
+    console.log(`Average time to load ${(totalSeconds/captureTime)}`)
     await browser.close();
 })().catch(err => console.log(err)); 
