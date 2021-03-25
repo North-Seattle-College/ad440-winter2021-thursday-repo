@@ -24,7 +24,7 @@ const puppeteer = require('puppeteer');
 
     const newDirPath = `../results/ui-test-results/users-id/group-${todate}`
 
-    // create folder?
+    // create folder
     mkdirp(newDirPath, function(err) { 
 
         // path exists unless there was an error
@@ -32,14 +32,22 @@ const puppeteer = require('puppeteer');
     
     });
 
-    // create timer?
     // create array of times
+    const timeArray = []
+
     var i;
     for (i = 0; i < 40; i++) {
         // start timer
+        let startTime = getTime();
+
         await page.goto(url);
+
         // end timer
+        let endTime = getTime();
+
         // save time to array
+        let seconds = (endTime - startTime)/1000;
+        timeArray[i] = seconds;
 
         // create path to save screenshot
         let [month, date, year] = new Date().toLocaleDateString("en-US", dateOptions).split(",")[0].split("/");
@@ -51,5 +59,15 @@ const puppeteer = require('puppeteer');
         console.log(`Screenshot Successful!`);
         await page.screenshot({ path: screenshotPath});
     }
+
+    let totalSeconds = 0;
+    for (seconds in timeArray) {
+        totalSeconds += seconds;
+    }
+    console.log(`Total time: ${totalSeconds} seconds`);
+    avgSeconds = totalSeconds/40;
+    console.log(`Average time: ${avgSeconds} seconds`);
+
   await browser.close();
-})();
+  
+})().catch(err => console.log(err));
