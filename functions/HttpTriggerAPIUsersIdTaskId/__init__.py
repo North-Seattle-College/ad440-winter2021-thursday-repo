@@ -282,7 +282,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         if method == "DELETE":
             logging.debug('Passed DELETE method')  
             
-            # Invalidate users tasks all call 
+            # Invalidate userId tasksId call 
             invalidate_users_tasks_id(r, userId, taskId)
             
             # ADDED implementation of redis r=redis 
@@ -301,6 +301,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         #if PUT method is selected, it executes here 
         if method == "PUT":
             logging.debug('Passed PUT method')  
+
+            # Invalidate userId tasksId call 
+            invalidate_users_tasks_id(r, userId, taskId)
             
             # ADDED implementation of redis r=redis
             return (update(userId, taskId, task_fields))
