@@ -7,7 +7,7 @@ const puppeteer = require('puppeteer');
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setCacheEnabled(false)
-    await page.goto(url);
+    await page.goto(url, waitUntil="networkidle2");
     console.log(`Navigating to ${url}`);
 
     const dateOptions = { 

@@ -24,6 +24,7 @@
   "dependencies": {
     "aws-sdk": "^2.853.0",
     "fs": "0.0.1-security",
-    "mkdirp": "^1.0.4"
+    "mkdirp": "^1.0.4",
+    "puppeteer": "^8.0.0"
   }
 }
