@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "c:\\Users\\Idot\\Documents\\ad440-winter2021-thursday-repo\\functions\\.venv\\Scripts\\python.exe",
+    "azureFunctions.deploySubpath": ".",
+    "azureFunctions.scmDoBuildDuringDeployment": true,
+    "azureFunctions.pythonVenv": ".venv",
+    "azureFunctions.projectLanguage": "Python",
+    "azureFunctions.projectRuntime": "~3",
+    "debug.internalConsoleOptions": "neverOpen"
+}
