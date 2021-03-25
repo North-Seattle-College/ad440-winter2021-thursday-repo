@@ -6,11 +6,12 @@ import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {HashRouter} from 'react-router-dom'
 
 ReactDOM.render(
-  <React.StrictMode>
+  <HashRouter>
     <App />
-  </React.StrictMode>,
+  </HashRouter>,
   document.getElementById('root')
 );
 

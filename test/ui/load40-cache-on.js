@@ -4,7 +4,7 @@
 
  const puppeteer = require("puppeteer");
  const testCount = 40;
- const url = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/#/users";
+ const url = "https://nsc-thursday-react-app.azureedge.net/users";
 
  (async () => {
   const browser = await puppeteer.launch();
@@ -16,7 +16,7 @@
     await page.goto(url);
     const usersMetrics = await page.metrics();
     const testDate = usersMetrics.Timestamp
-    const screenshotPath = `../../results/ui-test-results/users/load40_cache_on_${testDate}.png`;
+    const screenshotPath = `../results/ui-test-results/users-load40_cache_on_${testDate}.png`;
     const browserTimer = usersMetrics.TaskDuration
     console.log(
       `${url}-  
