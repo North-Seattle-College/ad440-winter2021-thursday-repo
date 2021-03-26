@@ -1,8 +1,9 @@
 const puppeteer = require('puppeteer')
 
-var NUM_TIMES=40
-var totalSeconds = 0
-var loadtime=0
+var NUM_TIMES=40;
+const ENV_PAGE = `https://nscstrdevusw2thucommon.z5.web.core.windows.net/#/users/2/tasks/1`;
+let totalSeconds = 0;
+let loadtime=0;
 
 const  pageMetrics = async() =>{
     const browser = await puppeteer.launch({headless: false})
@@ -21,7 +22,7 @@ const  pageMetrics = async() =>{
 }
 
 for(var i = 0; i <NUM_TIMES; i++){
-    pageMetrics()
+    pageMetrics();
 
 }
 console.log(`The average time it took to load the page 40 times: ${totalSeconds/NUM_TIMES}`)
