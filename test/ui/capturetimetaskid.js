@@ -11,10 +11,9 @@ const  pageMetrics = async() =>{
     ENV_PAGE = os.environ['target_website']
     await webpage.goto(ENV_PAGE)
     const pagePerf = await page.evaluate(_=>{
-        const{loadEventEnd, navigationStart}=PerformanceTiming
-        return({loadtime=loadEventEnd-navigationStart
-        })
-        
+            loadtime =PerformanceNavigationTiming.loadEventEnd - PerformanceNavigationTiming.loadEventStart
+            return loadtime
+       
     })
     totalSeconds+=pagePerf.loadtime
     console.log(`Page Load took: ${pagePerf.loadtime}ms`)
