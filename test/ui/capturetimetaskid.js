@@ -1,8 +1,8 @@
 const puppeteer = require('puppeteer')
 
-NUM_TIMES=40
-totalSeconds = 0
-loadtime=0
+var NUM_TIMES=40
+var totalSeconds = 0
+var loadtime=0
 
 const  pageMetrics = async() =>{
     const browser = await puppeteer.launch({headless: false})
