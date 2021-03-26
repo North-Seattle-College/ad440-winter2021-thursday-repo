@@ -315,7 +315,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             # Invalidate userId tasksId call 
             invalidate_users_tasks_id(r, userId, taskId)
 
-            return (patch(userId, taskId, task_fields))
+            return (patch(userId, taskId, task_fields, r))
         else:
             logging.warn(f"Request with method {method} is not allowed for this endpoint")
             func.HttpResponse(status_code=405)
