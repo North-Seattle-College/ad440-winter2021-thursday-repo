@@ -306,7 +306,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             invalidate_users_tasks_id(r, userId, taskId)
             
             # ADDED implementation of redis r=redis
-            return (update(userId, taskId, task_fields))
+            return (update(userId, taskId, task_fields,r))
 
         #if PATCH method is selected, it executes here
         elif method == "PATCH":
@@ -314,7 +314,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             # Invalidate userId tasksId call 
             invalidate_users_tasks_id(r, userId, taskId)
-            
+
             return (patch(userId, taskId, task_fields))
         else:
             logging.warn(f"Request with method {method} is not allowed for this endpoint")
