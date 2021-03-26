@@ -311,6 +311,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         #if PATCH method is selected, it executes here
         elif method == "PATCH":
             logging.debug('Passed PATCH method')   
+
+            # Invalidate userId tasksId call 
+            invalidate_users_tasks_id(r, userId, taskId)
+            
             return (patch(userId, taskId, task_fields))
         else:
             logging.warn(f"Request with method {method} is not allowed for this endpoint")
