@@ -1,0 +1,59 @@
+name: Lambda users-userid api
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  art-aws-users-test:
+    name: Artillery Lambda Users id test
+    runs-on: ubuntu-latest
+    env:
+      NPM_CONFIG_PREFIX: "~/.npm-global"
+      NODE_VERSION: "14"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          check-latest: true
+      - name: Install Artillery
+        run: npm install -g artillery
+      - name: Artillery Test with Lamda Users ID API
+        run: ~/.npm-global/bin/artillery run --output ./test/results/lambda_users_results.json ./test/artillery/artillery-user-id-lambda.yml
+      - name: Grab current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+      - name: Rename results json
+        run: mv ./test/results/lambda_users_results.json ./test/results/lambda_users_${{ steps.date.outputs.date }}.json
+      - name: Upload report to Azure Blob Storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload \
+              -c artillery \
+              -f ./test/results/lambda_users_${{ steps.date.outputs.date }}.json \
+              -n lambda_users_id_${{ steps.date.outputs.date }}.json \
+              --connection-string "${{ secrets.BLOB_STORAGE_CONNECTION_STRING }}"
+
+# name: Upload To Azure Blob Storage
+
+# on:
+#   push:
+#     branches:
+#       - master
+# jobs:
+#   upload:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: bacongobbler/azure-blob-storage-upload@v1.1.1
+#         with:
+#           source_dir: _dist
+#           container_name: www
+#           connection_string: ${{ secrets.ConnectionString }}
+#           extra_args: '--pattern *.tar.gz'
+#           sync: false
