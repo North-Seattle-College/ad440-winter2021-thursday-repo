@@ -1,0 +1,1413 @@
+{
+	"summary": {
+		"url": "https://nscstrdevusw2thucommon.z5.web.core.windows.net",
+		"endpoints": [
+			"/users",
+			"/users/{userId}",
+			"/users/{userId}/tasks",
+			"/users/{userId}/tasks/{taskId}"
+		],
+		"totalTime": 264615,
+		"avgRenderTime": 1323.075,
+		"timeUnit": "ms",
+		"runsPerPage": 40,
+		"totalTests": 200,
+		"errorRatio": 0.23,
+		"errors": [
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 0,
+				"timeElapsed": 190
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 1,
+				"timeElapsed": 87
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 2,
+				"timeElapsed": 72
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 3,
+				"timeElapsed": 83
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"httpError": "Failed To Render",
+				"runNumber": 4,
+				"timeElapsed": 30028
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 4,
+				"timeElapsed": 106
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 5,
+				"timeElapsed": 94
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 6,
+				"timeElapsed": 6302
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 7,
+				"timeElapsed": 114
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 8,
+				"timeElapsed": 92
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 9,
+				"timeElapsed": 83
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 10,
+				"timeElapsed": 96
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 11,
+				"timeElapsed": 75
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 12,
+				"timeElapsed": 77
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"httpError": "Failed To Render",
+				"runNumber": 13,
+				"timeElapsed": 30025
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 13,
+				"timeElapsed": 89
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 14,
+				"timeElapsed": 107
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 15,
+				"timeElapsed": 90
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 16,
+				"timeElapsed": 107
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 17,
+				"timeElapsed": 77
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 18,
+				"timeElapsed": 78
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 19,
+				"timeElapsed": 78
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 20,
+				"timeElapsed": 107
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 21,
+				"timeElapsed": 154
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 22,
+				"timeElapsed": 6326
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 23,
+				"timeElapsed": 147
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 24,
+				"timeElapsed": 121
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 25,
+				"timeElapsed": 82
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 26,
+				"timeElapsed": 85
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 27,
+				"timeElapsed": 88
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 28,
+				"timeElapsed": 84
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 29,
+				"timeElapsed": 92
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 30,
+				"timeElapsed": 75
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 31,
+				"timeElapsed": 81
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"httpError": "Failed To Render",
+				"runNumber": 32,
+				"timeElapsed": 30029
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 32,
+				"timeElapsed": 147
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"httpError": "Failed To Render",
+				"runNumber": 33,
+				"timeElapsed": 30039
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 33,
+				"timeElapsed": 79
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 34,
+				"timeElapsed": 112
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"httpError": "Failed To Render",
+				"runNumber": 35,
+				"timeElapsed": 30022
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 35,
+				"timeElapsed": 137
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 36,
+				"timeElapsed": 226
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 37,
+				"timeElapsed": 83
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 38,
+				"timeElapsed": 90
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 39,
+				"timeElapsed": 111
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"httpError": "404",
+				"runNumber": 40,
+				"timeElapsed": 80
+			}
+		]
+	},
+	"results": {
+		"users": [
+			{
+				"endpoint": "/users",
+				"timeElapsed": 3687,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:49:58.724Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 148,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:50:03.511Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 134,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:50:07.943Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 118,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:50:12.188Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 161,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:50:16.434Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 198,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:50:50.792Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 173,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:50:55.598Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 6190,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:51:17.508Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 128,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:51:34.116Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 166,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:51:38.624Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 167,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:51:42.916Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 126,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:51:47.191Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 125,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:51:51.657Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 451,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:51:56.278Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 230,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:52:35.770Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 123,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:52:40.179Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 180,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:52:44.711Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 124,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:52:49.460Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 166,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:52:53.873Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 120,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:52:57.991Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 127,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:53:02.147Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 139,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:53:11.469Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 5222,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:53:20.772Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 3291,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:53:37.365Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 3283,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:53:47.798Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 121,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:53:55.154Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 155,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:53:59.338Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 139,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:54:03.516Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 165,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:54:07.980Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 137,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:54:12.546Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 177,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:54:17.028Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 149,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:54:21.314Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 138,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:54:25.451Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 153,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:54:59.769Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 237,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:55:34.300Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 150,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:55:39.014Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 157,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:56:13.525Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 279,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:56:18.127Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 171,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:56:22.634Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 145,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:56:26.872Z.png"
+			},
+			{
+				"endpoint": "/users",
+				"timeElapsed": 154,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-2021-03-22T05:56:31.020Z.png"
+			}
+		],
+		"userId": [
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 270",
+				"timeElapsed": 379,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:50:00.053Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 971",
+				"timeElapsed": 268,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:50:04.763Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 187",
+				"timeElapsed": 161,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:50:09.067Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 47",
+				"timeElapsed": 105,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:50:13.245Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 679",
+				"timeElapsed": 117,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:50:17.508Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 284",
+				"timeElapsed": 135,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:50:51.860Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 836",
+				"timeElapsed": 5402,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:51:02.106Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 298",
+				"timeElapsed": 6216,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:51:24.639Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 20",
+				"timeElapsed": 181,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:51:35.223Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 568",
+				"timeElapsed": 256,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:51:39.792Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 604",
+				"timeElapsed": 111,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:51:43.960Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 532",
+				"timeElapsed": 141,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:51:48.430Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 939",
+				"timeElapsed": 163,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:51:52.757Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 574",
+				"timeElapsed": 5278,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:52:02.522Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 619",
+				"timeElapsed": 106,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:52:36.847Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 998",
+				"timeElapsed": 371,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:52:41.436Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 500",
+				"timeElapsed": 514,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:52:46.146Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 661",
+				"timeElapsed": 138,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:52:50.537Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 938",
+				"timeElapsed": 104,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:52:54.884Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 785",
+				"timeElapsed": 105,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:52:59.023Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 935",
+				"timeElapsed": 104,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:53:03.149Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 557",
+				"timeElapsed": 141,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:53:12.496Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 518",
+				"timeElapsed": 3182,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:53:24.851Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 44",
+				"timeElapsed": 3194,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:53:41.440Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 690",
+				"timeElapsed": 3176,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:53:51.885Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 883",
+				"timeElapsed": 149,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:53:56.197Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 172",
+				"timeElapsed": 160,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:54:00.389Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 791",
+				"timeElapsed": 358,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:54:04.787Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 33",
+				"timeElapsed": 128,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:54:09.261Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 373",
+				"timeElapsed": 122,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:54:13.633Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 25",
+				"timeElapsed": 133,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:54:18.109Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 994",
+				"timeElapsed": 111,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:54:22.361Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 677",
+				"timeElapsed": 135,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:54:26.486Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 988",
+				"timeElapsed": 212,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:55:00.920Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 871",
+				"timeElapsed": 333,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:55:35.721Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 946",
+				"timeElapsed": 215,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:55:40.258Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 937",
+				"timeElapsed": 177,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:56:14.671Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 538",
+				"timeElapsed": 141,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:56:19.387Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 291",
+				"timeElapsed": 143,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:56:23.714Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 442",
+				"timeElapsed": 140,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:56:27.897Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}",
+				"text": "USER 914",
+				"timeElapsed": 200,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-2021-03-22T05:56:32.148Z.png"
+			}
+		],
+		"tasks": [
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 142,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:50:01.134Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 121,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:50:05.782Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 134,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:50:10.085Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 94,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:50:14.235Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "Failed To Render",
+				"timeElapsed": 30028,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:50:48.437Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 83,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:50:52.857Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 115,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:51:03.088Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 6304,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:51:31.828Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 78,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:51:36.183Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 81,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:51:40.777Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 95,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:51:44.951Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 86,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:51:49.389Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 106,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:51:53.782Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "Failed To Render",
+				"timeElapsed": 30025,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:52:33.474Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 122,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:52:38.020Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 76,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:52:42.407Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 105,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:52:47.112Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 99,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:52:51.579Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 81,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:52:55.853Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 129,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:53:00.053Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 5251,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:53:09.289Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 92,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:53:13.452Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 90,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:53:25.825Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 116,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:53:42.430Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 106,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:53:52.874Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 80,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:53:57.173Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 122,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:54:01.368Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 81,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:54:05.745Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 82,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:54:10.280Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 81,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:54:14.630Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 100,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:54:19.100Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 81,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:54:23.340Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "Failed To Render",
+				"timeElapsed": 30029,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:54:57.405Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "Failed To Render",
+				"timeElapsed": 30039,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:55:31.854Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 97,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:55:36.697Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "Failed To Render",
+				"timeElapsed": 30022,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:56:11.174Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 123,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:56:15.728Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 83,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:56:20.432Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 117,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:56:24.716Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 87,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:56:28.843Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks",
+				"text": "TASK",
+				"timeElapsed": 99,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-2021-03-22T05:56:33.152Z.png"
+			}
+		],
+		"taskId": [
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 190,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:50:02.317Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 87,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:50:06.765Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 72,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:50:11.053Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 83,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:50:15.244Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 106,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:50:49.492Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 94,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:50:53.987Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 6302,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:51:10.296Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 114,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:51:32.890Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 92,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:51:37.142Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 83,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:51:41.740Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 96,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:51:46.036Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 75,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:51:50.398Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 77,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:51:54.786Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 89,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:52:34.520Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 107,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:52:39.042Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 90,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:52:43.427Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 107,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:52:48.297Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 77,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:52:52.649Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 78,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:52:56.848Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 78,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:53:01.017Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 107,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:53:10.311Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 154,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:53:14.490Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 6326,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:53:33.043Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 147,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:53:43.481Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 121,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:53:53.980Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 82,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:53:58.155Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 85,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:54:02.331Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 88,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:54:06.703Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 84,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:54:11.303Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 92,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:54:15.761Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 75,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:54:20.095Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 81,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:54:24.290Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 147,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:54:58.552Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 79,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:55:32.912Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 112,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:55:37.744Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 137,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:56:12.262Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 226,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:56:16.840Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 83,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:56:21.427Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 90,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:56:25.729Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 111,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:56:29.835Z.png"
+			},
+			{
+				"endpoint": "/users/{userId}/tasks/{taskId}",
+				"text": "404",
+				"timeElapsed": 80,
+				"unit": "ms",
+				"scrShotPath": "../results/ui-test-results/-users-{userId}-tasks-{taskId}-2021-03-22T05:56:34.151Z.png"
+			}
+		],
+		"home": []
+	}
+}

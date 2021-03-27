@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+//import puppeteer from 'puppeteer'
 
 (async () => {
     const uiLocation = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/users";

@@ -1,0 +1,21 @@
+{
+  "name": "ui-tests",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "UI tests for the react portion of the cloud tasks app",
+  "scripts": {
+    "ui-tests": "node run-ui-tests.js",
+    "test-users": "node ui-tests-user.js",
+    "ui-test-taskid": "node ui-test-users-id-tasks-id.js"
+  },
+  "author": "Lenny Brown, Sean Gilliland",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^5.4.3",
+    "jsdoc": "^3.6.6",
+    "jsdoc-to-markdown": "^7.0.0"
+  }
+}
