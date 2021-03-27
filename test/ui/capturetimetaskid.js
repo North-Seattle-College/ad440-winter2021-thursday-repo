@@ -8,7 +8,7 @@ var NUM_TIMES=40;
     let totalSeconds = 0;
     //var totalSeconds = 0;
     const ENV_PAGE = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/#/users/2/tasks/1";
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch({headless:false})
     for(var i = 0; i< NUM_TIMES; i++){
         const webpage = await browser.newPage();
         console.log(`Opening Page. Heading for target page...`);
