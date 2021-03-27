@@ -3,9 +3,9 @@ const puppeteer = require('puppeteer')
 var NUM_TIMES=40;
 
 (async() =>{
-    var startDate = new Date();
-    var startTime = startDate.getTime();
-    var totalSeconds = 0;
+    let startDate = new Date();
+    let startTime = startDate.getTime();
+    let totalSeconds = 0;
     //var totalSeconds = 0;
     const ENV_PAGE = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/#/users/2/tasks/1";
     const browser = await puppeteer.launch()
