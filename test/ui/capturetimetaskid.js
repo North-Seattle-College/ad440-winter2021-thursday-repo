@@ -16,6 +16,9 @@ var NUM_TIMES=40;
             var endDate = new Date();
         var loadtime = endDate.getTime-startTime;
         console.log(`Time to load page was: ${loadtime}`)
+        totalSeconds = totalSeconds + loadtime
+        //Resets the startTime for next page loading
+        startTime = new Date()
         await webpage.close();    
         }
         console.log(`The average time it took to load the page 40 times: ${totalSeconds/NUM_TIMES}`)
