@@ -22,11 +22,13 @@ const UserTasks = () => {
     .catch((error) => console.error(error))
   }, [userId]);
 
+  /*
   function deleteTask(taskId){
     const messages = this.state.messages.filter((_, index) => index !== i)
     this.setState({ messages });
 
   }
+  */
 
   return (
     <>
@@ -37,7 +39,7 @@ const UserTasks = () => {
         ? <BootstrapTable heatherItems={Object.keys(userTasks[2][0])} rows={userTasks[2]} /> 
         : <h3>User {userId} Tasks Not Found</h3>
       }
-      <button onClick={() => this.deleteTask()}>Delete Task</button>
+      {/* <button onClick={() => this.deleteTask()}>Delete Task</button> */}
       </Container>
     </>
   )
