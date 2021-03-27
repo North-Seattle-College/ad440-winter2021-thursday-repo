@@ -6,7 +6,8 @@ import azure.functions as func
 import datetime
 import redis 
 
-redisFeature = "On" == os.environ["CACHE_TOGGLE"]
+
+redisFeature = os.environ["CACHE_TOGGLE"] == True
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info(
@@ -30,19 +31,33 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(status_code=500)
     logging.debug("Connected to DB successfuly!")
 
-    r = init_redis()
+
+    #Redis Sever
+    rDB = None
+    
+    if(redisFeature):
+        try:
+            rDBpassword = os.environ["ENV_REDIS_KEY"]
+            rDBhost = os.environ["ENV_REDIS_HOST"]
+            rDBport = os.environ["ENV_REDIS_PORT"]
+            rDB = redis.Redis(host=rDBhost, port=rDBport, db=0, password=rDBpassword, ssl=True) 
+            rDB.ping()
+            logging.debug("Connected to Redis!")
+        except(redis.exceptions.ConnectionError, ConnectionRefusedError) as e:
+                logging.error("Redis connection error!" + e.args[0])
+
     
     try:
         if method == "GET":
             logging.debug("trying to get one user with id {} all tasks".format(user_id))
-            all_tasks_by_userId = get_user_tasks(conn, user_id, count, page, r, redis_key)
+            all_tasks_by_userId = get_user_tasks(conn, user_id, count, page, rDB, redis_key)
             logging.debug("tasks retrieved successfully!")
             return all_tasks_by_userId
 
         elif method == "POST":
             logging.debug("trying to add one task to tasks")
             task_req_body = req.get_json()
-            new_task_id = add_tasks(conn, task_req_body, user_id, r, redis_key)
+            new_task_id = add_tasks(conn, task_req_body, user_id, rDB, redis_key)
             logging.debug("task added successfully!")
             return new_task_id
 
@@ -94,7 +109,9 @@ def get_user_tasks(conn, userId, count, page, r, redis_key):
         # Empty data list
         tasks = []
 
+
         columns = [column[0] for column in cursor.description]
+
         for task in task_data:
             tasks.append(dict(zip(columns, task)))
             

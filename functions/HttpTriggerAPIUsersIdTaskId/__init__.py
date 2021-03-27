@@ -18,8 +18,6 @@ r = redis.StrictRedis(
 
 # Global variables for Redis cache toggle and the invalidation of tasks all 
 CACHE_TOGGLE = os.environ["CACHE_TOGGLE"],
-USERS_USERID_TASKS_ALL_CACHE = b'users:{user_id}:tasks:all'
-USERS_USERID_TASKS_TASKSID_CACHE= b'users:{user_id}/tasks/{task_id}'
 
 #GET API method function
 def get(userId, taskId, r):
@@ -177,6 +175,9 @@ def delete(userId, taskId,r):
         return func.HttpResponse(status_code=200)
     except Exception as e:
         logging.error('Unable to execute the query')
+
+        
+
         return func.HttpResponse("Error: %s" % str(e), status_code=400)
     finally:
         #commits changes to db
@@ -281,8 +282,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         if method == "DELETE":
             logging.debug('Passed DELETE method')  
             
-            # Invalidate users tasks all call 
-            invalidate_users_tasks_all_cache(r)
+            # Invalidate userId tasksId call 
+            invalidate_users_tasks_id(r, userId, taskId)
             
             # ADDED implementation of redis r=redis 
             return (delete(userId, taskId,r))
@@ -300,9 +301,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         #if PUT method is selected, it executes here 
         if method == "PUT":
             logging.debug('Passed PUT method')  
-            
-            # Invalidate users tasks all call 
-            invalidate_users_tasks_all_cache(r) 
+
+            # Invalidate userId tasksId call 
+            invalidate_users_tasks_id(r, userId, taskId)
             
             # ADDED implementation of redis r=redis
             return (update(userId, taskId, task_fields,r))
@@ -310,7 +311,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         #if PATCH method is selected, it executes here
         elif method == "PATCH":
             logging.debug('Passed PATCH method')   
-            return (patch(userId, taskId, task_fields))
+
+            # Invalidate userId tasksId call 
+            invalidate_users_tasks_id(r, userId, taskId)
+
+            return (patch(userId, taskId, task_fields, r))
         else:
             logging.warn(f"Request with method {method} is not allowed for this endpoint")
             func.HttpResponse(status_code=405)
@@ -344,7 +349,8 @@ def cache_users(r, task, userId, taskId):
             logging.info(e.args[0])
 
 # Invalidate users tasks all method
-def invalidate_users_tasks_all_cache(r):
-    r.delete(USERS_USERID_TASKS_ALL_CACHE)
+def invalidate_users_tasks_id(r, userId, taskId):
+    key = "users:" + userId + ":tasks:" + taskId
+    r.delete(key)
     logging.info("Cache Invalidated")
 
