@@ -6,6 +6,7 @@ var NUM_TIMES=40;
     var startDate = new Date();
     var startTime = startDate.getTime();
     var totalSeconds = 0;
+    //var totalSeconds = 0;
     const ENV_PAGE = "https://nscstrdevusw2thucommon.z5.web.core.windows.net/#/users/2/tasks/1";
     const browser = await puppeteer.launch()
     for(var i = 0; i< NUM_TIMES; i++){
@@ -14,14 +15,14 @@ var NUM_TIMES=40;
         await webpage.goto(ENV_PAGE)
         await webpage.setCacheEnabled(false)
             var endDate = new Date();
-        var loadtime = endDate.getTime-startTime;
-        console.log(`Time to load page was: ${loadtime}`)
+        var loadtime = endDate.getTime()-startTime;
+        console.log(`Time to load page was: ${loadtime}ms`)
         totalSeconds = totalSeconds + loadtime
         //Resets the startTime for next page loading
         startTime = new Date()
         await webpage.close();    
         }
-        console.log(`The average time it took to load the page 40 times: ${totalSeconds/NUM_TIMES}`)
+        console.log(`The average time it took to load the page 40 times: ${(totalSeconds/NUM_TIMES)}`)
     })().catch(err => console.log(err));
     
     
