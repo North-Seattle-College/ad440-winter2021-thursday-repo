@@ -6,7 +6,8 @@
   "scripts": {
     "ui-tests": "node run-ui-tests.js",
     "test-users": "node ui-tests-user.js",
-    "ui-test-taskid": "node ui-test-users-id-tasks-id.js"
+    "ui-test-taskid": "node ui-test-users-id-tasks-id.js",
+    "test-users-load40-cache-on": "node test-users-load40-cache-on.js"
   },
   "author": "Lenny Brown, Sean Gilliland",
   "license": "ISC",
